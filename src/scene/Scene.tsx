@@ -6,7 +6,8 @@ import type { Growth } from "../lib/demo";
 import { Backdrop } from "./Backdrop";
 import { Tree } from "./Tree";
 import { Minimi } from "./Minimi";
-import { PALETTES } from "./palette";
+import { paletteFor, type SceneId } from "./palette";
+import { Sofa, SOFA_SEAT } from "./Sofa";
 import type { AnimalId } from "./animals";
 
 const FOV = 30;
@@ -71,10 +72,11 @@ type Props = {
   bubble: RefObject<HTMLDivElement>;
   pokeAt: number;
   onPoke: () => void;
+  scene: SceneId;
 };
 
-export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke }: Props) {
-  const pal = PALETTES[phase];
+export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, scene }: Props) {
+  const pal = paletteFor(scene, phase);
   const anchor = useMemo(() => new THREE.Vector3(), []);
   return (
     <Canvas
@@ -88,7 +90,8 @@ export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke }: P
       <CameraRig view={view} />
       <Backdrop phase={phase} pal={pal} />
       <Tree pal={pal} growth={growth} />
-      <Minimi animal={animal} phase={phase} pal={pal} anchor={anchor} pokeAt={pokeAt} onPoke={onPoke} />
+      {scene === "sofa" && <Sofa pal={pal} />}
+      <Minimi animal={animal} phase={phase} pal={pal} anchor={anchor} pokeAt={pokeAt} onPoke={onPoke} seat={scene === "sofa" ? SOFA_SEAT : undefined} />
       <BubbleTracker anchor={anchor} el={bubble} />
     </Canvas>
   );

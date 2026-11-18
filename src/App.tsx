@@ -10,6 +10,7 @@ import { GiftBar, type GiftEntry } from "./ui/GiftBar";
 import { Tabs, type Tab } from "./ui/Tabs";
 import { Sheet } from "./ui/Sheet";
 import { DevBar } from "./ui/DevBar";
+import type { SceneId } from "./scene/palette";
 
 const VIEWS = [0, 0.42, -0.42]; // rotate-view button cycles through these yaw angles (≈ ±24°)
 const MAX_YAW = 0.52;
@@ -37,6 +38,8 @@ export default function App() {
   const phase = phaseOverride ?? phaseAt(now);
   const [animal, setAnimal] = useState<AnimalId>(() => animalFromSearch(search) ?? load<AnimalId>("animal", "polar"));
   const growth = useMemo(() => demoGrowth(search), [search]);
+  const [scene, setScene] = useState<SceneId>(() => (params.get("scene") === "dusk" ? "dusk" : load<SceneId>("scene", "sofa")));
+  useEffect(() => save("scene", scene), [scene]);
   const [tab, setTab] = useState<Tab>("home");
   const [gifts, setGifts] = useState<GiftEntry[]>(() => load<GiftEntry[]>("gifts", []));
   const today = localDay(now);
@@ -100,9 +103,9 @@ export default function App() {
   const bubble = useRef<HTMLDivElement>(null);
 
   return (
-    <div className={`app phase-${phase}`}>
+    <div className={`app phase-${phase} scene-${scene}`}>
       <div className="stage" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onPointerLeave={onUp}>
-        <Scene phase={phase} animal={animal} growth={growth} view={view} bubble={bubble} pokeAt={pokeAt} onPoke={onPoke} />
+        <Scene phase={phase} animal={animal} growth={growth} view={view} bubble={bubble} pokeAt={pokeAt} onPoke={onPoke} scene={scene} />
         <div className="bubble-anchor" ref={bubble} aria-live="polite">
           <div className="bubble" key={line}>{line}</div>
         </div>
@@ -115,7 +118,7 @@ export default function App() {
       </div>
       {tab !== "home" && <Sheet tab={tab} gifts={gifts} animalName={ANIMALS[animal].name} onClose={() => setTab("home")} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
-        <DevBar phase={phase} animal={animal} onPhase={setPhaseOverride} onAnimal={setAnimal} />
+        <DevBar phase={phase} animal={animal} scene={scene} onPhase={setPhaseOverride} onAnimal={setAnimal} onScene={setScene} />
       )}
     </div>
   );

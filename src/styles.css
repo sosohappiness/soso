@@ -9,6 +9,9 @@
   color-scheme: light;
 }
 .phase-night { --ink-ground: #e9e4f2; }
+/* sofa meadow: cream sky needs dark text up top, green ground keeps navy (light at night) */
+.scene-sofa { --ink-sky: #2a2622; --ink-ground: #1e2456; }
+.scene-sofa.phase-night { --ink-sky: #f7f2e8; --ink-ground: #f0ece2; }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body, #root { height: 100%; margin: 0; }

@@ -73,32 +73,44 @@ const FUR = 0.03;
 
 export function bodyTex(a: Animal) {
   return painted(`minimi-${a.id}`, BODY_TEX.w, BODY_TEX.h, (p) => {
-    // ears that sit behind the head share its colour, so they read as one mass
-    if (a.ears === "round") {
-      for (const sx of [-1, 1]) p.fill(p.ellipse(...s(sx * 54, 224), 22 * K, 22 * K, 0.04), a.ear, 0.006, FUR * 0.8);
-    } else if (a.ears === "pointy") {
-      for (const sx of [-1, 1]) {
-        p.fill(p.bezier(s(sx * 74, 208), [
-          [s(sx * 84, 244), s(sx * 76, 270), s(sx * 66, 272)],
-          [s(sx * 48, 264), s(sx * 30, 238), s(sx * 26, 220)],
-          [s(sx * 40, 214), s(sx * 60, 210), s(sx * 74, 208)],
-        ], 14), a.ear, 0.006, FUR * 0.7);
-      }
-    }
     p.fill(silhouette(p), a.body, 0.008, FUR);
     if (a.muzzle) p.fill(p.ellipse(...s(0, 136), 36 * K, 25 * K, 0.05), a.muzzle, 0.006, FUR * 0.35);
-    if (a.ears === "floppy") {
-      for (const sx of [-1, 1]) {
-        p.fill(p.bezier(s(sx * 54, 222), [
-          [s(sx * 84, 220), s(sx * 96, 170), s(sx * 90, 118)],
-          [s(sx * 86, 96), s(sx * 62, 92), s(sx * 54, 118)],
-          [s(sx * 48, 150), s(sx * 44, 190), s(sx * 40, 214)],
-          [s(sx * 44, 220), s(sx * 50, 222), s(sx * 54, 222)],
-        ], 14), a.ear, 0.006, FUR * 0.8);
-      }
-    }
     p.strands(900, 0.035);
   }, { grain: 0.06, mottle: 0.05 });
+}
+
+// ---- ears: separate sprites so they can show the mood --------------------------
+
+export type EarArt = { art: ReturnType<typeof painted>; pivot: [number, number]; base: [number, number] };
+
+/** Ear for side sx (-1 left, 1 right). `base` is where it joins the head (sheet coords → world). */
+export function earTex(a: Animal, sx: -1 | 1): EarArt {
+  const upright = a.ears !== "floppy";
+  const oy = upright ? -0.12 : 0.3; // painter y of the pivot inside the ear texture
+  const L = (lx: number, ly: number): Pt => [lx * K, ly * K + oy];
+  const base: [number, number] = a.ears === "floppy" ? at(sx * 50, 222) : at(sx * 50, a.ears === "round" ? 214 : 212);
+  const art = painted(`ear-${a.id}-${sx}`, 0.5, upright ? 0.6 : 0.8, (p) => {
+    if (a.ears === "round") {
+      p.fill(p.ellipse(...L(sx * 4, 12), 22 * K, 22 * K, 0.04), a.ear, 0.006, FUR * 0.8);
+    } else if (a.ears === "pointy") {
+      const q = (x: number, y: number) => L(sx * (x - 50), y - 212);
+      p.fill(p.bezier(q(74, 208), [
+        [q(84, 244), q(76, 270), q(66, 272)],
+        [q(48, 264), q(30, 238), q(26, 220)],
+        [q(40, 214), q(60, 210), q(74, 208)],
+      ], 14), a.ear, 0.006, FUR * 0.7);
+    } else {
+      const q = (x: number, y: number) => L(sx * (x - 50), y - 222);
+      p.fill(p.bezier(q(54, 222), [
+        [q(84, 220), q(96, 170), q(90, 118)],
+        [q(86, 96), q(62, 92), q(54, 118)],
+        [q(48, 150), q(44, 190), q(40, 214)],
+        [q(44, 220), q(50, 222), q(54, 222)],
+      ], 14), a.ear, 0.006, FUR * 0.8);
+    }
+    p.strands(60, 0.03);
+  }, { grain: 0.06, mottle: 0.05 });
+  return { art, pivot: [0, oy], base };
 }
 
 export function pawTex(a: Animal) {

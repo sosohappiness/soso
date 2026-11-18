@@ -6,12 +6,12 @@ import { Sprite } from "./Sprite";
 import { Z } from "./Backdrop";
 import type { Palette } from "./palette";
 import {
-  ANIMALS, BODY_TEX, FACE, at, bodyTex, cupTex, eyeTex, noseTex, pawTex, shadowTex, zTex, type AnimalId,
+  ANIMALS, BODY_TEX, FACE, at, bodyTex, cupTex, earTex, eyeTex, noseTex, pawTex, shadowTex, zTex, type AnimalId,
 } from "./animals";
 
-/** Where Minimi sits: the base of the silhouette, on the ground right of the tree. */
-export const MINIMI_POS = new THREE.Vector3(0.72, 0.12, Z.minimi);
-const CUP_X = 0.72;
+/** Where Minimi sits: on the ground right of the tree, or on the sofa seat. */
+export type Seat = { x: number; y: number; cup: [number, number]; shadow: boolean };
+export const GROUND_SEAT: Seat = { x: 0.72, y: 0.12, cup: [0.8, 0], shadow: true };
 const SCALE = 1.12;
 
 /**
@@ -27,13 +27,15 @@ type Pose = {
   eyeOpen: number;        // 1 open, ~0.35 droopy, 0 closed
   breathe: number; breatheHz: number;
   zzz: number;
+  // ears are a mood device: angle outward (+ = droop), lift, and how lively they are
+  earOut: number; earLift: number; earWiggle: number; earTwitch: number;
 };
 
 const POSES: Record<Phase, Pose> = {
-  morning: { sx: 1, sy: 1, lean: 0, sway: 0.015, hop: 0, stretch: 1, eyeOpen: 1, breathe: 0.012, breatheHz: 0.35, zzz: 0 },
-  day: { sx: 1, sy: 1.02, lean: 0, sway: 0.045, hop: 0.018, stretch: 0, eyeOpen: 1, breathe: 0.012, breatheHz: 0.4, zzz: 0 },
-  evening: { sx: 1.07, sy: 0.88, lean: -0.07, sway: 0.01, hop: 0, stretch: 0, eyeOpen: 0.35, breathe: 0.02, breatheHz: 0.25, zzz: 0.6 },
-  night: { sx: 1.16, sy: 0.74, lean: 0, sway: 0, hop: 0, stretch: 0, eyeOpen: 0, breathe: 0.028, breatheHz: 0.18, zzz: 1 },
+  morning: { sx: 1, sy: 1, lean: 0, sway: 0.015, hop: 0, stretch: 1, eyeOpen: 1, breathe: 0.012, breatheHz: 0.35, zzz: 0, earOut: 0.05, earLift: 0.005, earWiggle: 0.04, earTwitch: 0.5 },
+  day: { sx: 1, sy: 1.02, lean: 0, sway: 0.045, hop: 0.018, stretch: 0, eyeOpen: 1, breathe: 0.012, breatheHz: 0.4, zzz: 0, earOut: -0.06, earLift: 0.015, earWiggle: 0.1, earTwitch: 1 },
+  evening: { sx: 1.07, sy: 0.88, lean: -0.07, sway: 0.01, hop: 0, stretch: 0, eyeOpen: 0.35, breathe: 0.02, breatheHz: 0.25, zzz: 0.6, earOut: 0.5, earLift: -0.025, earWiggle: 0.015, earTwitch: 0.15 },
+  night: { sx: 1.16, sy: 0.74, lean: 0, sway: 0, hop: 0, stretch: 0, eyeOpen: 0, breathe: 0.028, breatheHz: 0.18, zzz: 1, earOut: 0.95, earLift: -0.05, earWiggle: 0, earTwitch: 0 },
 };
 
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
@@ -46,14 +48,19 @@ type Props = {
   anchor: THREE.Vector3;
   pokeAt: number; // timestamp of the last poke; drives a little bounce
   onPoke: () => void;
+  seat?: Seat;
 };
 
-export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke }: Props) {
+export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROUND_SEAT }: Props) {
   const a = ANIMALS[animal];
   const art = useMemo(() => ({
     body: bodyTex(a), paw: pawTex(a), nose: noseTex(a), cup: cupTex(a),
     eye: eyeTex(false), eyeShut: eyeTex(true), z: zTex(), shadow: shadowTex(),
+    ears: [earTex(a, -1), earTex(a, 1)],
   }), [a]);
+  const earRefs = [useRef<THREE.Group>(null), useRef<THREE.Group>(null)];
+  const twitchAt = useRef({ t: 3, side: 0 });
+  const floppy = a.ears === "floppy";
 
   const body = useRef<THREE.Group>(null);
   const head = useRef<THREE.Group>(null);
@@ -86,6 +93,21 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke }: Props) {
       body.current.rotation.z = c.lean + Math.sin(t * 0.9) * c.sway;
       body.current.position.y = hop;
     }
+
+    // ears: droop with tiredness, flick up when poked, twitch now and then when awake
+    if (t > twitchAt.current.t + 0.35) twitchAt.current = { t: t + 1.5 + Math.random() * 4, side: Math.random() < 0.5 ? 0 : 1 };
+    const tw = twitchAt.current;
+    earRefs.forEach((e, i) => {
+      if (!e.current) return;
+      const sx = i === 0 ? -1 : 1;
+      const twitch = t > tw.t && tw.side === i ? Math.sin((t - tw.t) * Math.PI * 6) * 0.25 * c.earTwitch : 0;
+      const wiggle = Math.sin(t * (floppy ? 3.2 : 1.7) + i * 1.3) * c.earWiggle * (floppy ? 2.2 : 1);
+      const out = c.earOut + wiggle + twitch - bounce * 0.5 + stretch * -0.12;
+      // upright ears droop by rotating their tips outward; floppy ears swing their tips outward
+      e.current.rotation.z = floppy ? sx * out * 0.7 : -sx * out;
+      const [bx, by] = art.ears[i].base;
+      e.current.position.set(bx, by + c.earLift + stretch * 0.02 + Math.max(0, bounce) * 0.03, floppy ? 0.012 : -0.01);
+    });
 
     if (t > blinkAt.current + 0.14) blinkAt.current = t + 2 + Math.random() * 3.5;
     const blinking = t > blinkAt.current && c.eyeOpen > 0.3;
@@ -120,10 +142,15 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke }: Props) {
   const paws: [number, number][] = [at(-34, 4), at(34, 4)];
 
   return (
-    <group position={MINIMI_POS} scale={SCALE}>
-      <Sprite art={art.shadow} position={[0.1, 0.0, -0.06]} color="#000" opacity={pal.shadow} order={20} />
-      <Sprite art={art.cup} position={[CUP_X, 0.15 * 1.5, 0.04]} scale={1.5} color={tint} order={30} />
+    <group position={[seat.x, seat.y, Z.minimi]} scale={SCALE}>
+      {seat.shadow && <Sprite art={art.shadow} position={[0.1, 0.0, -0.06]} color="#000" opacity={pal.shadow} order={20} />}
+      <Sprite art={art.cup} position={[seat.cup[0], seat.cup[1] + 0.15 * 1.5, 0.04]} scale={1.5} color={tint} order={30} />
       <group ref={body} onPointerDown={poke}>
+        {art.ears.map((ear, i) => (
+          <group key={i} ref={earRefs[i]}>
+            <Sprite art={ear.art} pivot={ear.pivot} color={tint} order={floppy ? 27 : 21} />
+          </group>
+        ))}
         <Sprite art={art.body} position={[0, -BODY_TEX.baseY, 0]} color={tint} order={22} />
         {[FACE.eyeL, FACE.eyeR].map(([x, y], i) => (
           <group key={i}>
