@@ -1,0 +1,359 @@
+<title>Soso Build Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a painted scene band on top (the app's own world), then a working plan on paper: questions first, then roadmap, mechanics, data, risks. */
+:root {
+  --sky: #B4552F;        /* terracotta sky */
+  --ground: #8EA6CC;     /* blue ground */
+  --navy: #1E2456;       /* moon, trunk, ink-navy */
+  --sun: #F2C230;        /* moon yolk, tree canopy */
+  --snow: #F7F2E8;       /* Minimi white, bubbles */
+  --bg: #EFEAE1;         /* page paper */
+  --surface: #F8F5EF;
+  --fg: #26231F;
+  --muted: #6E675E;
+  --line: #D7CFC2;
+  --accent: #B4552F;
+  --accent-soft: #F1DCCF;
+  --chip-bg: #E3E8F2;
+  --chip-fg: #283466;
+  --ok: #3F7A4E;
+  --warn: #A5631A;
+  --risk: #A23A2B;
+  --font-hand: "Gaegu", "IBM Plex Sans KR", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14183A; --surface: #1C2149; --fg: #EDE7DC; --muted: #A9A6B8; --line: #2F3563;
+    --accent: #E58A61; --accent-soft: #3A2A3A; --chip-bg: #2A3166; --chip-fg: #D6DEF5;
+    --ok: #7FC092; --warn: #E1A75A; --risk: #EE8574; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14183A; --surface: #1C2149; --fg: #EDE7DC; --muted: #A9A6B8; --line: #2F3563;
+  --accent: #E58A61; --accent-soft: #3A2A3A; --chip-bg: #2A3166; --chip-fg: #D6DEF5;
+  --ok: #7FC092; --warn: #E1A75A; --risk: #EE8574; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50; opacity: .22; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .45  0 0 0 0 .4  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.wrap { max-width: 1060px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Scene band */
+.scene { position: relative; background: #B4552F; color: #F7F2E8; overflow: hidden; }
+.scene svg.bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.scene .wrap { position: relative; padding-block: 36px 92px; }
+.eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; opacity: .85; }
+h1 { font-family: var(--font-hand); font-weight: 700; font-size: clamp(44px, 9vw, 76px); line-height: 1; margin: 8px 0 10px; }
+h1 small { font-size: .45em; font-weight: 400; margin-left: .3em; opacity: .9; }
+.lede { max-width: 56ch; font-size: 16px; margin: 0; color: #FBEFE6; }
+.status { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.status span { background: rgba(30,36,86,.82); color: #F7F2E8; border-radius: 999px; padding: 4px 12px; font-size: 13px; }
+
+main .wrap { padding-block: 8px 64px; }
+section { margin-top: 48px; }
+h2 { font-family: var(--font-hand); font-size: 34px; font-weight: 700; line-height: 1.1; margin: 0 0 6px; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0 0 20px; max-width: 70ch; }
+h3 { font-size: 16px; margin: 0 0 6px; font-weight: 600; }
+p { margin: 0 0 10px; }
+code, .mono { font-family: var(--font-mono); font-size: 13px; }
+
+/* Questions */
+.qs { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.q { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.q .num { font-family: var(--font-hand); font-size: 22px; color: var(--accent); line-height: 1; }
+.q h3 { font-size: 16.5px; }
+.opts { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.opts li { border: 1px dashed var(--line); border-radius: 10px; padding: 7px 10px; font-size: 14px; }
+.opts li.rec { border: 1.5px solid var(--accent); background: var(--accent-soft); }
+.opts li b { font-weight: 600; }
+.tag { display: inline-block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-left: 6px; }
+
+/* References */
+.refs { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.ref { border-top: 3px solid var(--fg); padding-top: 10px; min-width: 0; }
+.ref .k { font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.ref p { font-size: 14px; margin: 4px 0 0; }
+.verdict { margin-top: 18px; background: var(--navy); color: #F7F2E8; border-radius: 14px; padding: 18px 20px; }
+.verdict h3 { font-family: var(--font-hand); font-size: 24px; font-weight: 700; color: #F2C230; }
+.verdict ul { margin: 6px 0 0; padding-left: 18px; }
+.verdict li { margin-bottom: 4px; }
+
+/* Roadmap */
+.weeks { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.week { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.week .wk { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.week .wk span:first-child { font-family: var(--font-hand); font-size: 26px; font-weight: 700; }
+.pill { font-size: 12px; border-radius: 999px; padding: 2px 10px; background: var(--chip-bg); color: var(--chip-fg); white-space: nowrap; }
+.pill.next { background: var(--accent); color: #FFF7F0; }
+.week ul { margin: 0; padding-left: 18px; font-size: 14px; }
+.week li { margin-bottom: 3px; }
+.done { margin-top: auto; font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
+.done b { color: var(--fg); font-weight: 600; }
+
+/* Flow */
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.node { flex: 1 1 150px; min-width: 0; background: var(--surface); border: 1.5px solid var(--fg); border-radius: 12px; padding: 12px; font-size: 14px; }
+.node .who { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.node b { display: block; font-weight: 600; margin: 2px 0 4px; }
+.node.server { border-style: dashed; }
+.arrow { align-self: center; font-family: var(--font-hand); font-size: 26px; color: var(--accent); flex: 0 0 auto; }
+@media (max-width: 640px) { .flow { flex-direction: column; } .arrow { transform: rotate(90deg); align-self: center; } }
+
+pre { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.55; margin: 14px 0 0; }
+
+/* Tables */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+td.ko { font-family: var(--font-hand); font-size: 18px; line-height: 1.3; }
+.tnum { font-variant-numeric: tabular-nums; }
+
+.two { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.two > * { min-width: 0; }
+
+/* Risks */
+.risks { display: grid; gap: 10px; }
+.risk { display: grid; grid-template-columns: 84px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.sev { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.sev.high { color: var(--risk); } .sev.med { color: var(--warn); } .sev.low { color: var(--ok); }
+.risk p { margin: 0; font-size: 14px; }
+.risk h3 { font-size: 15px; margin-bottom: 2px; }
+@media (max-width: 480px) { .risk { grid-template-columns: 1fr; gap: 4px; } }
+
+footer { color: var(--muted); font-size: 13px; margin-top: 48px; border-top: 1px solid var(--line); padding-top: 14px; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<header class="scene">
+  <svg class="bg" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <circle cx="1040" cy="96" r="56" fill="#1E2456"/>
+    <path d="M984 96 a56 56 0 0 0 112 0 z" fill="#1E2456"/>
+    <circle cx="1040" cy="118" r="24" fill="#F2C230"/>
+    <rect x="980" y="40" width="120" height="56" fill="#B4552F"/>
+    <circle cx="1040" cy="96" r="56" fill="#1E2456" clip-path="inset(0 0 50% 0)"/>
+    <path d="M0 262 C 200 246, 420 254, 640 248 S 1000 240, 1200 252 L1200 320 L0 320 Z" fill="#8EA6CC"/>
+    <path d="M0 292 C 260 282, 520 290, 800 284 S 1100 280, 1200 286 L1200 320 L0 320 Z" fill="#7F98C1"/>
+    <ellipse cx="900" cy="262" rx="58" ry="20" fill="#F7F2E8"/>
+    <circle cx="852" cy="258" r="17" fill="#F7F2E8"/>
+    <circle cx="848" cy="245" r="6" fill="#F7F2E8"/>
+    <path d="M840 258 q4 3 8 0" stroke="#26231F" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="836" cy="264" r="3.2" fill="#26231F"/>
+  </svg>
+  <div class="wrap">
+    <div class="eyebrow">Build plan · v0.1 · 18 Nov 2026</div>
+    <h1>소소 <small>Soso</small></h1>
+    <p class="lede">A tiny painted world where you give a tired little animal one thing you love each day and write three things you're grateful for. This page holds the 4-week plan, how the gift system works, and the decisions behind it.</p>
+    <div class="status">
+      <span>Phase: building week 1</span>
+      <span>Decisions locked</span>
+      <span>4 weeks to friends test</span>
+      <span>Target: mobile web (PWA)</span>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+<section id="questions">
+  <h2>Decisions</h2>
+  <p class="sub">Locked on 18 Nov 2026. Week 1 is in progress.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>#</th><th>Question</th><th>Decision</th><th>What it means for the build</th></tr></thead>
+      <tbody>
+        <tr><td class="tnum">1</td><td>3D style</td><td><b>Paper diorama</b></td><td>Every element is a flat painted cutout on its own depth layer. The rotate button turns the camera up to about ±30° to show the layers.</td></tr>
+        <tr><td class="tnum">2</td><td>Drawing style</td><td><b>Flat shapes, no outlines (like the mockup)</b></td><td>Shapes are painted at runtime onto canvas textures with fuzzy edges and grain. There are no image files to draw.</td></tr>
+        <tr><td class="tnum">3</td><td>Animals</td><td><b>Polar bear, red panda, dog</b></td><td>All three share one lying-down body. The head, ears, tail, muzzle, and colors swap.</td></tr>
+        <tr><td class="tnum">4</td><td>Missed gratitude days</td><td><b>Yesterday only</b></td><td>The journal shows today, plus yesterday if it's empty.</td></tr>
+        <tr><td class="tnum">5</td><td>Sign-in</td><td><b>Email</b></td><td>Supabase email sign-up with a 6-digit code instead of a magic link. On iPhone, magic links open in Safari, not the home-screen app.</td></tr>
+        <tr><td class="tnum">6</td><td>Gift reader</td><td><b>Free for now</b></td><td>A built-in Korean keyword reader plus a bank of reaction lines, with no AI call and no cost. It returns the same JSON shape, so Claude can be added later without app changes.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="references">
+  <h2>What I took from your references</h2>
+  <p class="sub">Your mockup is the target for layout and color. The other four images set the drawing style for characters and props.</p>
+  <div class="refs">
+    <div class="ref"><div class="k">Your Home mockup</div><p>Evening state, 7:42, "흠냐.. 졸려..". Big empty sky, tree on the left, Minimi lying on the right, a quiet input bar, and three tabs: 홈 · 감사일기 · 선물기록. I'll build the layout from this exactly.</p></div>
+    <div class="ref"><div class="k">Red panda + newspaper</div><p>Its warm orange and cream palette works for a second animal. The coffee cup is a good model for the latte prop: simple shape, one strong color.</p></div>
+    <div class="ref"><div class="k">Bear, honey jar, owl</div><p>Risograph grain and soft, broken edges on the clouds. The owl suggests a second helper character, like a night courier.</p></div>
+    <div class="ref"><div class="k">Lying brown bear</div><p>Paper texture and a two-color world. Its pose (on its back, paws up) is a good "happy after gift" pose.</p></div>
+    <div class="ref"><div class="k">Hamster</div><p>A round body, fuzzy edge, cheek circles, and a flat shadow. This is the clearest guide for the shared body shape.</p></div>
+  </div>
+  <div class="verdict">
+    <h3>Visual rules I'll follow</h3>
+    <ul>
+      <li>No outlines. Shapes are flat fills with slightly fuzzy, wobbly edges, plus one flat shadow under each character.</li>
+      <li>Paper grain over the whole screen, and a second, coarser grain inside large fills, like the sky in your mockup.</li>
+      <li>Faces use dot eyes, a small nose, and optional cheek circles. No mouths except while eating or drinking.</li>
+      <li>Animals: polar bear, red panda, and dog on one shared body.</li>
+      <li>Every scene uses at most 5 colors: sky, ground, navy, yellow, and the character's white or orange.</li>
+      <li>All UI text is Korean, in Gaegu.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="roadmap">
+  <h2>Roadmap</h2>
+  <p class="sub">Each week ends with something you can open on your phone. I'll build week 1 as soon as you answer questions 1–3.</p>
+  <div class="weeks">
+    <article class="week">
+      <div class="wk"><span>Week 1</span><span class="pill next">Next up</span></div>
+      <h3>The scene comes alive</h3>
+      <ul>
+        <li>Vite + React + react-three-fiber project, installable as a PWA</li>
+        <li>Painted material: flat color, fuzzy edge mask, and a grain shader</li>
+        <li>Sky, moon, ground, and the tree, with leaf and blossom slots</li>
+        <li>Minimi as a shared body with swappable head, ears, and tail</li>
+        <li>4 time-of-day poses and lines, plus the speech bubble</li>
+        <li>Home UI from your mockup: clock, counters, input, tabs</li>
+        <li>Rotate-view button, plus a <code>?time=</code> override for testing</li>
+      </ul>
+      <div class="done"><b>Done when:</b> opening the app at 8am, 2pm, 7pm, and midnight shows 4 different Minimis, at 60fps on a mid-range phone.</div>
+    </article>
+    <article class="week">
+      <div class="wk"><span>Week 2</span><span class="pill">Gift flow</span></div>
+      <h3>Text → Claude → animation</h3>
+      <ul>
+        <li>Free gift reader: Korean keyword dictionary → item, category, and reaction</li>
+        <li>Reaction line bank with 4–6 variations per category, with correct 을/를 particles</li>
+        <li>Template player: helper walks in, hands over the gift, Minimi uses it, reacts, and the caption appears</li>
+        <li>Template 1: matcha latte, with the polar bear in an apron</li>
+        <li>Fallback: a gift box with a name tag, so every input animates</li>
+        <li>One gift per day, enforced in the database</li>
+      </ul>
+      <div class="done"><b>Done when:</b> 30 test inputs, including nonsense, emoji, and English, all play an animation without errors.</div>
+    </article>
+    <article class="week">
+      <div class="wk"><span>Week 3</span><span class="pill">Journal + data</span></div>
+      <h3>Gratitude, growth, memory</h3>
+      <ul>
+        <li>Email sign-up with a 6-digit code, tables, and row-level security</li>
+        <li>감사일기 screen: 3 lines a day, plus backfill per question 4</li>
+        <li>Tree growth computed from your logs (rules below)</li>
+        <li>선물기록 collection grid, with a "most loved" view later</li>
+        <li>"보고 싶었어" greeting after 2+ days away</li>
+      </ul>
+      <div class="done"><b>Done when:</b> data survives closing the app, and two devices never see each other's entries.</div>
+    </article>
+    <article class="week">
+      <div class="wk"><span>Week 4</span><span class="pill">Friends test</span></div>
+      <h3>Animals, nudges, sharing</h3>
+      <ul>
+        <li>Choose-your-animal screen: polar bear, red panda, dog</li>
+        <li>Web Push: a morning hello and an evening "졸려…" nudge</li>
+        <li>Profile: rename Minimi, notification times</li>
+        <li>Share link with a preview image, and an "add to home screen" guide</li>
+        <li>Polish pass and a test with 5–10 friends</li>
+      </ul>
+      <div class="done"><b>Done when:</b> a friend can open your link, pick an animal, give a gift, and get the next morning's notification.</div>
+    </article>
+  </div>
+</section>
+
+<section id="gift">
+  <h2>How a gift works</h2>
+  <p class="sub">The reader only picks from a fixed menu of animation parts and one line, so any input becomes something playable. Today the reader is a free keyword matcher. Swapping in Claude later changes nothing in the app.</p>
+  <div class="flow">
+    <div class="node"><div class="who">App</div><b>You type</b>"말차라떼를 주고 싶어"</div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="node server"><div class="who">Supabase function</div><b>Check + limit</b>Signed in? Already gave a gift today? Under 60 characters?</div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="node server"><div class="who">Gift reader</div><b>Read the gift</b>Free keyword reader now, Claude later. Same JSON either way.</div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="node server"><div class="who">Database</div><b>Save</b>Original text, the parsed JSON, and the reaction line</div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="node"><div class="who">App</div><b>Play template</b>Matched template, or the gift-box fallback</div>
+  </div>
+<pre>{
+  "category": "drink",          // drink | food | sweet | flower | object | place | activity | person | unknown
+  "item":     "matcha_latte",   // a known prop id, or "generic" → gift box with name tag
+  "label":    "말차라떼",        // text for the name tag and the collection card
+  "helper":   "polar_apron",    // polar_apron | owl_courier | none
+  "reaction": "cozy",           // happy | cozy | delighted | surprised | sleepy_happy
+  "line":     "따뜻하다… 몸이 사르르 녹아.",   // Minimi's line, ≤ 30 characters
+  "caption":  "오늘의 선물: 따뜻한 말차라떼"   // ≤ 24 characters
+}</pre>
+</section>
+
+<section id="rules">
+  <h2>Moods and growth</h2>
+  <div class="two">
+    <div>
+      <h3>Time of day (user's local time)</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>When</th><th>Pose</th><th>Line</th></tr></thead>
+          <tbody>
+            <tr><td class="tnum">05–11</td><td>Stretching</td><td class="ko">좋은 아침! 오늘은 무슨 일이 있을까?</td></tr>
+            <tr><td class="tnum">11–17</td><td>Sitting up, head tilt</td><td class="ko">뭐 하고 있었어? 궁금해!</td></tr>
+            <tr><td class="tnum">17–22</td><td>Slumped, eyes half closed</td><td class="ko">흠냐.. 졸려..</td></tr>
+            <tr><td class="tnum">22–05</td><td>Asleep, z z z</td><td class="ko">쿨쿨…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sub" style="margin-top:8px">Each phase has 4–6 line variations so it doesn't repeat. After a gift, Claude's line replaces the default for the rest of the day.</p>
+    </div>
+    <div>
+      <h3>Tree growth (computed from your logs, never stored)</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>You do</th><th>The tree gets</th></tr></thead>
+          <tbody>
+            <tr><td>Write 1 gratitude line</td><td>1 leaf (잎)</td></tr>
+            <tr><td>Log gratitude on 7 days (any 7, gaps are fine)</td><td>1 flower (꽃)</td></tr>
+            <tr><td>Reach 30, 100, 365 days</td><td>The canopy grows to the next size</td></tr>
+            <tr><td>Miss days</td><td>Nothing is lost. Minimi says 보고 싶었어.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sub" style="margin-top:8px">Your mockup shows 잎 24 · 꽃 3. With these rules, 24 leaves means 8 days logged, which gives 1 flower. Tell me if you'd rather have flowers bloom faster.</p>
+    </div>
+  </div>
+</section>
+
+<section id="data">
+  <h2>Data</h2>
+  <p class="sub">Three tables in Supabase Postgres. Row-level security means each row is readable only by its owner.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Table</th><th>Columns</th><th>Rule</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">profile</td><td class="mono">id, animal, minimi_name, timezone, notify_morning, notify_evening, created_at</td><td>One row per user</td></tr>
+        <tr><td class="mono">gifts</td><td class="mono">id, user_id, local_date, text, parsed jsonb, line, created_at</td><td>Unique on (user_id, local_date): one gift a day</td></tr>
+        <tr><td class="mono">gratitude</td><td class="mono">id, user_id, local_date, items text[3], created_at</td><td>Unique on (user_id, local_date). Backfill per question 4.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub" style="margin-top:8px"><code>local_date</code> is computed on the server from the profile's time zone, so changing the phone's clock can't unlock a second gift.</p>
+</section>
+
+<section id="risks">
+  <h2>Risks</h2>
+  <div class="risks">
+    <div class="risk"><div class="sev high">High</div><div><h3>The 3D look not matching the references</h3><p>This is the biggest risk to the app's feel. I'll handle it with the diorama approach and by spending week 1 on the look before adding features.</p></div></div>
+    <div class="risk"><div class="sev med">Medium</div><div><h3>Notifications on iPhone</h3><p>Web Push only works on iOS 16.4+ and only after the app is added to the home screen. Week 4 includes a short guide for this. Native app-store wrappers would remove the limit later.</p></div></div>
+    <div class="risk"><div class="sev med">Medium</div><div><h3>The keyword reader missing things</h3><p>Anything it doesn’t recognize becomes a gift box with the typed name on its tag, which still feels personal. I’ll log unmatched words so the dictionary grows from real gifts.</p></div></div>
+    <div class="risk"><div class="sev low">Low</div><div><h3>Running cost</h3><p>Zero for now: the keyword reader is free, and Supabase and static hosting have free tiers. Unknown words fall back to the gift box. Adding Claude later costs about $0.00014 per gift with Haiku.</p></div></div>
+    <div class="risk"><div class="sev low">Low</div><div><h3>Gaegu at small sizes</h3><p>Gaegu gets hard to read below about 14px. Small labels will use Gaegu Bold, or a plain font for timestamps.</p></div></div>
+  </div>
+</section>
+
+<footer>Still open after this round: the final name (소소 for now) and social features like visiting a friend's tree. Both are parked until after the friends test.</footer>
+</div>
+</main>
