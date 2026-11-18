@@ -50,7 +50,7 @@ function BubbleTracker({ anchor, el }: { anchor: THREE.Vector3; el: RefObject<HT
   const v = useMemo(() => new THREE.Vector3(), []);
   useFrame(() => {
     if (!el.current) return;
-    v.copy(anchor).add({ x: 0.15, y: 0.5, z: 0 } as THREE.Vector3).project(camera);
+    v.copy(anchor).add({ x: 0.1, y: 0.18, z: 0 } as THREE.Vector3).project(camera);
     const x = (v.x * 0.5 + 0.5) * size.width;
     const y = (-v.y * 0.5 + 0.5) * size.height;
     // keep the whole bubble on screen; the tail still points at Minimi

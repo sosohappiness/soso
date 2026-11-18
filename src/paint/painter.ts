@@ -23,7 +23,7 @@ export class Painter {
   readonly canvas: HTMLCanvasElement;
   readonly ctx: CanvasRenderingContext2D;
   readonly rand: Rand;
-  private edges: { pts: Pt[]; color: string; amt: number }[] = [];
+  private edges: { pts: Pt[]; color: string; amt: number; fur: number }[] = [];
 
   constructor(readonly w: number, readonly h: number, seed = 1, readonly ppu = PPU) {
     this.canvas = document.createElement("canvas");
@@ -76,7 +76,7 @@ export class Painter {
   }
 
   /** Fill a shape. Its edge gets fuzzed in finish(), after every fill is down. */
-  fill(pts: Pt[], color: string, fuzz = 0.012): Pt[] {
+  fill(pts: Pt[], color: string, fuzz = 0.012, fur = 0): Pt[] {
     const { ctx } = this;
     ctx.fillStyle = color;
     ctx.beginPath();
@@ -84,7 +84,7 @@ export class Painter {
     for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
     ctx.closePath();
     ctx.fill();
-    if (fuzz > 0) this.edges.push({ pts, color, amt: fuzz });
+    if (fuzz > 0 || fur > 0) this.edges.push({ pts, color, amt: fuzz, fur });
     return pts;
   }
 
@@ -92,8 +92,46 @@ export class Painter {
     return this.fill(this.ellipse(cx, cy, rx, ry, opts.wob ?? 0.025, opts.rot ?? 0), color, opts.fuzz ?? 0.012);
   }
 
-  poly(points: Pt[], color: string, opts: { wob?: number; fuzz?: number } = {}) {
-    return this.fill(this.wobbly(points, true, opts.wob ?? 0.008), color, opts.fuzz ?? 0.012);
+  poly(points: Pt[], color: string, opts: { wob?: number; fuzz?: number; fur?: number } = {}) {
+    return this.fill(this.wobbly(points, true, opts.wob ?? 0.008), color, opts.fuzz ?? 0.012, opts.fur ?? 0);
+  }
+
+  /** Sample a closed path of cubic béziers: start point, then [c1, c2, end] per segment. */
+  bezier(start: Pt, segs: [Pt, Pt, Pt][], steps = 20): Pt[] {
+    const pts: Pt[] = [];
+    let p0 = start;
+    for (const [c1, c2, p3] of segs) {
+      for (let i = 0; i < steps; i++) {
+        const t = i / steps, u = 1 - t;
+        pts.push([
+          u * u * u * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p3[0],
+          u * u * u * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p3[1],
+        ]);
+      }
+      p0 = p3;
+    }
+    return pts;
+  }
+
+  /** Faint hair strokes inside everything painted so far (fur texture, never outside the shapes). */
+  strands(count: number, len: number, color = "rgba(0,0,0,0.06)") {
+    const { ctx, rand: r, canvas, ppu } = this;
+    const W = canvas.width / ppu, H = canvas.height / ppu;
+    ctx.save();
+    ctx.globalCompositeOperation = "source-atop";
+    ctx.strokeStyle = color;
+    ctx.lineCap = "round";
+    for (let i = 0; i < count; i++) {
+      const x = (r() - 0.5) * W, y = (r() - 0.5) * H;
+      const a = Math.PI / 2 + (r() - 0.5) * 1.6;
+      const l = len * (0.5 + r());
+      ctx.lineWidth = (0.6 + r()) / ppu;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + Math.cos(a) * l * 0.5 + (r() - 0.5) * l * 0.4, y - Math.sin(a) * l * 0.5, x + Math.cos(a) * l, y - Math.sin(a) * l);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   /** A soft, slightly uneven brush stroke (for eyes, z's, petals' veins). */
@@ -113,7 +151,7 @@ export class Painter {
   private fuzzEdges() {
     const { ctx, rand: r, ppu } = this;
     const px = 1 / ppu;
-    for (const { pts, color, amt } of this.edges) {
+    for (const { pts, color, amt, fur } of this.edges) {
       // signed area tells us which side is "outside"
       let area = 0;
       for (let i = 0; i < pts.length; i++) {
@@ -136,6 +174,25 @@ export class Painter {
           ctx.beginPath();
           ctx.arc(x0 + (x1 - x0) * t + nx * out, y0 + (y1 - y0) * t + ny * out, rad, 0, Math.PI * 2);
           ctx.fill();
+        }
+        // frizzy fur: short curved hairs sticking out of the edge
+        if (fur > 0) {
+          ctx.strokeStyle = color;
+          ctx.lineCap = "round";
+          const hairs = Math.ceil((len / px) * 0.55);
+          for (let j = 0; j < hairs; j++) {
+            const t = r();
+            const sx = x0 + (x1 - x0) * t - nx * fur * 0.35, sy = y0 + (y1 - y0) * t - ny * fur * 0.35;
+            const ang = Math.atan2(ny, nx) + (r() - 0.5) * 1.3;
+            const l = fur * (0.45 + r() * 0.9);
+            const bend = (r() - 0.5) * l * 0.8;
+            ctx.globalAlpha = 0.45 + r() * 0.55;
+            ctx.lineWidth = (0.7 + r() * 1.1) * px;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+            ctx.quadraticCurveTo(sx + Math.cos(ang) * l * 0.5 - Math.sin(ang) * bend, sy + Math.sin(ang) * l * 0.5 + Math.cos(ang) * bend, sx + Math.cos(ang) * l, sy + Math.sin(ang) * l);
+            ctx.stroke();
+          }
         }
       }
     }

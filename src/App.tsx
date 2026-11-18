@@ -114,7 +114,7 @@ export default function App() {
         <Tabs tab={tab} onTab={setTab} />
       </div>
       {tab !== "home" && <Sheet tab={tab} gifts={gifts} animalName={ANIMALS[animal].name} onClose={() => setTab("home")} />}
-      {params.has("dev") && (
+      {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
         <DevBar phase={phase} animal={animal} onPhase={setPhaseOverride} onAnimal={setAnimal} />
       )}
     </div>
