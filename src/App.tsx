@@ -111,7 +111,7 @@ export default function App() {
         </div>
       </div>
       <div className="grain" aria-hidden="true" />
-      <Hud time={clockText(now)} label={PHASE_LABEL[phase]} leaves={growth.leaves} flowers={growth.flowers} onRotate={rotate} />
+      <Hud time={clockText(now)} label={PHASE_LABEL[phase]} flowers={growth.flowers} days={growth.days} onRotate={rotate} />
       <div className="bottom">
         <GiftBar given={todaysGift} onGive={onGift} />
         <Tabs tab={tab} onTab={setTab} />

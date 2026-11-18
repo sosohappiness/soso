@@ -2,10 +2,11 @@
  * Flower-cloud growth is computed from logs, never stored (see plan).
  * Week 1 has no journal yet, so ?days=N fakes N logged days (3 lines each).
  */
-export type Growth = { leaves: number; flowers: number; days: number };
+/** flowers: one small flower per gratitude line. bigFlowers: one per 7 logged days (any 7, gaps are fine). */
+export type Growth = { days: number; flowers: number; bigFlowers: number };
 
 export function growthFromDays(days: number): Growth {
-  return { days, leaves: days * 3, flowers: Math.floor(days / 7) };
+  return { days, flowers: days * 3, bigFlowers: Math.floor(days / 7) };
 }
 
 export function demoGrowth(search: string): Growth {

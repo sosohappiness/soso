@@ -1,6 +1,6 @@
-type Props = { time: string; label: string; leaves: number; flowers: number; onRotate: () => void };
+type Props = { time: string; label: string; flowers: number; days: number; onRotate: () => void };
 
-export function Hud({ time, label, leaves, flowers, onRotate }: Props) {
+export function Hud({ time, label, flowers, days, onRotate }: Props) {
   return (
     <header className="hud">
       <div className="clock">
@@ -9,8 +9,8 @@ export function Hud({ time, label, leaves, flowers, onRotate }: Props) {
       </div>
       <div className="side">
         <div className="counts">
-          <div>잎 <b>{leaves}</b></div>
           <div>꽃 <b>{flowers}</b></div>
+          <div>함께한 날 <b>{days}</b></div>
         </div>
         <button className="rotate" onClick={onRotate} aria-label="시점 돌리기">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">

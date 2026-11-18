@@ -40,39 +40,55 @@ function cushion(x0: number, y0: number, x1: number, y1: number, r: number, bulg
 }
 
 function sofaArt() {
-  return painted("sofa", W, H, (p: Painter) => {
-    const opt = { wob: 0.006, fuzz: 0.008 };
-    // back cushions
-    p.poly(cushion(-1.0, SEAT_TOP - 0.1, 0.02, 0.62, 0.12, 0.05), RED, opt);
-    p.poly(cushion(-0.06, SEAT_TOP - 0.1, 1.0, 0.6, 0.12, 0.05), RED, opt);
-    // seat and base
-    p.poly(cushion(-1.1, BASE, 1.12, SEAT_TOP, 0.1, 0.035), RED, opt);
-    // arms
-    p.poly(cushion(-1.22, BASE, -0.86, 0.22, 0.12, 0.04), RED, opt);
-    p.poly(cushion(0.86, BASE, 1.22, 0.24, 0.12, 0.04), RED, opt);
-    // pencil-like stripes running down the fabric, kept inside the sofa
+  return painted("sofa-puffy2", W, H, (p: Painter) => {
+    const opt = { wob: 0.01, fuzz: 0.01 };
+    // two overstuffed back pillows that bulge over each other
+    p.poly(cushion(-1.0, SEAT_TOP - 0.12, 0.08, 0.6, 0.24, 0.1), RED, opt);
+    p.poly(cushion(-0.1, SEAT_TOP - 0.12, 1.0, 0.58, 0.24, 0.1), RED, opt);
+    // a thick, rounded seat cushion
+    p.poly(cushion(-1.06, SEAT_TOP - 0.26, 1.08, SEAT_TOP + 0.03, 0.14, 0.06), RED, opt);
+    // base
+    p.poly(cushion(-1.12, BASE, 1.14, SEAT_TOP - 0.18, 0.12, 0.02), RED, opt);
+    // plump rolled arms
+    p.poly(cushion(-1.26, BASE, -0.84, 0.18, 0.2, 0.08), RED, opt);
+    p.poly(cushion(0.84, BASE, 1.26, 0.2, 0.2, 0.08), RED, opt);
+    p.blob(-1.05, 0.15, 0.22, 0.12, RED, { wob: 0.03, fuzz: 0.01 });
+    p.blob(1.05, 0.17, 0.22, 0.12, RED, { wob: 0.03, fuzz: 0.01 });
+
+    // soft light on the tops of every cushion, soft shade where they tuck in
+    // wide soft light along each cushion top, soft shade where cushions tuck in
+    const lights: [number, number, number, number][] = [
+      [-0.46, 0.44, 0.62, 0.32], [0.46, 0.42, 0.62, 0.32], [-0.5, SEAT_TOP - 0.03, 0.62, 0.22], [0.5, SEAT_TOP - 0.03, 0.62, 0.22],
+      [-1.05, 0.2, 0.26, 0.6], [1.05, 0.22, 0.26, 0.6],
+    ];
+    for (const [x, y, r, sq] of lights) p.glow(x, y, r, LIGHT, 0.55, sq);
+    const shades: [number, number, number, number][] = [
+      [0.0, 0.1, 0.3, 1.4], [0, SEAT_TOP - 0.36, 1.1, 0.16], [0, SEAT_TOP + 0.04, 0.9, 0.08],
+    ];
+    for (const [x, y, r, sq] of shades) p.glow(x, y, r, DEEP, 0.5, sq);
+
+    // a few soft fabric lines, much quieter than before
     const { ctx, rand: r } = p;
     ctx.save();
     ctx.globalCompositeOperation = "source-atop";
     ctx.lineCap = "round";
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < 45; i++) {
       const x = -1.2 + r() * 2.4;
       ctx.strokeStyle = r() < 0.6 ? LIGHT : DEEP;
-      ctx.globalAlpha = 0.35 + r() * 0.35;
-      ctx.lineWidth = (0.8 + r() * 1.2) / p.ppu;
+      ctx.globalAlpha = 0.18 + r() * 0.18;
+      ctx.lineWidth = (0.8 + r()) / p.ppu;
       ctx.beginPath();
-      const y0 = BASE + r() * 0.3, y1 = 0.62 - r() * 0.3;
+      const y0 = BASE + r() * 0.3, y1 = 0.6 - r() * 0.3;
       ctx.moveTo(x, y0);
-      ctx.bezierCurveTo(x + (r() - 0.5) * 0.04, y0 + 0.3, x + (r() - 0.5) * 0.04, y1 - 0.3, x + (r() - 0.5) * 0.03, y1);
+      ctx.bezierCurveTo(x + (r() - 0.5) * 0.05, y0 + 0.3, x + (r() - 0.5) * 0.05, y1 - 0.3, x + (r() - 0.5) * 0.04, y1);
       ctx.stroke();
     }
     ctx.restore();
     ctx.globalAlpha = 1;
-    // seams between cushions, drawn as soft dark brush lines
-    p.stroke([[-0.04, SEAT_TOP + 0.02], [-0.03, 0.3], [-0.02, 0.56]], DEEP, 0.012);
-    p.stroke([[-1.06, SEAT_TOP], [-0.4, SEAT_TOP + 0.015], [0.4, SEAT_TOP + 0.01], [1.08, SEAT_TOP]], DEEP, 0.012);
-    p.stroke([[-1.0, BASE + 0.26], [0, BASE + 0.25], [1.0, BASE + 0.26]], DEEP, 0.009);
-  }, { grain: 0.06, mottle: 0.06 });
+    // where the pillows press into each other and the seat
+    p.stroke([[0.02, SEAT_TOP + 0.08], [0.0, 0.25], [0.03, 0.5]], DEEP, 0.01);
+    p.stroke([[-0.98, SEAT_TOP - 0.2], [-0.3, SEAT_TOP - 0.22], [0.3, SEAT_TOP - 0.22], [1.0, SEAT_TOP - 0.2]], DEEP, 0.008);
+  }, { grain: 0.05, mottle: 0.05 });
 }
 
 function sofaShadow() {

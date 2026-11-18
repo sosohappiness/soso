@@ -113,6 +113,23 @@ export class Painter {
     return pts;
   }
 
+  /** Soft radial light (or shade) painted only on top of what is already there. */
+  glow(x: number, y: number, r: number, color: string, alpha: number, squash = 1) {
+    const { ctx } = this;
+    ctx.save();
+    ctx.globalCompositeOperation = "source-atop";
+    ctx.globalAlpha = alpha;
+    ctx.translate(x, y);
+    ctx.scale(1, squash); // squash < 1 makes a wide, soft ellipse
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+    g.addColorStop(0, color);
+    g.addColorStop(0.45, color.length === 7 ? color + "99" : color);
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(-r, -r, r * 2, r * 2);
+    ctx.restore();
+  }
+
   /** Faint hair strokes inside everything painted so far (fur texture, never outside the shapes). */
   strands(count: number, len: number, color = "rgba(0,0,0,0.06)") {
     const { ctx, rand: r, canvas, ppu } = this;
