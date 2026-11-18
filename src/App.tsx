@@ -11,6 +11,7 @@ import { Tabs, type Tab } from "./ui/Tabs";
 import { Sheet } from "./ui/Sheet";
 import { DevBar } from "./ui/DevBar";
 import type { SceneId } from "./scene/palette";
+import { FONTS, useFontStack, type FontId } from "./lib/fonts";
 
 const VIEWS = [0, 0.42, -0.42]; // rotate-view button cycles through these yaw angles (≈ ±24°)
 const MAX_YAW = 0.52;
@@ -40,6 +41,12 @@ export default function App() {
   const growth = useMemo(() => demoGrowth(search), [search]);
   const [scene, setScene] = useState<SceneId>(() => (params.get("scene") === "dusk" ? "dusk" : load<SceneId>("scene", "sofa")));
   useEffect(() => save("scene", scene), [scene]);
+  const [font, setFont] = useState<FontId>(() => {
+    const f = load<FontId>("font", "noto");
+    return f in FONTS ? f : "noto";
+  });
+  useEffect(() => save("font", font), [font]);
+  const fontStack = useFontStack(font);
   const [tab, setTab] = useState<Tab>("home");
   const [gifts, setGifts] = useState<GiftEntry[]>(() => load<GiftEntry[]>("gifts", []));
   const today = localDay(now);
@@ -103,7 +110,7 @@ export default function App() {
   const bubble = useRef<HTMLDivElement>(null);
 
   return (
-    <div className={`app phase-${phase} scene-${scene}`}>
+    <div className={`app phase-${phase} scene-${scene}`} style={{ "--hand": fontStack } as React.CSSProperties}>
       <div className="stage" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onPointerLeave={onUp}>
         <Scene phase={phase} animal={animal} growth={growth} view={view} bubble={bubble} pokeAt={pokeAt} onPoke={onPoke} scene={scene} />
         <div className="bubble-anchor" ref={bubble} aria-live="polite">
@@ -118,7 +125,7 @@ export default function App() {
       </div>
       {tab !== "home" && <Sheet tab={tab} gifts={gifts} animalName={ANIMALS[animal].name} onClose={() => setTab("home")} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
-        <DevBar phase={phase} animal={animal} scene={scene} onPhase={setPhaseOverride} onAnimal={setAnimal} onScene={setScene} />
+        <DevBar phase={phase} animal={animal} scene={scene} font={font} onPhase={setPhaseOverride} onAnimal={setAnimal} onScene={setScene} onFont={setFont} />
       )}
     </div>
   );

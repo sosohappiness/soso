@@ -27,7 +27,7 @@ body {
 button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 2.5px solid var(--yellow); outline-offset: 3px; }
 
-.app { position: fixed; inset: 0; overflow: hidden; }
+.app { position: fixed; inset: 0; overflow: hidden; font-family: var(--hand); }
 .stage { position: absolute; inset: 0; touch-action: none; }
 
 /* paper grain over everything, like the mockup's speckled sky */

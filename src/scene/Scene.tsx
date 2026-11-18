@@ -8,6 +8,7 @@ import { CloudFlower } from "./CloudFlower";
 import { Minimi } from "./Minimi";
 import { paletteFor, type SceneId } from "./palette";
 import { Sofa, SOFA_SEAT } from "./Sofa";
+import { MeadowLife } from "./MeadowLife";
 import type { AnimalId } from "./animals";
 
 const FOV = 30;
@@ -91,6 +92,7 @@ export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, sce
       <Backdrop phase={phase} pal={pal} />
       <CloudFlower pal={pal} growth={growth} night={phase === "night"} />
       {scene === "sofa" && <Sofa pal={pal} />}
+      {scene === "sofa" && <MeadowLife pal={pal} />}
       <Minimi animal={animal} phase={phase} pal={pal} anchor={anchor} pokeAt={pokeAt} onPoke={onPoke} seat={scene === "sofa" ? SOFA_SEAT : undefined} />
       <BubbleTracker anchor={anchor} el={bubble} />
     </Canvas>
