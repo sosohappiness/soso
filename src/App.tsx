@@ -42,10 +42,10 @@ export default function App() {
   const [scene, setScene] = useState<SceneId>(() => (params.get("scene") === "dusk" ? "dusk" : load<SceneId>("scene", "sofa")));
   useEffect(() => save("scene", scene), [scene]);
   const [font, setFont] = useState<FontId>(() => {
-    const f = load<FontId>("font", "noto");
-    return f in FONTS ? f : "noto";
+    const f = load<FontId>("font2", "jua");
+    return f in FONTS ? f : "jua";
   });
-  useEffect(() => save("font", font), [font]);
+  useEffect(() => save("font2", font), [font]);
   const fontStack = useFontStack(font);
   const [tab, setTab] = useState<Tab>("home");
   const [gifts, setGifts] = useState<GiftEntry[]>(() => load<GiftEntry[]>("gifts", []));

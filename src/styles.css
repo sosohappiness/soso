@@ -5,7 +5,7 @@
   --terracotta: #b4552f;
   --ink-sky: #f7f2e8;     /* text over the sky */
   --ink-ground: #1e2456;  /* text over the ground */
-  --hand: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --hand: "Jua", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   color-scheme: light;
 }
 .phase-night { --ink-ground: #e9e4f2; }
@@ -43,11 +43,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
   display: flex; justify-content: space-between; align-items: flex-start;
   color: var(--ink-sky); pointer-events: none;
 }
-.time { font-size: 42px; font-weight: 500; line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.time { font-size: 42px; font-weight: 400; line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
 .label { font-size: 15px; margin-top: 8px; opacity: .95; }
 .side { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
 .counts { font-size: 15px; text-align: right; line-height: 1.5; }
-.counts b { font-weight: 500; font-variant-numeric: tabular-nums; }
+.counts b { font-weight: 400; font-variant-numeric: tabular-nums; }
 .rotate {
   pointer-events: auto; width: 38px; height: 38px; border-radius: 50%;
   border: 2px solid var(--ink-sky); background: transparent; color: var(--ink-sky);
@@ -60,7 +60,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bubble {
   position: absolute; left: 0; bottom: 14px; transform: translateX(-50%);
   background: var(--cream); color: var(--navy); border: 2.5px solid var(--navy); border-radius: 22px;
-  padding: 9px 16px; font-size: 15px; font-weight: 500; line-height: 1.35; white-space: nowrap; max-width: 78vw;
+  padding: 9px 16px; font-size: 15px; font-weight: 400; line-height: 1.35; white-space: nowrap; max-width: 78vw;
   animation: pop .35s cubic-bezier(.3,1.6,.6,1) both;
 }
 .bubble::after {
@@ -78,7 +78,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   color: var(--ink-ground);
 }
 .gift-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; padding: 0 4px; }
-.gift-title { font-size: 17px; font-weight: 700; }
+.gift-title { font-size: 17px; font-weight: 400; }
 .gift-rule { font-size: 12px; opacity: .85; }
 .gift-row { display: flex; gap: 10px; align-items: center; }
 .gift-row input {
@@ -102,7 +102,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .gift-box::before { content: ""; position: absolute; left: 9px; top: 0; bottom: 0; width: 4px; background: var(--terracotta); }
 
 .tabs { display: flex; justify-content: space-around; margin-top: 14px; }
-.tabs button { background: none; border: 0; font-size: 15px; font-weight: 500; padding: 6px 10px 10px; position: relative; color: var(--ink-ground); }
+.tabs button { background: none; border: 0; font-size: 15px; font-weight: 400; padding: 6px 10px 10px; position: relative; color: var(--ink-ground); }
 .tabs button.on::after {
   content: ""; position: absolute; left: 50%; bottom: 2px; width: 28px; height: 5px; margin-left: -14px;
   background: var(--yellow); border-radius: 3px; border: 1.5px solid var(--navy);
@@ -120,7 +120,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .sheet p { margin: 0 0 12px; line-height: 1.4; }
 .sheet-close { position: absolute; right: 16px; top: 12px; border: 0; background: none; font-size: 28px; line-height: 1; padding: 4px 8px; }
 .lines-demo { margin: 6px 0 14px; padding-left: 26px; opacity: .55; }
-.soon { color: var(--terracotta); font-weight: 700; }
+.soon { color: var(--terracotta); font-weight: 400; }
 .gift-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .gift-list li { display: flex; align-items: center; gap: 12px; border-bottom: 2px dashed rgba(30,36,86,.2); padding-bottom: 10px; }
 .g-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
