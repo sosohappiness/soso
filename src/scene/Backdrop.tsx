@@ -11,12 +11,15 @@ export const Z = { sky: -7, sky2: -6.5, celestial: -6, clouds: -5, hill: -1.6, t
 
 const WHITE = "#ffffff";
 
-function skyArt() {
-  // neutral white with grain + mottle; the palette colour is multiplied on top
-  return painted("sky", 46, 26, (p) => {
-    p.ctx.fillStyle = WHITE;
+function skyArt(top: string, bottom: string) {
+  // a soft vertical wash from the top of the screen down to the horizon
+  return painted(`sky-${top}-${bottom}`, 46, 26, (p) => {
+    const g = p.ctx.createLinearGradient(0, 3, 0, -3.6);
+    g.addColorStop(0, top);
+    g.addColorStop(1, bottom);
+    p.ctx.fillStyle = g;
     p.ctx.fillRect(-23, -13, 46, 26);
-  }, { ppu: 40, grain: 0.06, mottle: 0.06 });
+  }, { ppu: 40, grain: 0.045, mottle: 0.05 });
 }
 
 function hillArt() {
@@ -86,7 +89,7 @@ const STARS: [number, number][] = [
 ];
 
 export function Backdrop({ phase, pal }: { phase: Phase; pal: Palette }) {
-  const sky = useMemo(skyArt, []);
+  const sky = useMemo(() => skyArt(pal.sky, pal.sky2 ?? pal.sky), [pal.sky, pal.sky2]);
   const hill = useMemo(hillArt, []);
   const front = useMemo(frontArt, []);
   const cel = useMemo(() => celestialArt(phase), [phase]);
@@ -94,7 +97,7 @@ export function Backdrop({ phase, pal }: { phase: Phase; pal: Palette }) {
   const star = useMemo(starArt, []);
   const cloudRefs = [useRef<THREE.Group>(null), useRef<THREE.Group>(null)];
   const starRefs = useRef<(THREE.Group | null)[]>([]);
-  const showClouds = phase === "morning" || phase === "day";
+  const cloudOpacity = phase === "night" ? 0.25 : phase === "evening" ? 0.8 : 1;
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
@@ -113,14 +116,14 @@ export function Backdrop({ phase, pal }: { phase: Phase; pal: Palette }) {
 
   return (
     <group>
-      <Sprite art={sky} position={[0, 4, Z.sky]} color={pal.sky} order={0} />
+      <Sprite art={sky} position={[0, 4, Z.sky]} order={0} />
       {phase === "night" &&
         STARS.map(([x, y], i) => (
           <Sprite key={i} ref={(g) => (starRefs.current[i] = g)} art={star} position={[x, y, Z.sky2]} order={1} />
         ))}
       <Sprite art={cel} position={celPos} order={2} />
-      <Sprite ref={cloudRefs[0]} art={clouds[0]} position={[-2.6, 5.6, Z.clouds]} order={3} visible={showClouds} />
-      <Sprite ref={cloudRefs[1]} art={clouds[1]} position={[2.4, 3.9, Z.clouds]} order={3} visible={showClouds} />
+      <Sprite ref={cloudRefs[0]} art={clouds[0]} position={[-2.6, 5.6, Z.clouds]} order={3} opacity={cloudOpacity} color={pal.tint} />
+      <Sprite ref={cloudRefs[1]} art={clouds[1]} position={[2.4, 3.9, Z.clouds]} order={3} opacity={cloudOpacity} color={pal.tint} />
       <Sprite art={hill} position={[0, -2.0, Z.hill]} color={pal.hill} order={10} />
       <Sprite art={front} position={[0, -2.8, Z.front]} color={pal.ground} order={60} />
     </group>

@@ -4,7 +4,7 @@ import * as THREE from "three";
 import type { Phase } from "../lib/time";
 import type { Growth } from "../lib/demo";
 import { Backdrop } from "./Backdrop";
-import { Tree } from "./Tree";
+import { CloudFlower } from "./CloudFlower";
 import { Minimi } from "./Minimi";
 import { paletteFor, type SceneId } from "./palette";
 import { Sofa, SOFA_SEAT } from "./Sofa";
@@ -89,7 +89,7 @@ export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, sce
       <color attach="background" args={[pal.sky]} />
       <CameraRig view={view} />
       <Backdrop phase={phase} pal={pal} />
-      <Tree pal={pal} growth={growth} />
+      <CloudFlower pal={pal} growth={growth} night={phase === "night"} />
       {scene === "sofa" && <Sofa pal={pal} />}
       <Minimi animal={animal} phase={phase} pal={pal} anchor={anchor} pokeAt={pokeAt} onPoke={onPoke} seat={scene === "sofa" ? SOFA_SEAT : undefined} />
       <BubbleTracker anchor={anchor} el={bubble} />

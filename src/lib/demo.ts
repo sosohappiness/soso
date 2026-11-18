@@ -1,5 +1,5 @@
 /**
- * Tree growth is computed from logs, never stored (see plan).
+ * Flower-cloud growth is computed from logs, never stored (see plan).
  * Week 1 has no journal yet, so ?days=N fakes N logged days (3 lines each).
  */
 export type Growth = { leaves: number; flowers: number; days: number };
