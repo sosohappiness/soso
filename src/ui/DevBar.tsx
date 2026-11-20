@@ -1,26 +1,21 @@
 import type { Phase } from "../lib/time";
-import { ANIMALS, type AnimalId } from "../scene/animals";
-import type { SceneId } from "../scene/palette";
 
 const PHASES: Phase[] = ["morning", "day", "evening", "night"];
 const NAMES: Record<Phase, string> = { morning: "아침", day: "낮", evening: "저녁", night: "밤" };
 
-/** Shown with ?dev — flip time of day and animal without waiting for the clock. */
-export function DevBar({ phase, animal, scene, onPhase, onAnimal, onScene, onResetGift }: { phase: Phase; animal: AnimalId; scene: SceneId; onPhase: (p: Phase) => void; onAnimal: (a: AnimalId) => void; onScene: (s: SceneId) => void; onResetGift: () => void }) {
+/** Shown with ?dev and in preview builds: flip time of day, replay today's gift, call a friend over. */
+export function DevBar({ phase, onPhase, onResetGift, visiting, onVisit }: {
+  phase: Phase; onPhase: (p: Phase) => void; onResetGift: () => void; visiting: boolean; onVisit: () => void;
+}) {
   return (
     <div className="devbar">
       {PHASES.map((p) => (
         <button key={p} className={p === phase ? "on" : ""} onClick={() => onPhase(p)}>{NAMES[p]}</button>
       ))}
       <span className="sep" />
-      {(Object.keys(ANIMALS) as AnimalId[]).map((a) => (
-        <button key={a} className={a === animal ? "on" : ""} onClick={() => onAnimal(a)}>{ANIMALS[a].name}</button>
-      ))}
-      <span className="sep" />
-      <button className={scene === "sofa" ? "on" : ""} onClick={() => onScene("sofa")}>소파 초원</button>
-      <button className={scene === "dusk" ? "on" : ""} onClick={() => onScene("dusk")}>노을</button>
-      <span className="sep" />
       <button onClick={onResetGift}>오늘 선물 다시 주기</button>
+      <span className="sep" />
+      <button className={visiting ? "on" : ""} onClick={onVisit}>{visiting ? "친구 돌려보내기" : "친구 놀러오기"}</button>
     </div>
   );
 }

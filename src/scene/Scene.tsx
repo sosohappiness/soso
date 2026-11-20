@@ -50,12 +50,12 @@ function CameraRig({ view }: { view: RefObject<{ yaw: number; pitch: number }> }
 }
 
 /** Moves the HTML speech bubble so it follows Minimi's head on screen. */
-function BubbleTracker({ anchor, el }: { anchor: THREE.Vector3; el: RefObject<HTMLDivElement> }) {
+function BubbleTracker({ anchor, el, lift = 0, shift = 0 }: { anchor: THREE.Vector3; el: RefObject<HTMLDivElement>; lift?: number; shift?: number }) {
   const { camera, size } = useThree();
   const v = useMemo(() => new THREE.Vector3(), []);
   useFrame(() => {
     if (!el.current) return;
-    v.copy(anchor).add({ x: 0.1, y: 0.18, z: 0 } as THREE.Vector3).project(camera);
+    v.copy(anchor).add({ x: 0.1 + shift, y: 0.18 + lift, z: 0 } as THREE.Vector3).project(camera);
     const x = (v.x * 0.5 + 0.5) * size.width;
     const y = (-v.y * 0.5 + 0.5) * size.height;
     // keep the whole bubble on screen; the tail still points at Minimi
@@ -78,15 +78,32 @@ type Props = {
   onPoke: () => void;
   scene: SceneId;
   gift: { at: number; item: GiftId } | null;
+  /** Another friend visiting for the day: sits next to Minimi with its own speech bubble. */
+  visitor: { animal: AnimalId; travel: { at: number; dir: "in" | "out"; offX: number } } | null;
+  bubble2: RefObject<HTMLDivElement>;
+  visitorPokeAt: number;
+  onPokeVisitor: () => void;
 };
 
-export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, scene, gift }: Props) {
+export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, scene, gift, visitor, bubble2, visitorPokeAt, onPokeVisitor }: Props) {
   const pal = paletteFor(scene, phase);
   // where gifts happen: Minimi's seat, the ground in front of it, and where the bath tub stands
-  const seat = scene === "sofa" ? SOFA_SEAT : GROUND_SEAT;
+  const home = scene === "sofa" ? SOFA_SEAT : GROUND_SEAT;
+  // with a visitor, Minimi scoots left on the sofa and the friend takes the right half
+  const seat = useMemo(() => {
+    if (!visitor) return home;
+    if (scene !== "sofa") return home;
+    return { ...home, x: home.x - 0.36, cup: null }; // the arm cup is tidied away while two friends share the sofa
+  }, [visitor, scene, home]);
+  const guestSeat = useMemo(() => (
+    scene === "sofa"
+      ? { ...SOFA_SEAT, x: SOFA_SEAT.x + 0.52, cup: null }
+      : { ...GROUND_SEAT, x: GROUND_SEAT.x - 1.1, cup: null }
+  ), [scene]);
   const groundY = scene === "sofa" ? -0.32 : GROUND_SEAT.y - 0.15;
   const tubX = seat.x - 0.1;
   const anchor = useMemo(() => new THREE.Vector3(), []);
+  const anchor2 = useMemo(() => new THREE.Vector3(), []);
   return (
     <Canvas
       flat
@@ -103,7 +120,15 @@ export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, sce
       {scene === "sofa" && <MeadowLife pal={pal} />}
       <Minimi animal={animal} phase={phase} pal={pal} anchor={anchor} pokeAt={pokeAt} onPoke={onPoke} seat={seat} gift={gift} stage={{ tubX, groundY }} />
       <GiftShow pal={pal} seat={seat} groundY={groundY} tubX={tubX} gift={gift} />
-      <BubbleTracker anchor={anchor} el={bubble} />
+      {visitor && (
+        <Minimi
+          key={`guest-${visitor.animal}`}
+          animal={visitor.animal} phase={phase} pal={pal} anchor={anchor2} pokeAt={visitorPokeAt} onPoke={onPokeVisitor}
+          seat={guestSeat} travel={visitor.travel} size={1.0}
+        />
+      )}
+      <BubbleTracker anchor={anchor} el={bubble} shift={visitor ? -0.15 : 0} />
+      {visitor && <BubbleTracker anchor={anchor2} el={bubble2} lift={0.62} shift={0.1} />}
     </Canvas>
   );
 }

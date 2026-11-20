@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Scene } from "./scene/Scene";
-import { animalFromSearch, type AnimalId } from "./scene/animals";
+import { ANIMALS, animalFromSearch, type AnimalId } from "./scene/animals";
 import { PHASE_LABEL, clockText, localDay, phaseAt, timeOverride, type Phase } from "./lib/time";
 import { LINES, MISSED_YOU, pick, pokeLine } from "./lib/lines";
 import { demoGrowth } from "./lib/demo";
@@ -13,6 +13,8 @@ import { growthFromJournal, loadJournal, sampleJournal, saveJournal, type Journa
 import { DevBar } from "./ui/DevBar";
 import type { SceneId } from "./scene/palette";
 import { GIFTS, enjoyLine, type GiftId } from "./lib/gifts";
+import { CHATS, callName, isVisitDay, visitorFor } from "./lib/visits";
+import { Settings } from "./ui/Settings";
 
 
 function useNow(frozen: Date | null) {
@@ -117,6 +119,66 @@ export default function App() {
     }, 900);
   }, []);
 
+  // ---- a friend visiting for the day ----
+  type Visitor = { animal: AnimalId; travel: { at: number; dir: "in" | "out"; offX: number } };
+  const [visitor, setVisitor] = useState<Visitor | null>(null);
+  const [line2, setLine2] = useState("");
+  const [visitorPokeAt, setVisitorPokeAt] = useState(0);
+  const chatTimers = useRef<number[]>([]);
+  const chatLater = (s: number, fn: () => void) => chatTimers.current.push(window.setTimeout(fn, s * 1000));
+  useEffect(() => () => chatTimers.current.forEach(clearTimeout), []);
+
+  const startVisit = useCallback((guest: AnimalId, delay = 0) => {
+    chatTimers.current.forEach(clearTimeout);
+    chatTimers.current = [];
+    setLine2("");
+    setVisitor({ animal: guest, travel: { at: performance.now() + delay * 1000, dir: "in", offX: 3.4 } });
+    const sleepy = phase === "night";
+    chatLater(delay + 1.9, () => setLine2(sleepy ? "쉿, 나도 같이 잘래.." : "놀러 왔어!"));
+    chatLater(delay + 3.4, () => setLine(sleepy ? "음냐.. 어서 와.." : `와, ${callName(ANIMALS[guest].name)}! 반가워!`));
+    if (!sleepy) {
+      // now and then they chat: the visitor says something, Minimi answers
+      CHATS.forEach(([v, m], i) => {
+        chatLater(delay + 12 + i * 14, () => setLine2(v));
+        chatLater(delay + 14.2 + i * 14, () => setLine(m));
+      });
+    }
+  }, [phase]);
+
+  const endVisit = useCallback(() => {
+    chatTimers.current.forEach(clearTimeout);
+    chatTimers.current = [];
+    setLine2("또 놀러 올게!");
+    window.setTimeout(() => setVisitor((v) => (v ? { ...v, travel: { at: performance.now(), dir: "out", offX: 3.4 } } : v)), 900);
+    window.setTimeout(() => { setVisitor(null); setLine2(""); }, 2800);
+  }, []);
+
+  // on a visit day, the friend shows up a moment after you open the app
+  const visitChecked = useRef(false);
+  useEffect(() => {
+    if (visitChecked.current) return;
+    visitChecked.current = true;
+    if (isVisitDay(now, growth.days)) startVisit(visitorFor(animal, now), 1.5);
+  }, [now, growth.days, animal, startVisit]);
+
+  const onPokeVisitor = useCallback(() => {
+    setVisitorPokeAt(performance.now());
+    setLine2((l) => pokeLine(phase, new Date(), l));
+  }, [phase]);
+
+  // ---- settings ----
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const changeFriend = useCallback((a: AnimalId) => {
+    setAnimal(a);
+    if (visitor?.animal === a) {
+      setVisitor(null);
+      setLine2("");
+    }
+    setSettingsOpen(false);
+    setPokeAt(performance.now());
+    setLine("안녕! 오늘부터 잘 부탁해");
+  }, [visitor]);
+
   const resetToday = useCallback(() => {
     setGifts((g) => {
       const next = g.filter((x) => x.day !== today);
@@ -129,19 +191,24 @@ export default function App() {
   const view = useRef({ yaw: 0, pitch: 0 });
 
   const bubble = useRef<HTMLDivElement>(null);
+  const bubble2 = useRef<HTMLDivElement>(null);
 
   return (
     <div className={`app phase-${phase} scene-${scene}`}>
       <div className="stage">
-        <Scene phase={phase} animal={animal} growth={growth} view={view} bubble={bubble} pokeAt={pokeAt} onPoke={onPoke} scene={scene} gift={giftShow} />
+        <Scene phase={phase} animal={animal} growth={growth} view={view} bubble={bubble} pokeAt={pokeAt} onPoke={onPoke} scene={scene} gift={giftShow}
+          visitor={visitor} bubble2={bubble2} visitorPokeAt={visitorPokeAt} onPokeVisitor={onPokeVisitor} />
         <div className="bubble-anchor" ref={bubble} aria-live="polite">
           <div className="bubble" key={line}>{line}</div>
         </div>
+        <div className="bubble-anchor" ref={bubble2} aria-live="polite" hidden={!visitor || !line2}>
+          {line2 && <div className="bubble guest" key={line2}>{line2}</div>}
+        </div>
       </div>
       <div className="grain" aria-hidden="true" />
-      <Hud time={clockText(now)} label={PHASE_LABEL[phase]} flowers={growth.flowers} days={growth.days} />
+      <Hud time={clockText(now)} label={PHASE_LABEL[phase]} flowers={growth.flowers} days={growth.days} onSettings={() => setSettingsOpen(true)} />
       <div className="bottom">
-        {tab === "home" && <GiftPicker given={todaysGift} onGive={onGift} busy={giftShow !== null} />}
+        {tab === "home" && !settingsOpen && <GiftPicker given={todaysGift} onGive={onGift} busy={giftShow !== null} />}
         <Tabs tab={tab} onTab={setTab} />
       </div>
       {card && (
@@ -155,8 +222,9 @@ export default function App() {
       )}
       {tab === "journal" && <JournalWrite journal={journal} now={now} onSave={onSaveJournal} onClose={() => setTab("home")} />}
       {tab === "history" && <JournalHistory journal={journal} now={now} onClose={() => setTab("home")} />}
+      {settingsOpen && <Settings animal={animal} scene={scene} onAnimal={changeFriend} onScene={setScene} onClose={() => setSettingsOpen(false)} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
-        <DevBar phase={phase} animal={animal} scene={scene} onPhase={setPhaseOverride} onAnimal={setAnimal} onScene={setScene} onResetGift={resetToday} />
+        <DevBar phase={phase} onPhase={setPhaseOverride} onResetGift={resetToday} visiting={!!visitor} onVisit={() => (visitor ? endVisit() : startVisit(visitorFor(animal, now)))} />
       )}
     </div>
   );

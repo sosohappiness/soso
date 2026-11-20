@@ -252,3 +252,33 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .bubble, .panel, .panel-wrap, .gift-emo, .cal-day.has svg { animation: none; }
 }
 .gift-btn .gift-box { background: #fff9f0; border: 1.5px solid var(--navy); }
+
+/* ---- settings button (top right) and the settings panel ---- */
+.hud .side { pointer-events: auto; }
+.settings-btn {
+  width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; padding: 0;
+  border: 2px solid currentColor; background: rgba(255,249,240,.35); color: var(--ink-sky); opacity: .85;
+}
+.settings-btn:active { transform: rotate(30deg) scale(.95); }
+.set-title { margin: 4px 0 0; font-size: 17px; font-weight: 400; }
+.friend-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.friend-card, .scene-card {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px 12px; text-align: center;
+  background: #fff; border: 2px solid rgba(74,59,51,.2); border-radius: 18px; color: var(--navy); position: relative;
+}
+.friend-card.mine, .scene-card.mine { border-color: #4a3b33; background: #fff3d6; box-shadow: 3px 4px 0 rgba(74,59,51,.12); }
+.friend-card.asking { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(242,194,48,.5); }
+.fc-name { font-size: 16px; }
+.fc-meta { font-size: 11px; color: #8a7a6c; line-height: 1.3; }
+.fc-tag { position: absolute; top: -9px; background: var(--yellow); border: 1.5px solid var(--navy); border-radius: 999px; font-size: 11px; padding: 1px 8px; }
+.set-confirm { background: #fff; border: 2px solid #4a3b33; border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.set-confirm p { margin: 0; font-size: 15px; line-height: 1.5; }
+.set-confirm b { font-weight: 400; color: #b3261e; }
+.set-confirm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.set-confirm-row .export-action.primary { grid-column: auto; }
+.scene-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.scene-card svg { border-radius: 12px; display: block; }
+
+/* the visiting friend's bubble: same shape, a soft blush so you can tell who's talking */
+.bubble.guest { background: #fff1f3; }
+.bubble.guest::before { background: #c9b6e8; }

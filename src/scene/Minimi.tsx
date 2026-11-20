@@ -12,7 +12,7 @@ import {
 } from "./animals";
 
 /** Where Minimi sits: on the ground right of the tree, or on the sofa seat. */
-export type Seat = { x: number; y: number; cup: [number, number]; shadow: boolean };
+export type Seat = { x: number; y: number; cup: [number, number] | null; shadow: boolean };
 export const GROUND_SEAT: Seat = { x: 0.72, y: 0.12, cup: [0.8, 0], shadow: true };
 const SCALE = 1.12;
 
@@ -55,9 +55,16 @@ type Props = {
   gift?: { at: number; item: GiftId } | null;
   /** Where the bath tub stands (world space), so Minimi can jump into it. */
   stage?: { tubX: number; groundY: number };
+  /** A visiting friend hops in from (or out to) world x = offX. */
+  travel?: { at: number; dir: "in" | "out"; offX: number } | null;
+  size?: number;
 };
 
-export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROUND_SEAT, gift = null, stage }: Props) {
+export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROUND_SEAT, gift = null, stage, travel = null, size = SCALE }: Props) {
+  const SCALE = size;
+  const root = useRef<THREE.Group>(null);
+  // set once: after that, useFrame glides the root to the seat (so a seat change never snaps)
+  const startPos = useMemo<[number, number, number]>(() => [seat.x, seat.y, Z.minimi], []); // eslint-disable-line react-hooks/exhaustive-deps
   const a = ANIMALS[animal];
   const art = useMemo(() => ({
     body: bodyTex(a), paw: pawTex(a), nose: noseTex(a), cup: cupTex(a),
@@ -145,7 +152,21 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
         my = ty * k2 + arc + (k2 === 1 ? Math.sin(g * 2.5) * 0.015 : 0);
         mz = tz * (k2 > 0 ? 1 : 0);
       }
+      // a visitor hops in from the side of the screen, or hops away again
+      if (travel) {
+        const k = Math.min(1, Math.max(0, (performance.now() - travel.at) / 1700));
+        const away = (travel.offX - seat.x) / SCALE;
+        const along = travel.dir === "in" ? 1 - k : k;
+        mx += away * along;
+        my += k < 1 ? Math.abs(Math.sin(k * Math.PI * 5)) * 0.14 : 0;
+      }
       mover.current.position.set(mx, my, mz);
+    }
+    // when a friend sits down, Minimi scoots over smoothly instead of jumping
+    if (root.current) {
+      const rp = root.current.position;
+      rp.x += (seat.x - rp.x) * (1 - Math.exp(-dt * 4));
+      rp.y = seat.y;
     }
 
     // ears: droop with tiredness, flick up when poked, twitch now and then when awake
@@ -231,8 +252,8 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
   const paws: [number, number][] = [at(-34, 4), at(34, 4)];
 
   return (
-    <group position={[seat.x, seat.y, Z.minimi]} scale={SCALE}>
-      <Sprite art={art.cup} position={[seat.cup[0], seat.cup[1] + 0.15 * 1.5, 0.04]} scale={1.5} color={tint} order={30} />
+    <group ref={root} position={startPos} scale={SCALE}>
+      {seat.cup && <Sprite art={art.cup} position={[seat.cup[0], seat.cup[1] + 0.15 * 1.5, 0.04]} scale={1.5} color={tint} order={30} />}
       <group ref={mover}>
       {seat.shadow && <Sprite art={art.shadow} position={[0.1, 0.0, -0.06]} color="#000" opacity={pal.shadow} order={20} />}
       <group ref={body} onPointerDown={poke}>
