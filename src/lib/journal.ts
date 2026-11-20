@@ -57,3 +57,44 @@ export function sampleJournal(today: Date): Journal {
   gaps.forEach((g, i) => (j[localDay(shiftDay(today, -g))] = samples[i]));
   return j;
 }
+
+const WEEK_FULL = ["일", "월", "화", "수", "목", "금", "토"];
+
+/** Every entry, oldest first, as plain text for email, copying or a .txt file. */
+export function journalText(j: Journal, now: Date, name = "소소"): string {
+  const days = Object.keys(j).filter((d) => linesOf(j, d).length > 0).sort();
+  const total = days.reduce((n, d) => n + linesOf(j, d).length, 0);
+  const head = [
+    `${name} 감사일기`,
+    `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일까지 · ${days.length}일 · 꽃 ${total}송이`,
+    "",
+  ];
+  const body = days.flatMap((d) => {
+    const [y, m, dd] = d.split("-").map(Number);
+    const w = WEEK_FULL[new Date(y, m - 1, dd).getDay()];
+    return [`${y}년 ${m}월 ${dd}일 ${w}요일`, ...linesOf(j, d).map((l) => `· ${l}`), ""];
+  });
+  return [...head, ...body].join("\n").trimEnd() + "\n";
+}
+
+/** Mail apps cut very long links; past this the body is shortened and points to the file option. */
+export const MAILTO_LIMIT = 1800;
+
+export function mailtoHref(text: string, subject = "소소 감사일기"): { href: string; trimmed: boolean } {
+  let body = text;
+  let trimmed = false;
+  if (encodeURIComponent(body).length > MAILTO_LIMIT * 3) {
+    trimmed = true;
+    // keep the newest entries: they're at the end
+    const lines = text.split("\n");
+    const head = lines.slice(0, 3);
+    let tail: string[] = [];
+    for (let i = lines.length - 1; i >= 3; i--) {
+      const next = [lines[i], ...tail];
+      if (encodeURIComponent([...head, "(최근 일기만 담았어요. 전체는 '파일로 저장'을 써 주세요.)", "", ...next].join("\n")).length > MAILTO_LIMIT * 3) break;
+      tail = next;
+    }
+    body = [...head, "(최근 일기만 담았어요. 전체는 '파일로 저장'을 써 주세요.)", "", ...tail].join("\n");
+  }
+  return { href: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, trimmed };
+}

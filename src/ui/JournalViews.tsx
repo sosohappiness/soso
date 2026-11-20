@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { localDay } from "../lib/time";
-import { dayLabel, linesOf, shiftDay, type Journal } from "../lib/journal";
+import { dayLabel, journalText, linesOf, mailtoHref, shiftDay, type Journal } from "../lib/journal";
 
 const PETALS = ["#F4B6C2", "#F6D46A", "#F29A7E", "#C9B6E8"];
 
@@ -122,6 +122,7 @@ export function JournalHistory({ journal, now, onClose }: { journal: Journal; no
   const days = useMemo(() => Object.keys(journal).filter((d) => linesOf(journal, d).length > 0).sort().reverse(), [journal]);
   const [month, setMonth] = useState(() => ({ y: now.getFullYear(), m: now.getMonth() }));
   const [picked, setPicked] = useState<string | null>(days[0] ?? null);
+  const [exporting, setExporting] = useState(false);
   const today = localDay(now);
 
   const first = new Date(month.y, month.m, 1);
@@ -175,7 +176,11 @@ export function JournalHistory({ journal, now, onClose }: { journal: Journal; no
         </article>
       )}
 
-      <h3 className="list-title">지난 일기</h3>
+      <div className="list-row">
+        <h3 className="list-title">지난 일기</h3>
+        {days.length > 0 && <button className="export-btn" onClick={() => setExporting((x) => !x)} aria-expanded={exporting}>이메일로 보내기</button>}
+      </div>
+      {exporting && <ExportCard journal={journal} now={now} />}
       {days.length === 0 ? (
         <p className="journal-hint">아직 쓴 일기가 없어요. 감사일기 탭에서 첫 꽃을 피워 봐요.</p>
       ) : (
@@ -191,5 +196,58 @@ export function JournalHistory({ journal, now, onClose }: { journal: Journal; no
         </div>
       )}
     </Panel>
+  );
+}
+
+// ---- 내보내기: send everything written so far by email, copy it, or save it as a file ----
+
+function ExportCard({ journal, now }: { journal: Journal; now: Date }) {
+  const text = useMemo(() => journalText(journal, now), [journal, now]);
+  const mail = useMemo(() => mailtoHref(text), [text]);
+  const [note, setNote] = useState("");
+  const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setNote("복사했어요. 메일이나 메모에 붙여넣어 보세요.");
+    } catch {
+      setNote("이 화면에서는 복사가 막혀 있어요. 아래 글을 길게 눌러 직접 복사해 주세요.");
+    }
+  };
+  const download = () => {
+    try {
+      const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `소소-감사일기-${now.toISOString().slice(0, 10)}.txt`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setNote("파일로 저장했어요. 메일에 첨부해서 보낼 수 있어요.");
+    } catch {
+      setNote("이 화면에서는 저장이 막혀 있어요. '복사하기'를 써 주세요.");
+    }
+  };
+  const share = async () => {
+    try {
+      await navigator.share({ title: "소소 감사일기", text });
+    } catch {
+      /* closed the share sheet */
+    }
+  };
+
+  return (
+    <div className="export-card">
+      <p className="journal-hint">지금까지 쓴 감사일기 {text.split("\n").filter((l) => l.startsWith("·")).length}줄을 날짜순으로 정리했어요.</p>
+      <div className="export-actions">
+        <a className="export-action primary" href={mail.href}>메일로 보내기</a>
+        {canShare && <button className="export-action" onClick={share}>공유하기</button>}
+        <button className="export-action" onClick={copy}>복사하기</button>
+        <button className="export-action" onClick={download}>파일로 저장</button>
+      </div>
+      {mail.trimmed && <p className="journal-hint">일기가 많아서 메일에는 최근 일기만 담겨요. 전체는 '파일로 저장'을 써 주세요.</p>}
+      {note && <p className="export-note" role="status">{note}</p>}
+      <pre className="export-preview">{text}</pre>
+    </div>
   );
 }

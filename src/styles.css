@@ -215,6 +215,24 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .entry-card h3 { margin: 0; font-size: 15px; font-weight: 400; display: flex; align-items: center; gap: 6px; }
 .entry-card.on, .picked-card { border-color: #4a3b33; box-shadow: 3px 4px 0 rgba(74,59,51,.12); }
 .list-title { margin: 6px 0 0; font-size: 17px; font-weight: 400; }
+.list-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.export-btn { border: 2px solid #4a3b33; background: #fff9f0; color: #4a3b33; border-radius: 999px; padding: 6px 14px; font-size: 13px; }
+.export-btn[aria-expanded="true"] { background: var(--yellow); }
+.export-card {
+  background: #fff; border: 2px solid #4a3b33; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 3px 4px 0 rgba(74,59,51,.12); animation: up .25s ease-out both;
+}
+.export-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.export-action {
+  display: grid; place-items: center; min-height: 44px; border-radius: 14px; border: 2px solid #4a3b33; background: #fff9f0;
+  color: #4a3b33; font: inherit; font-size: 15px; text-decoration: none;
+}
+.export-action.primary { grid-column: 1 / -1; background: var(--yellow); border-color: var(--navy); color: var(--navy); }
+.export-note { margin: 0; font-size: 13px; color: #3f7a4e; }
+.export-preview {
+  margin: 0; max-height: 160px; overflow: auto; white-space: pre-wrap; font: inherit; font-size: 13px; line-height: 1.6;
+  color: #5a4d44; background: #fffaf2; border-radius: 12px; padding: 10px 12px; user-select: text; -webkit-user-select: text;
+}
 .entry-list { display: flex; flex-direction: column; gap: 10px; }
 
 @keyframes fade { from { opacity: 0; } }
