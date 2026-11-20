@@ -15,6 +15,9 @@
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body, #root { height: 100%; margin: 0; }
+/* iPhone home-screen app with a see-through status bar reports a viewport one status bar short;
+   stretch the page so nothing of the outside shows at the bottom */
+html { min-height: calc(100% + env(safe-area-inset-top, 0px)); background: #87a55d; }
 body {
   background: #87a55d;
   font-family: var(--hand);
@@ -27,7 +30,7 @@ body {
 button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 2.5px solid var(--yellow); outline-offset: 3px; }
 
-.app { position: fixed; inset: 0; overflow: hidden; font-family: var(--hand); }
+.app { position: fixed; top: 0; left: 0; right: 0; bottom: 0; min-height: 100vh; min-height: 100dvh; overflow: hidden; font-family: var(--hand); }
 .stage { position: absolute; inset: 0; touch-action: none; }
 
 /* paper grain over everything, like the mockup's speckled sky */

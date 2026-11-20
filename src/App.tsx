@@ -61,7 +61,7 @@ export default function App() {
   useEffect(() => save("helloStyle2", helloStyle), [helloStyle]);
   // the strip outside the app (behind the home bar / browser chrome) matches the screen
   useEffect(() => {
-    document.body.style.background = account ? "#87a55d" : "#be9068";
+    document.body.style.background = document.documentElement.style.background = account ? "#87a55d" : "#be9068";
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", account ? "#d3e3ec" : "#be9068");
   }, [account]);
   const [logoFont, setLogoFont] = useState<LogoFontId>(() => {
