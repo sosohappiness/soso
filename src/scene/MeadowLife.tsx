@@ -108,7 +108,7 @@ const FLOWERS: { x: number; y: number; z: number; h: number; lean: number; s: nu
   { x: 1.7, y: -0.32, z: 0.5, h: 0.32, lean: -0.03, s: 1.5 },
 ];
 const PUFF = { x: -2.0, y: 0.0, z: -0.35 };
-const SEEDS = 5;
+const SEEDS = 12;
 
 export function MeadowLife({ pal }: { pal: Palette }) {
   const flowers = useMemo(() => FLOWERS.map((f) => dandelionArt(f.h, f.lean)), []);
@@ -120,7 +120,8 @@ export function MeadowLife({ pal }: { pal: Palette }) {
   const seedRefs = useRef<(THREE.Group | null)[]>([]);
   const seedPaths = useMemo(() => {
     const r = seeded(41);
-    return Array.from({ length: SEEDS }, () => ({ ph: r(), drift: 0.6 + r() * 0.6, rise: 0.7 + r() * 0.8, wob: r() * 6 }));
+    // each seed rides the breeze across the whole meadow, rising and dipping, some higher than others
+    return Array.from({ length: SEEDS }, () => ({ ph: r(), drift: 3.6 + r() * 1.6, rise: 0.5 + r() * 2.2, wob: r() * 6, speed: 12 + r() * 8, z: (r() - 0.5) * 1.2 }));
   }, []);
 
   useFrame(({ clock }) => {
@@ -132,14 +133,17 @@ export function MeadowLife({ pal }: { pal: Palette }) {
       snailRef.current.position.x = x;
       snailRef.current.scale.set(inch, 2 - inch, 1);
     }
-    flowerRefs.current.forEach((g, i) => g && (g.rotation.z = Math.sin(t * 0.8 + i * 1.7) * 0.05));
+    // flowers sway in the breeze, with an occasional stronger gust passing through
+    const gust = Math.max(0, Math.sin(t * 0.23)) ** 3 * 0.12;
+    flowerRefs.current.forEach((g, i) => g && (g.rotation.z = Math.sin(t * 1.1 + i * 1.7) * 0.12 + Math.sin(t * 2.3 + i) * 0.03 - gust));
     // seeds lift off the puffball and drift away on the breeze, then start over
     seedRefs.current.forEach((g, i) => {
       if (!g) return;
       const sp = seedPaths[i];
-      const cyc = (t / 11 + sp.ph) % 1;
-      g.position.set(PUFF.x + cyc * sp.drift * 2.2, PUFF.y + 0.6 + cyc * sp.rise + Math.sin(cyc * 8 + sp.wob) * 0.06, PUFF.z + 0.02);
-      g.rotation.z = Math.sin(cyc * 6 + sp.wob) * 0.4;
+      const cyc = (t / sp.speed + sp.ph) % 1;
+      g.position.set(PUFF.x + cyc * sp.drift, PUFF.y + 0.6 + Math.sin(cyc * Math.PI) * sp.rise + Math.sin(cyc * 9 + sp.wob) * 0.12, PUFF.z + 0.4 + sp.z);
+      g.rotation.z = Math.sin(cyc * 6 + sp.wob) * 0.5;
+      g.scale.setScalar(1.3);
       const m = (g.children[0] as THREE.Mesh | undefined)?.material as THREE.MeshBasicMaterial | undefined;
       if (m) m.opacity = Math.min(1, cyc * 10) * Math.min(1, (1 - cyc) * 3);
     });

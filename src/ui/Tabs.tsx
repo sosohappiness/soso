@@ -1,9 +1,8 @@
-export type Tab = "home" | "journal" | "gifts";
+export type Tab = "home" | "journal";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "home", label: "홈" },
   { id: "journal", label: "감사일기" },
-  { id: "gifts", label: "선물기록" },
 ];
 
 export function Tabs({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {

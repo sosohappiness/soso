@@ -20,10 +20,11 @@ export function GiftIcon({ id, size = 30 }: { id: GiftId; size?: number }) {
     case "tteok":
       return (
         <svg {...common}>
-          <path d="M5 15h22c0 6-4.5 11-11 11S5 21 5 15z" fill="#F6F2EA" stroke="#4a3b33" strokeWidth="1.2" />
-          <ellipse cx="16" cy="15" rx="11" ry="2.6" fill="#C8442E" />
-          <rect x="9" y="11" width="7" height="3.2" rx="1.6" fill="#E86A45" transform="rotate(-15 12 12)" />
-          <rect x="16" y="11.5" width="7" height="3.2" rx="1.6" fill="#E86A45" transform="rotate(12 19 13)" />
+          <ellipse cx="16" cy="21" rx="13" ry="5" fill="#F6F2EA" stroke="#4a3b33" strokeWidth="1.2" />
+          <ellipse cx="16" cy="20" rx="8" ry="2.6" fill="#C8442E" />
+          <rect x="9" y="15.5" width="7" height="3.2" rx="1.6" fill="#E86A45" transform="rotate(-15 12 17)" />
+          <rect x="16" y="16" width="7" height="3.2" rx="1.6" fill="#E86A45" transform="rotate(12 19 17.5)" />
+          <path d="M13 12c-1-1.5 1-2.5 0-4M19 12c-1-1.5 1-2.5 0-4" stroke="#B8AFA3" strokeWidth="1.2" fill="none" strokeLinecap="round" />
         </svg>
       );
     case "bath":
@@ -36,71 +37,57 @@ export function GiftIcon({ id, size = 30 }: { id: GiftId; size?: number }) {
           <path d="M7 25l-1.5 3M25 25l1.5 3" stroke="#4a3b33" strokeWidth="1.4" strokeLinecap="round" />
         </svg>
       );
-    case "pack":
-      return (
-        <svg {...common}>
-          <ellipse cx="16" cy="17" rx="11" ry="9" fill="#CFE3B4" stroke="#4a3b33" strokeWidth="1.2" />
-          <circle cx="12" cy="15.5" r="1.6" fill="#151213" />
-          <circle cx="20" cy="15.5" r="1.6" fill="#151213" />
-          <ellipse cx="16" cy="20" rx="2" ry="1.4" fill="#151213" />
-          <path d="M25 5l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#F6D46A" />
-        </svg>
-      );
     case "song":
       return (
         <svg {...common}>
-          <path d="M7 19c0-7 4-12 9-12s9 5 9 12" fill="none" stroke="#E07A5F" strokeWidth="2.6" strokeLinecap="round" />
-          <rect x="4" y="17" width="6" height="9" rx="3" fill="#C8604A" />
-          <rect x="22" y="17" width="6" height="9" rx="3" fill="#C8604A" />
-          <path d="M15 22v-7l5-1.5" stroke="#6B5CA5" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-          <ellipse cx="13.6" cy="22.4" rx="2" ry="1.5" fill="#6B5CA5" />
+          <rect x="5" y="11" width="22" height="15" rx="3" fill="#B07A4F" stroke="#4a3b33" strokeWidth="1.2" />
+          <path d="M11 11c0-3 10-3 10 0" fill="none" stroke="#4a3b33" strokeWidth="1.6" />
+          <circle cx="11.5" cy="19" r="3.6" fill="#3B2B2E" />
+          <circle cx="20.5" cy="19" r="3.6" fill="#3B2B2E" />
+          <circle cx="11.5" cy="19" r="1.4" fill="#8B7B75" />
+          <circle cx="20.5" cy="19" r="1.4" fill="#8B7B75" />
+          <path d="M25 4v6l3-1" stroke="#6B5CA5" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+          <ellipse cx="24" cy="10.4" rx="1.6" ry="1.2" fill="#6B5CA5" />
         </svg>
       );
   }
 }
 
 /**
- * Five gifts to choose from. Tap once to pick, tap the same one again to give it.
- * One gift a day, so the second tap keeps a stray touch from using it up.
+ * "선물 주기": tap it and the gift emoticons pop out; tap one and it's on its way.
+ * One gift a day; once given the button says so until tomorrow.
  */
 export function GiftPicker({ given, onGive, busy }: { given: GiftEntry | null; onGive: (id: GiftId) => void; busy: boolean }) {
-  const [picked, setPicked] = useState<GiftId | null>(null);
-  const hint = given
-    ? "내일 또 줄 수 있어"
-    : picked
-      ? "한 번 더 누르면 선물해요"
-      : "하루에 딱 하나";
+  const [open, setOpen] = useState(false);
+  const done = !!given;
   return (
-    <section className="gift" aria-label="오늘의 선물">
-      <div className="gift-head">
-        <span className="gift-title">오늘의 선물</span>
-        <span className="gift-rule">{hint}</span>
-      </div>
-      {given ? (
-        <div className="gift-given">
-          {given.item ? <GiftIcon id={given.item} size={26} /> : <span className="gift-box" aria-hidden="true" />}
-          <span>{busy ? "선물을 전하는 중…" : `오늘은 ${given.caption ?? given.label ?? given.text}`}</span>
-        </div>
-      ) : (
-        <div className="gift-choices" role="group">
-          {GIFT_ORDER.map((id) => (
-            <button
-              key={id}
-              className={`gift-choice${picked === id ? " on" : ""}`}
-              aria-pressed={picked === id}
-              onClick={() => {
-                if (picked === id) {
+    <div className="gift-picker">
+      {open && !done && (
+        <>
+          <button className="gift-scrim" aria-label="닫기" onClick={() => setOpen(false)} />
+          <div className="gift-pop" role="menu" aria-label="선물 고르기">
+            {GIFT_ORDER.map((id, i) => (
+              <button
+                key={id}
+                role="menuitem"
+                className="gift-emo"
+                style={{ "--i": i } as React.CSSProperties}
+                onClick={() => {
+                  setOpen(false);
                   onGive(id);
-                  setPicked(null);
-                } else setPicked(id);
-              }}
-            >
-              <span className="gc-icon"><GiftIcon id={id} /></span>
-              <span className="gc-label">{GIFTS[id].label}</span>
-            </button>
-          ))}
-        </div>
+                }}
+              >
+                <span className="ge-icon"><GiftIcon id={id} size={40} /></span>
+                <span className="ge-label">{GIFTS[id].label}</span>
+              </button>
+            ))}
+          </div>
+        </>
       )}
-    </section>
+      <button className={`gift-btn${done ? " done" : ""}${open ? " open" : ""}`} disabled={done} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        {done && given?.item ? <GiftIcon id={given.item} size={24} /> : <span className="gift-box" aria-hidden="true" />}
+        <span>{busy ? "선물을 전하는 중…" : done ? "오늘 선물 완료 · 내일 또 줄 수 있어" : open ? "무엇을 줄까?" : "선물 주기"}</span>
+      </button>
+    </div>
   );
 }

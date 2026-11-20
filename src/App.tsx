@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Scene } from "./scene/Scene";
-import { ANIMALS, animalFromSearch, type AnimalId } from "./scene/animals";
+import { animalFromSearch, type AnimalId } from "./scene/animals";
 import { PHASE_LABEL, clockText, localDay, phaseAt, timeOverride, type Phase } from "./lib/time";
 import { LINES, MISSED_YOU, pick, pokeLine } from "./lib/lines";
 import { demoGrowth } from "./lib/demo";
@@ -11,7 +11,7 @@ import { Tabs, type Tab } from "./ui/Tabs";
 import { Sheet } from "./ui/Sheet";
 import { DevBar } from "./ui/DevBar";
 import type { SceneId } from "./scene/palette";
-import { GIFT_T, GIFTS, enjoyLine, type GiftId } from "./lib/gifts";
+import { GIFTS, enjoyLine, type GiftId } from "./lib/gifts";
 
 const VIEWS = [0, 0.42, -0.42]; // rotate-view button cycles through these yaw angles (≈ ±24°)
 const MAX_YAW = 0.52;
@@ -87,12 +87,13 @@ export default function App() {
     timers.current = [];
     setCard(null);
     setGiftShow({ at: performance.now(), item: id });
-    later(0.3, () => setLine(phase === "night" ? "음냐..? 누구야..?" : "어? 그거 나 주는 거야?"));
-    later(GIFT_T.give, () => setLine(enjoyLine(id)));
-    later(GIFT_T.drink + 0.2, () => setLine(gift.thanks));
-    later(GIFT_T.drink + 0.4, () => setCard({ caption: gift.caption, day: today }));
-    later(GIFT_T.leave + 0.3, () => setGiftShow(null));
-    later(GIFT_T.drink + 3.8, () => setCard(null));
+    const T = gift.t;
+    later(0.3, () => setLine(phase === "night" ? "음냐..? 누구야..?" : gift.hello));
+    later(T.give, () => setLine(enjoyLine(id)));
+    later(T.drink + 0.2, () => setLine(gift.thanks));
+    later(T.drink + 0.4, () => setCard({ caption: gift.caption, day: today }));
+    later(T.leave + 0.3, () => setGiftShow(null));
+    later(T.drink + 3.8, () => setCard(null));
   }, [today, phase]);
 
   const resetToday = useCallback(() => {
@@ -142,16 +143,15 @@ export default function App() {
         <Tabs tab={tab} onTab={setTab} />
       </div>
       {card && (
-        <button className="gift-card" onClick={() => { setCard(null); setTab("gifts"); }}>
+        <button className="gift-card" onClick={() => setCard(null)}>
           <span className="gift-box" aria-hidden="true" />
           <span className="gc-text">
             <span className="gc-small">오늘의 선물 · {card.day.slice(5).replace("-", "월 ")}일</span>
             <span className="gc-title">{card.caption}</span>
-            <span className="gc-link">선물기록에 담았어요 ›</span>
           </span>
         </button>
       )}
-      {tab !== "home" && <Sheet tab={tab} gifts={gifts} animalName={ANIMALS[animal].name} onClose={() => setTab("home")} />}
+      {tab !== "home" && <Sheet onClose={() => setTab("home")} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
         <DevBar phase={phase} animal={animal} scene={scene} onPhase={setPhaseOverride} onAnimal={setAnimal} onScene={setScene} onResetGift={resetToday} />
       )}

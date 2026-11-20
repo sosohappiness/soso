@@ -88,36 +88,34 @@ button { font: inherit; color: inherit; cursor: pointer; }
   padding: 0 max(20px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 10px) max(20px, env(safe-area-inset-left, 0px));
   color: var(--ink-ground);
 }
-.gift-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; padding: 0 4px; }
-.gift-title { font-size: 17px; font-weight: 400; }
-.gift-rule { font-size: 12px; opacity: .85; }
-.gift-row { display: flex; gap: 10px; align-items: center; }
-.gift-row input {
-  flex: 1; min-width: 0; height: 50px; border-radius: 25px; border: 2.5px solid var(--navy);
-  background: var(--cream); color: var(--navy); padding: 0 20px; font: inherit; font-size: 15px; outline: none;
-  user-select: text; -webkit-user-select: text;
+/* "선물 주기" button and the gift emoticons that pop out of it */
+.gift-picker { position: relative; display: flex; justify-content: center; }
+.gift-btn {
+  display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 26px; border-radius: 26px;
+  border: 2.5px solid var(--navy); background: var(--yellow); color: var(--navy); font-size: 17px;
+  box-shadow: 0 4px 0 rgba(30,36,86,.18); position: relative; z-index: 3;
 }
-.gift-row input::placeholder { color: #8a8478; }
-.gift-row input:focus { box-shadow: 0 0 0 3px rgba(242,194,48,.7); }
-.send {
-  flex: 0 0 auto; width: 52px; height: 52px; border-radius: 50%; border: 2.5px solid var(--navy);
-  background: var(--yellow); color: var(--navy); display: grid; place-items: center;
+.gift-btn:not(:disabled):active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(30,36,86,.18); }
+.gift-btn.open { background: #fff9f0; }
+.gift-btn.done { background: rgba(255,249,240,.7); border-style: dashed; box-shadow: none; font-size: 14px; }
+.gift-scrim { position: fixed; inset: 0; background: transparent; border: 0; z-index: 2; }
+.gift-pop {
+  position: absolute; bottom: 64px; left: 50%; transform: translateX(-50%); z-index: 3;
+  display: flex; gap: 10px; align-items: flex-end;
 }
-.send:disabled { opacity: .75; }
-.send:not(:disabled):active { transform: scale(.94); }
-.gift-choices { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
-.gift-choice {
-  display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 2px 6px; min-height: 66px;
-  background: rgba(255, 249, 240, .88); border: 2.5px solid var(--navy); border-radius: 18px; color: var(--navy);
-  transition: transform .15s, background .15s;
+.gift-emo {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; padding: 0;
+  animation: emo-pop .45s cubic-bezier(.3, 1.8, .5, 1) both; animation-delay: calc(var(--i) * 70ms);
 }
-.gift-choice .gc-label { font-size: 12px; white-space: nowrap; }
-.gift-choice.on { background: var(--yellow); transform: translateY(-4px) rotate(-2deg); box-shadow: 0 4px 0 rgba(30,36,86,.2); }
-.gift-choice:active { transform: scale(.95); }
-.gift-given {
-  display: flex; align-items: center; gap: 12px; height: 50px; border-radius: 25px; padding: 0 18px;
-  background: rgba(247,242,232,.55); color: var(--navy); font-size: 15px; border: 2.5px dashed var(--navy);
+/* the four sit on a gentle arc, the middle two a little higher */
+.gift-emo:nth-child(2), .gift-emo:nth-child(3) { margin-bottom: 14px; }
+.ge-icon {
+  width: 66px; height: 66px; border-radius: 50%; display: grid; place-items: center;
+  background: #fff9f0; border: 2.5px solid #4a3b33; box-shadow: 3px 4px 0 rgba(74,59,51,.16);
 }
+.gift-emo:active .ge-icon { transform: scale(.92); }
+.ge-label { font-size: 13px; color: #4a3b33; background: #fff9f0; border-radius: 10px; padding: 1px 8px; white-space: nowrap; }
+@keyframes emo-pop { from { opacity: 0; transform: translateY(30px) scale(.4); } }
 .gift-box { width: 22px; height: 18px; border-radius: 4px; background: var(--yellow); position: relative; flex: 0 0 auto; }
 .gift-box::before { content: ""; position: absolute; left: 9px; top: 0; bottom: 0; width: 4px; background: var(--terracotta); }
 
@@ -176,3 +174,4 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .bubble, .sheet, .sheet-wrap { animation: none; }
 }
+.gift-btn .gift-box { background: #fff9f0; border: 1.5px solid var(--navy); }

@@ -2,8 +2,8 @@ import { useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import type { Phase } from "../lib/time";
-import { GIFT_T, GIFTS, type GiftId } from "../lib/gifts";
-import { giftItemTex, maskTex, particleTex } from "./props";
+import { GIFTS, type GiftId } from "../lib/gifts";
+import { particleTex, plateTex } from "./props";
 import { Sprite } from "./Sprite";
 import { Z } from "./Backdrop";
 import type { Palette } from "./palette";
@@ -53,9 +53,11 @@ type Props = {
   seat?: Seat;
   /** A gift being given right now: Minimi perks up, receives it, enjoys it. */
   gift?: { at: number; item: GiftId } | null;
+  /** Where the bath tub stands (world space), so Minimi can jump into it. */
+  stage?: { tubX: number; groundY: number };
 };
 
-export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROUND_SEAT, gift = null }: Props) {
+export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROUND_SEAT, gift = null, stage }: Props) {
   const a = ANIMALS[animal];
   const art = useMemo(() => ({
     body: bodyTex(a), paw: pawTex(a), nose: noseTex(a), cup: cupTex(a),
@@ -65,9 +67,10 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
   }), [a]);
   const giftId = gift?.item ?? null;
   const giftArt = useMemo(() => giftId ? {
-    item: giftItemTex(giftId), particle: particleTex(GIFTS[giftId].particle), mask: maskTex(),
+    cup: cupTex(ANIMALS.polar), plates: [plateTex(3), plateTex(2), plateTex(1), plateTex(0)], particle: particleTex(GIFTS[giftId].particle),
   } : null, [giftId]);
-  const wear = useRef<THREE.Group>(null);
+  const mover = useRef<THREE.Group>(null);
+  const plateRefs = [useRef<THREE.Group>(null), useRef<THREE.Group>(null), useRef<THREE.Group>(null), useRef<THREE.Group>(null)];
   const happyRefs = [useRef<THREE.Group>(null), useRef<THREE.Group>(null)];
   const pawRefs = [useRef<THREE.Group>(null), useRef<THREE.Group>(null)];
   const held = useRef<THREE.Group>(null);
@@ -89,22 +92,22 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
     const t = clock.elapsedTime;
     // during a gift, the gift's beats override the time-of-day pose
     const g = gift ? (performance.now() - gift.at) / 1000 : -1;
-    const giving = g >= 0 && g < GIFT_T.leave;
+    const T = giftId ? GIFTS[giftId].t : { walkIn: 0, give: 0, drink: 0, leave: 0 };
+    const giving = g >= 0 && g < T.leave;
     const kind = giftId ? GIFTS[giftId].kind : null;
-    const enjoying = giving && g >= GIFT_T.give && g < GIFT_T.drink;
+    const enjoying = giving && g >= T.give && g < T.drink;
     const holding = enjoying && kind === "hold";
-    const wearing = giving && kind !== "hold" && g >= GIFT_T.give - 0.05 && g < GIFT_T.leave - 0.2;
-    const pleased = giving && g >= GIFT_T.give;
+    const pleased = giving && g >= T.give;
     let target = POSES[phase];
     if (giving) {
       const base = { ...target, zzz: 0, stretch: 0, eyeOpen: 1, earTwitch: 0 };
-      target = g < GIFT_T.give
+      target = g < T.give
         ? { ...base, sy: 1.05, sx: 0.98, lean: -0.07, sway: 0.01, hop: 0, earOut: -0.18, earLift: 0.025, earWiggle: 0.04 }
-        : g < GIFT_T.drink
-          ? giftId === "song"
-            ? { ...base, sy: 1.02, sx: 1, lean: 0, sway: 0.09, hop: 0.035, earOut: 0.1, earLift: 0.01, earWiggle: 0.12 }
-            : giftId === "pack"
-              ? { ...base, sy: 1, sx: 1.02, lean: 0, sway: 0.006, hop: 0, earOut: 0.3, earLift: 0, earWiggle: 0.02 }
+        : g < T.drink
+          ? kind === "music"
+            ? { ...base, sy: 1.02, sx: 1, lean: 0, sway: 0.1, hop: 0.045, earOut: 0.1, earLift: 0.01, earWiggle: 0.14 }
+            : kind === "bath"
+              ? { ...base, sy: 1, sx: 1.02, lean: 0, sway: 0.03, hop: 0, earOut: 0.35, earLift: -0.01, earWiggle: 0.04 }
               : { ...base, sy: 1, sx: 1.02, lean: 0, sway: 0.035, hop: 0, earOut: 0.45, earLift: -0.01, earWiggle: 0.05 }
           : { ...base, sy: 1.02, sx: 1, lean: 0, sway: 0.02, hop: 0.03, earOut: 0.08, earLift: 0.01, earWiggle: 0.08 };
     }
@@ -121,12 +124,28 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
     const hop = Math.max(0, Math.sin(t * 2.4)) * c.hop;
 
     if (body.current) {
-      const chew = holding && giftId === "tteok" ? Math.sin(g * 12) * 0.022 : 0;
+      const chew = holding && giftId === "tteok" ? Math.max(0, Math.sin(g * 11)) * 0.035 : 0;
       const sy = c.sy * (1 + breath * c.breathe + stretch * 0.09 + bounce * 0.12 + chew);
       const sx = c.sx * (1 - breath * c.breathe * 0.5 - stretch * 0.05 - bounce * 0.06);
       body.current.scale.set(sx, sy, 1);
       body.current.rotation.z = c.lean + Math.sin(t * 0.9) * c.sway;
       body.current.position.y = hop;
+    }
+
+    // bath: hop off the sofa into the tub, soak, then hop back
+    if (mover.current) {
+      let mx = 0, my = 0, mz = 0;
+      if (giving && kind === "bath" && stage) {
+        const tx = (stage.tubX - seat.x) / SCALE, ty = (stage.groundY + 0.06 - seat.y) / SCALE, tz = 0.55 / SCALE;
+        const jumpIn = Math.min(1, Math.max(0, (g - (T.give - 0.6)) / 0.6));
+        const jumpOut = Math.min(1, Math.max(0, (g - T.drink) / 0.6));
+        const k2 = jumpIn * (1 - jumpOut);
+        const arc = Math.sin(Math.PI * (jumpOut > 0 ? jumpOut : jumpIn)) * 0.45;
+        mx = tx * k2;
+        my = ty * k2 + arc + (k2 === 1 ? Math.sin(g * 2.5) * 0.015 : 0);
+        mz = tz * (k2 > 0 ? 1 : 0);
+      }
+      mover.current.position.set(mx, my, mz);
     }
 
     // ears: droop with tiredness, flick up when poked, twitch now and then when awake
@@ -155,30 +174,38 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
     shut.forEach((e) => e.current && (e.current.visible = open <= 0.15 && !pleased));
     happyRefs.forEach((e) => e.current && (e.current.visible = pleased));
 
-    // paws come up to hold the cup, then go back down
-    const reach = giving && kind === "hold" && g > GIFT_T.give - 0.7 ? Math.min(1, (g - GIFT_T.give + 0.7) / 0.5) * (g < GIFT_T.drink ? 1 : Math.max(0, 1 - (g - GIFT_T.drink) / 0.4)) : 0;
+    // paws come up to hold the cup or the plate, then go back down
+    const reach = giving && kind === "hold" && g > T.give - 0.7 ? Math.min(1, (g - T.give + 0.7) / 0.5) * (g < T.drink ? 1 : Math.max(0, 1 - (g - T.drink) / 0.4)) : 0;
+    const plate = giftId === "tteok";
+    // eating: one paw goes from the plate up to the mouth, again and again (얌얌)
+    const bite = holding && plate ? Math.max(0, Math.sin(g * 5.5)) : 0;
     pawRefs.forEach((e, i) => {
       if (!e.current) return;
       const [px, py] = at(i === 0 ? -34 : 34, 4);
-      e.current.position.set(lerp(px, (i === 0 ? -1 : 1) * 0.13, reach), lerp(py, 0.5, reach) + (holding ? Math.sin(g * 3) * 0.015 : 0), 0.05);
+      const hx = plate ? (i === 0 ? -1 : 1) * 0.2 : (i === 0 ? -1 : 1) * 0.13;
+      const hy = plate ? 0.33 + (i === 1 ? bite * 0.32 : 0) : 0.5;
+      e.current.position.set(lerp(px, hx - (i === 1 ? bite * 0.14 : 0), reach), lerp(py, hy, reach) + (holding && !plate ? Math.sin(g * 3) * 0.015 : 0), 0.05);
+      e.current.visible = !(kind === "bath" && giving && g > T.give - 0.3 && g < T.drink + 0.3);
     });
     if (held.current) {
-      held.current.visible = holding;
+      held.current.visible = holding && !plate;
       const sip = Math.sin(g * 3) * 0.02;
       held.current.position.set(0, 0.5 + sip, 0.04);
       held.current.rotation.z = holding ? Math.sin(g * 3) * 0.08 : 0;
     }
-    if (wear.current) wear.current.visible = wearing;
-    // each gift gives off its own little things: hearts, bath bubbles, music notes, sparkles
+    // the plate empties as Minimi eats: 3 → 2 → 1 → 0 pieces
+    const eaten = plate && holding ? Math.min(3, Math.floor(((g - T.give) / (T.drink - T.give)) * 4)) : -1;
+    plateRefs.forEach((r, i) => r.current && (r.current.visible = i === eaten));
+    // each gift gives off its own little things: hearts, bath bubbles, music notes
     const particle = giftId ? GIFTS[giftId].particle : "heart";
     heartRefs.forEach((h, i) => {
       if (!h.current) return;
-      const hp = giving && g > GIFT_T.give + 0.4 ? ((g - GIFT_T.give - 0.4) * (particle === "bubble" ? 0.6 : 0.45) + i / 3) % 1 : -1;
-      h.current.visible = hp >= 0 && g < GIFT_T.leave - 0.3;
-      const spread = particle === "bubble" ? [-0.45, 0.05, 0.5][i] : particle === "sparkle" ? [-0.38, 0.4, 0.05][i] : 0.32 - i * 0.22;
-      const y0 = particle === "bubble" ? 0.35 : particle === "sparkle" ? 0.7 : 1.05;
-      h.current.position.set(spread + Math.sin(hp * 6 + i) * 0.05, y0 + hp * (particle === "sparkle" ? 0.25 : 0.6), 0.07);
-      h.current.scale.setScalar(particle === "sparkle" ? 0.7 + Math.sin(hp * Math.PI) * 0.9 : 0.8 + hp * 0.7);
+      const hp = giving && g > T.give + 0.4 ? ((g - T.give - 0.4) * (particle === "bubble" ? 0.6 : 0.45) + i / 3) % 1 : -1;
+      h.current.visible = hp >= 0 && g < T.leave - 0.3 && (kind !== "bath" || g < T.drink);
+      const spread = particle === "bubble" ? [-0.45, 0.05, 0.5][i] : 0.32 - i * 0.22;
+      const y0 = particle === "bubble" ? 0.6 : 1.05;
+      h.current.position.set(spread + Math.sin(hp * 6 + i) * 0.05, y0 + hp * 0.6, 0.07);
+      h.current.scale.setScalar(0.8 + hp * 0.7);
     });
 
     zs.forEach((z, i) => {
@@ -205,8 +232,9 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
 
   return (
     <group position={[seat.x, seat.y, Z.minimi]} scale={SCALE}>
-      {seat.shadow && <Sprite art={art.shadow} position={[0.1, 0.0, -0.06]} color="#000" opacity={pal.shadow} order={20} />}
       <Sprite art={art.cup} position={[seat.cup[0], seat.cup[1] + 0.15 * 1.5, 0.04]} scale={1.5} color={tint} order={30} />
+      <group ref={mover}>
+      {seat.shadow && <Sprite art={art.shadow} position={[0.1, 0.0, -0.06]} color="#000" opacity={pal.shadow} order={20} />}
       <group ref={body} onPointerDown={poke}>
         {art.ears.map((ear, i) => (
           <group key={i} ref={earRefs[i]}>
@@ -223,15 +251,15 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
         ))}
         <Sprite art={art.nose} position={[FACE.nose[0], FACE.nose[1], 0.01]} color={tint} order={26} />
         <group ref={head} position={[FACE.headTop[0], FACE.headTop[1], 0]} />
-        <group ref={wear} visible={false}>
-          {giftArt && giftId === "bath" && <Sprite art={giftArt.item} position={[0.02, 1.22, 0.02]} scale={1.35} color={tint} order={29} />}
-          {giftArt && giftId === "song" && <Sprite art={giftArt.item} position={[0, 0.98, 0.02]} color={tint} order={27.5} />}
-          {giftArt && giftId === "pack" && <Sprite art={giftArt.mask} position={[0, 0.8, 0.005]} color={tint} order={25} />}
-        </group>
       </group>
       <group ref={held} visible={false}>
-        {giftArt && <Sprite art={giftArt.item} position={[0, 0.15 * 1.3, 0]} scale={1.3} color={tint} order={27} />}
+        {giftArt && <Sprite art={giftArt.cup} position={[0, 0.15 * 1.3, 0]} scale={1.3} color={tint} order={27} />}
       </group>
+      {giftArt && giftArt.plates.map((pl, i) => (
+        <group key={`pl${i}`} ref={plateRefs[i]} position={[0, 0.28, 0.04]} visible={false}>
+          <Sprite art={pl} position={[0, 0.15 * 1.3, 0]} scale={1.3} color={tint} order={27} />
+        </group>
+      ))}
       {paws.map(([x, y], i) => (
         <group key={i} ref={pawRefs[i]} position={[x, y, 0.05]}>
           <Sprite art={art.pawShadow} position={[0.012, -0.03, -0.005]} color="#000" opacity={0.16} order={27.5} />
@@ -244,6 +272,7 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
       {zs.map((z, i) => (
         <Sprite key={i} ref={z} art={art.z} order={29} visible={false} />
       ))}
+      </group>
     </group>
   );
 }

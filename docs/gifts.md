@@ -1,15 +1,12 @@
 # Gifts
 
-You choose one of five gifts a day (no free text). Defined in `src/lib/gifts.ts`.
-The squirrel friend brings each one, carrying a teapot with its tail; for the matcha latte it pours the tea into the cup first (`src/scene/GiftShow.tsx`, art in `src/scene/squirrel.ts`);
-Minimi's reaction lives in `src/scene/Minimi.tsx`, props in `src/scene/props.ts`.
+Tap "선물 주기" and four gift emoticons pop out; tap one to give it (one a day).
+Defined in `src/lib/gifts.ts`. The squirrel friend (`src/scene/squirrel.ts`) carries a teapot
+in its tail and brings each gift (`src/scene/GiftShow.tsx`); Minimi's side is in `src/scene/Minimi.tsx`.
 
-| Gift | How Minimi enjoys it | Particles |
-|---|---|---|
-| 말차라떼 | holds the cup and sips | hearts |
-| 떡볶이 | holds the bowl and chews | hearts |
-| 따뜻한 목욕 | a pink towel goes on its head | bath bubbles |
-| 얼굴 팩 | a green face mask goes on | sparkles |
-| 노래 | headphones go on, it sways and bops | music notes |
-
-Other ideas from the owner's list for later: 커피, 산책, 파스타먹기, 소파에 늘어지기.
+| Gift | Scene |
+|---|---|
+| 말차라떼 | The squirrel pours tea from the teapot into a cup, hands it over; Minimi sips (hearts) |
+| 떡볶이 | A plate of tteokbokki; Minimi eats 얌얌 until the plate is empty (hearts) |
+| 따뜻한 목욕 | The squirrel pushes in a big tub and fills it from the teapot; Minimi jumps in with a splash, soaks in bubbles, hops back to the sofa |
+| 노래 듣기 | The squirrel sets down a speaker and plays a song; notes float, Minimi and the squirrel dance |

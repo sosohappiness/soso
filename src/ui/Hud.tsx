@@ -9,7 +9,7 @@ export function Hud({ time, label, flowers, days, onRotate }: Props) {
       </div>
       <div className="side">
         <div className="counts">
-          <div>소담 <b>{flowers}</b></div>
+          <div>소복 <b>{flowers}</b></div>
           <div>함께한 날 <b>{days}</b></div>
         </div>
         <button className="rotate" onClick={onRotate} aria-label="시점 돌리기">

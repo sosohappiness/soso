@@ -82,6 +82,10 @@ type Props = {
 
 export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, scene, gift }: Props) {
   const pal = paletteFor(scene, phase);
+  // where gifts happen: Minimi's seat, the ground in front of it, and where the bath tub stands
+  const seat = scene === "sofa" ? SOFA_SEAT : GROUND_SEAT;
+  const groundY = scene === "sofa" ? -0.32 : GROUND_SEAT.y - 0.15;
+  const tubX = seat.x - 0.1;
   const anchor = useMemo(() => new THREE.Vector3(), []);
   return (
     <Canvas
@@ -97,8 +101,8 @@ export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, sce
       <CloudFlower pal={pal} growth={growth} night={phase === "night"} />
       {scene === "sofa" && <Sofa pal={pal} />}
       {scene === "sofa" && <MeadowLife pal={pal} />}
-      <Minimi animal={animal} phase={phase} pal={pal} anchor={anchor} pokeAt={pokeAt} onPoke={onPoke} seat={scene === "sofa" ? SOFA_SEAT : undefined} gift={gift} />
-      <GiftShow pal={pal} seat={scene === "sofa" ? SOFA_SEAT : GROUND_SEAT} groundY={scene === "sofa" ? -0.32 : GROUND_SEAT.y - 0.15} gift={gift} />
+      <Minimi animal={animal} phase={phase} pal={pal} anchor={anchor} pokeAt={pokeAt} onPoke={onPoke} seat={seat} gift={gift} stage={{ tubX, groundY }} />
+      <GiftShow pal={pal} seat={seat} groundY={groundY} tubX={tubX} gift={gift} />
       <BubbleTracker anchor={anchor} el={bubble} />
     </Canvas>
   );

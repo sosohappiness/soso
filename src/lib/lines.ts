@@ -10,7 +10,7 @@ export const LINES: Record<Phase, string[]> = {
   day: [
     "뭐 하고 있었어? 궁금해!",
     "점심은 맛있는 거 먹었어?",
-    "나무 그늘 시원하다~",
+    "구름 그늘 시원하다~",
     "나랑 잠깐 놀자!",
   ],
   evening: [

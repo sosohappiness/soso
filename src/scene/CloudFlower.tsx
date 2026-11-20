@@ -109,6 +109,8 @@ export function CloudFlower({ pal, growth, night }: { pal: Palette; growth: Grow
   const bigCount = Math.min(SPOTS.length, growth.bigFlowers);
 
   const float = useRef<THREE.Group>(null);
+  const smallRefs = useRef<(THREE.Group | null)[]>([]);
+  const bigRefs = useRef<(THREE.Group | null)[]>([]);
   const petalRefs = useRef<(THREE.Group | null)[]>([]);
   const sparkRefs = useRef<(THREE.Group | null)[]>([]);
   const sparkSeeds = useMemo(() => {
@@ -125,6 +127,13 @@ export function CloudFlower({ pal, growth, night }: { pal: Palette; growth: Grow
       const b = 1 + Math.sin(t * 0.7) * 0.012;
       float.current.scale.set(b, 2 - b, 1);
     }
+    // every flower on the cloud nods and sways a little, each to its own rhythm
+    smallRefs.current.forEach((f, i) => {
+      if (!f) return;
+      f.rotation.z = small[i].rot + Math.sin(t * 1.3 + i * 0.9) * 0.3;
+      f.scale.setScalar(small[i].k * (1 + Math.sin(t * 1.7 + i * 1.3) * 0.06));
+    });
+    bigRefs.current.forEach((f, i) => f && (f.rotation.z = Math.sin(t * 0.9 + i * 1.4) * 0.18));
     petalRefs.current.forEach((g, i) => {
       if (!g) return;
       if (smallCount === 0) {
@@ -156,12 +165,14 @@ export function CloudFlower({ pal, growth, night }: { pal: Palette; growth: Grow
         <group scale={s}>
           <Sprite art={cloud} color={pal.tint} order={12} />
           {small.slice(0, smallCount).map((f, i) => (
-            <group key={i} position={[f.x, f.y, 0.01]} rotation={[0, 0, f.rot]} scale={f.k}>
+            <group key={i} ref={(r) => { smallRefs.current[i] = r; }} position={[f.x, f.y, 0.01]} rotation={[0, 0, f.rot]} scale={f.k}>
               <Sprite art={flowers[f.c]} color={pal.tint} order={13} />
             </group>
           ))}
           {SPOTS.slice(0, bigCount).map(([x, y], i) => (
-            <Sprite key={i} art={flowers[i % flowers.length]} position={[x, y, 0.02]} scale={1 + ((i * 37) % 5) * 0.07} color={pal.tint} order={14} />
+            <group key={i} ref={(r) => { bigRefs.current[i] = r; }} position={[x, y, 0.02]} scale={1 + ((i * 37) % 5) * 0.07}>
+              <Sprite art={flowers[i % flowers.length]} color={pal.tint} order={14} />
+            </group>
           ))}
         </group>
       </group>
