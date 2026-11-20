@@ -287,7 +287,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .set-box { background: #fff; border: 2px solid rgba(74,59,51,.2); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
 .set-box .export-action.primary { grid-column: auto; }
 .set-account { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
-.invite-link { margin: 0; font-size: 13px; color: #5a4d44; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
+.invite-link { display: block; width: 100%; margin: 0; padding: 10px 12px; border: 1.5px solid #e3dcd0; border-radius: 12px; background: #fffaf2; font: inherit; font-size: 13px; color: #5a4d44; user-select: text; -webkit-user-select: text; }
 
 /* ---- first launch: hello → email → code → friend ---- */
 .onboard {

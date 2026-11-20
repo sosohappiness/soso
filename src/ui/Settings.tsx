@@ -19,7 +19,9 @@ export function Settings({ animal, email, onAnimal, onSignOut, onClose }: {
 }) {
   const [asking, setAsking] = useState<AnimalId | null>(null);
   const [inviteNote, setInviteNote] = useState("");
-  const link = typeof location !== "undefined" ? location.origin + "/" : "";
+  // the link friends open: set VITE_INVITE_URL when the app lives somewhere other than where it runs
+  // (e.g. shared as a claude.ai link); otherwise this page's own address
+  const link = (import.meta.env.VITE_INVITE_URL as string | undefined) || (typeof location !== "undefined" ? location.origin + "/" : "");
   const invite = async () => {
     const text = inviteText(link);
     if (typeof navigator.share === "function") {
@@ -34,7 +36,7 @@ export function Settings({ animal, email, onAnimal, onSignOut, onClose }: {
       await navigator.clipboard.writeText(text);
       setInviteNote("초대 메시지를 복사했어요. 카카오톡이나 문자에 붙여넣어 보내 주세요.");
     } catch {
-      setInviteNote("이 화면에서는 복사가 막혀 있어요. 아래 링크를 길게 눌러 복사해 주세요.");
+      setInviteNote("이 화면에서는 자동 복사가 막혀 있어요. 아래 링크를 길게 눌러 복사해서 보내 주세요.");
     }
   };
   return (
@@ -70,7 +72,7 @@ export function Settings({ animal, email, onAnimal, onSignOut, onClose }: {
         <p className="journal-hint">So So를 친구에게 소개해 보세요. 링크를 받은 친구도 자기만의 미니미와 구름을 키울 수 있어요.</p>
         <button className="export-action primary" onClick={invite}>친구 초대하기</button>
         {inviteNote && <p className="export-note" role="status">{inviteNote}</p>}
-        {inviteNote && <p className="invite-link">{link}</p>}
+        <input className="invite-link" readOnly value={link} aria-label="초대 링크" onFocus={(e) => e.currentTarget.select()} onClick={(e) => e.currentTarget.select()} />
       </div>
 
       <h3 className="set-title">계정</h3>
