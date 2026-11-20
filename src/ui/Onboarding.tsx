@@ -59,7 +59,7 @@ export function Onboarding({ onDone }: { onDone: (email: string, animal: AnimalI
               <FriendPortrait id="dog" size={78} />
             </div>
             <h1 className="ob-logo">소소</h1>
-            <p className="ob-lead">작고 지친 친구에게 하루 하나, 좋아하는 걸 선물해요.<br />고마운 일 세 가지를 적으면 구름에 꽃이 소복이 피어나요.</p>
+            <p className="ob-lead">작고 지친 친구에게 하루 하나, 좋아하는 걸 선물해요.<br />고마운 일 세 가지를 적으면 뭉게구름에 꽃이 소복이 피어나요.</p>
             <button className="ob-primary" onClick={() => setStep("email")}>시작하기</button>
           </>
         )}
