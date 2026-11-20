@@ -57,8 +57,8 @@ export default function App() {
   // sign-up: email + 6-digit code on first launch
   const [account, setAccount] = useState<Account | null>(() => loadAccount());
   // two first-screen styles to compare (preview only): kraft desk, watercolour sketchbook
-  const [helloStyle, setHelloStyle] = useState<"desk" | "nap" | "sketch">(() => { const h = load<string>("helloStyle", "nap"); return h === "desk" || h === "sketch" ? h : "nap"; });
-  useEffect(() => save("helloStyle", helloStyle), [helloStyle]);
+  const [helloStyle, setHelloStyle] = useState<"desk" | "nap" | "mine" | "sketch">(() => { const h = load<string>("helloStyle2", "mine"); return h === "desk" || h === "sketch" || h === "nap" ? h : "mine"; });
+  useEffect(() => save("helloStyle2", helloStyle), [helloStyle]);
   const [logoFont, setLogoFont] = useState<LogoFontId>(() => {
     const f = load<LogoFontId>("logoFont2", "marker");
     return f in LOGO_FONTS ? f : "marker";
@@ -250,7 +250,7 @@ export default function App() {
       {settingsOpen && <Settings animal={animal} email={account?.email ?? null} onAnimal={changeFriend} onSignOut={() => void onSignOut()} onClose={() => setSettingsOpen(false)} />}
       {!account && <Onboarding key={helloStyle} hello={helloStyle} logoFont={logoFont} onDone={onSignedUp} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
-        <DevBar phase={phase} onPhase={setPhaseOverride} onResetGift={resetToday} visiting={!!visitor} onVisit={() => (visitor ? endVisit() : startVisit(visitorFor(animal, now)))} onRestart={() => void onSignOut()} hello={helloStyle} onHello={() => { setHelloStyle((h) => (h === "nap" ? "desk" : h === "desk" ? "sketch" : "nap")); void onSignOut(); }}
+        <DevBar phase={phase} onPhase={setPhaseOverride} onResetGift={resetToday} visiting={!!visitor} onVisit={() => (visitor ? endVisit() : startVisit(visitorFor(animal, now)))} onRestart={() => void onSignOut()} hello={helloStyle} onHello={() => { setHelloStyle((h) => (h === "mine" ? "nap" : h === "nap" ? "desk" : h === "desk" ? "sketch" : "mine")); void onSignOut(); }}
           logoFont={LOGO_FONTS[logoFont].label} onLogoFont={() => { setLogoFont((f) => LOGO_ORDER[(LOGO_ORDER.indexOf(f) + 1) % LOGO_ORDER.length]); void onSignOut(); }} />
       )}
     </div>

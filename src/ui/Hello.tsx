@@ -1,3 +1,4 @@
+import myDesk from "../assets/my-desk.png?inline";
 // The first screen: a watercolour sketchbook page with a big "So So", and the three friends
 // painted exactly as on the home screen, gathered around a watercolour cloud.
 import { PORTRAIT_ASPECT, portraitURL } from "../scene/portrait";
@@ -262,7 +263,7 @@ function NapScene() {
   );
 }
 
-export function HelloDesk({ onStart, logoFont = "poppins", pose = "desk" }: { onStart: () => void; logoFont?: LogoFontId; pose?: "desk" | "nap" }) {
+export function HelloDesk({ onStart, logoFont = "poppins", pose = "desk" }: { onStart: () => void; logoFont?: LogoFontId; pose?: "desk" | "nap" | "mine" }) {
   return (
     <div className="hello desk" style={{ backgroundImage: `url(${kraftURL()})` }}>
       <header className="hello-head">
@@ -274,6 +275,11 @@ export function HelloDesk({ onStart, logoFont = "poppins", pose = "desk" }: { on
         <p className="desk-ko">지친 하루 끝, 친구가 기다리고 있어요.<br />소소한 행복을 함께 모아요.</p>
       </header>
 
+      {pose === "mine" ? (
+        <div className="hello-art2 hello-mine">
+          <img src={myDesk} alt="의자에 기대 누워 책상 위로 다리를 뻗고 음료를 든 채 웃고 있는 사람, 벽에는 시계, 책상엔 노트북" />
+        </div>
+      ) : (
       <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label={pose === "nap" ? "모니터 앞 책상에 볼을 대고 눈을 감은 지친 사람, 옆에는 김이 나는 머그잔과 엎어 둔 휴대폰" : "의자에 앉아 모니터 앞 책상에 얼굴을 묻고 팔을 늘어뜨린 지친 사람"}>
         <defs>
           <filter id="chalk-wobble" x="-5%" y="-5%" width="110%" height="110%">
@@ -286,6 +292,7 @@ export function HelloDesk({ onStart, logoFont = "poppins", pose = "desk" }: { on
         </defs>
         {pose === "nap" ? <NapScene /> : <DeskScene />}
       </svg>
+      )}
 
       <div className="hello-bottom2">
         <button className="hello-start chalk" onClick={onStart}>소소한 행복 속으로 <b>Go</b></button>

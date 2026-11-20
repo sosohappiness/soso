@@ -10,7 +10,7 @@ type Step = "hello" | "email" | "code" | "friend";
 /**
  * First launch: say hello → sign up with email → enter the 6-digit code → pick a friend.
  */
-export function Onboarding({ onDone, hello = "desk", logoFont = "poppins" }: { onDone: (email: string, animal: AnimalId) => void; hello?: "desk" | "nap" | "sketch"; logoFont?: LogoFontId }) {
+export function Onboarding({ onDone, hello = "desk", logoFont = "poppins" }: { onDone: (email: string, animal: AnimalId) => void; hello?: "desk" | "nap" | "mine" | "sketch"; logoFont?: LogoFontId }) {
   const [step, setStep] = useState<Step>("hello");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
