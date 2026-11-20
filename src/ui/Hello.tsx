@@ -177,53 +177,61 @@ function DeskScene() {
 }
 
 /**
- * Option 2: a worn-out person flat on the floor, legs out, a laptop propped on the belly, staring
- * at the ceiling with big round eyes. Line drawing on kraft; only the eyes are solid chalk.
+ * Option 2: someone with their head down on the desk, cheek on the table, eyes shut, a mug of
+ * something warm still steaming beside them and the phone face-down, the monitor still on in
+ * front. Drawn in the reference's coordinates and scaled down into the scene.
  */
-function LieScene() {
+function NapScene() {
   const paper = "#BB8D65";
   const ink = "#3B2818";
-  const body = { ...chalk, fill: paper };
-  const thin = { ...chalk, strokeWidth: 2.2 };
+  const line = { ...chalk, strokeWidth: 11 };
+  const thin = { ...chalk, strokeWidth: 6 };
   return (
     <g filter="url(#chalk-wobble)">
-      {/* a soft floor shadow */}
-      <ellipse cx="178" cy="300" rx="150" ry="34" fill="#8E6440" opacity="0.28" />
-      {/* the far arm, reaching out behind the laptop */}
-      <path d="M184 206 L 122 222 L 124 238 L 188 224 Z" {...body} />
-      <path d="M122 222 C 110 218 104 228 110 233 C 102 236 106 246 116 244 C 118 246 122 242 124 238" {...body} />
-      {/* legs out flat, feet tipped up */}
-      <path d="M178 248 L 66 286 L 70 310 L 184 274 Z" {...body} />
-      <path d="M66 286 C 58 270 42 276 44 294 C 44 308 58 316 70 310" {...body} />
-      <path d="M186 268 L 110 330 L 124 348 L 204 288 Z" {...body} />
-      <path d="M110 330 C 96 324 86 340 96 352 C 104 360 118 358 124 348" {...body} />
-      {/* torso */}
-      <path d="M204 192 C 236 192 266 218 266 248 C 266 280 236 298 198 298 C 168 298 152 278 158 252 C 164 224 180 194 204 192 Z" {...body} />
-      {/* near arm lying by the side, limp hand */}
-      <path d="M252 238 L 268 232 L 300 312 L 284 318 Z" {...body} />
-      <path d="M284 318 C 280 330 290 338 298 334 C 304 330 304 320 300 312" {...body} />
-      <path d="M290 326 L 288 334 M 296 324 L 296 332" {...thin} />
-      {/* laptop on the belly: keyboard base, then the lid seen from behind */}
-      <path d="M164 256 L 226 244 L 272 290 L 218 304 Z" {...body} />
-      <path d="M188 262 L 232 254 M 196 272 L 244 264 M 204 282 L 254 274 M 212 292 L 238 287" {...thin} />
-      <path d="M164 256 L 136 166 L 190 214 L 218 304 Z" {...body} />
-      <circle cx="177" cy="236" r="6" {...thin} />
-      {/* head: a big round blob, face turned up to the ceiling */}
-      <ellipse cx="266" cy="172" rx="56" ry="47" transform="rotate(-28 266 172)" {...body} />
-      {/* big blank eyes and a tiny mouth */}
-      <ellipse cx="236" cy="150" rx="16" ry="12" transform="rotate(-28 236 150)" {...chalk} fill={CHALK} />
-      <circle cx="231" cy="149" r="8" fill={ink} />
-      <ellipse cx="282" cy="180" rx="18" ry="13" transform="rotate(-28 282 180)" {...chalk} fill={CHALK} />
-      <circle cx="276" cy="178" r="9" fill={ink} />
-      <path d="M252 170 q -5 4 1 8" {...thin} />
-      {/* droopy lids: tired */}
-      <path d="M222 148 C 228 138 244 134 252 140" {...chalk} />
-      <path d="M266 176 C 272 166 290 164 300 172" {...chalk} />
+      <g transform="translate(26 50) scale(0.38)">
+        {/* monitor in front, still on */}
+        <path d="M-60 196 L 222 176 L 228 420 L -54 436 Z" {...line} fill={CHALK} />
+        <path d="M-34 218 L 200 200 L 204 396 L -28 410 Z" {...thin} fill={paper} />
+        <path d="M0 250 L 120 242 M 0 280 L 160 270 M 0 310 L 90 304" {...thin} />
+        <path d="M84 432 L 86 500" {...line} strokeWidth={16} />
+        <path d="M24 506 L 152 498" {...line} />
+
+        {/* steam curling up from the mug */}
+        <path d="M312 556 C 300 524 262 508 270 476 C 278 444 330 432 322 394 C 316 364 284 352 294 318" {...line} />
+        {/* mug */}
+        <path d="M276 596 C 300 584 350 586 366 598 L 356 690 C 340 706 300 706 286 690 Z" {...line} fill={paper} />
+        <ellipse cx="321" cy="602" rx="34" ry="10" fill={ink} />
+        <path d="M278 616 C 244 616 244 668 282 662" {...line} />
+
+        {/* the desk's front edge, running under the arm */}
+        <path d="M600 520 L 815 765" {...line} />
+        {/* phone, face down */}
+        <path d="M498 712 L 576 656 C 588 648 606 656 612 670 L 538 734 C 524 744 502 732 498 712 Z" {...line} fill={CHALK} />
+
+        {/* the jumper: shoulder, back, and the folded arm */}
+        <path d="M604 404 L 628 376 C 648 366 690 372 706 384" {...line} />
+        <path d="M700 384 L 650 560" {...line} />
+        <path d="M722 402 C 800 422 860 500 870 600 C 876 660 878 700 878 745" {...line} />
+        <path d="M660 588 C 664 520 694 488 736 482" {...line} />
+        <path d="M748 484 C 778 488 794 534 794 600 L 794 708" {...line} />
+
+        <g transform="rotate(14 480 470)">
+        {/* face peeking out under the fringe, cheek on the desk, eyes shut */}
+        <path d="M396 452 C 420 432 470 430 506 450 C 540 470 548 520 530 566 C 500 576 450 574 420 560 C 392 546 378 500 396 452 Z" fill={paper} />
+        <path d="M384 522 C 398 552 432 570 480 572" {...line} />
+        <path d="M448 488 L 450 512" {...line} />
+        <path d="M496 494 L 498 516" {...line} />
+        <path d="M472 530 L 474 542" {...thin} />
+        {/* hair: one soft mass around the face, spilling down onto the desk */}
+        <path d="M340 470 C 316 380 384 316 470 316 C 568 316 628 374 630 448 C 632 500 618 540 600 566 C 572 576 546 574 530 566 C 548 520 540 470 500 448 C 460 428 420 434 398 452 C 382 470 374 500 382 532 C 362 522 346 500 340 470 Z" {...line} fill={CHALK} />
+        <path d="M420 360 C 470 340 540 350 586 392" {...thin} stroke={paper} />
+        </g>
+      </g>
     </g>
   );
 }
 
-export function HelloDesk({ onStart, logoFont = "poppins", pose = "desk" }: { onStart: () => void; logoFont?: LogoFontId; pose?: "desk" | "lie" }) {
+export function HelloDesk({ onStart, logoFont = "poppins", pose = "desk" }: { onStart: () => void; logoFont?: LogoFontId; pose?: "desk" | "nap" }) {
   return (
     <div className="hello desk" style={{ backgroundImage: `url(${kraftURL()})` }}>
       <header className="hello-head">
@@ -235,7 +243,7 @@ export function HelloDesk({ onStart, logoFont = "poppins", pose = "desk" }: { on
         <p className="desk-ko">지친 하루 끝, 친구가 기다리고 있어요.<br />소소한 행복을 함께 모아요.</p>
       </header>
 
-      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label={pose === "lie" ? "바닥에 대자로 누워 배 위에 노트북을 올려놓고 천장을 멍하니 보는 지친 사람" : "의자에 앉아 모니터 앞 책상에 얼굴을 묻고 팔을 늘어뜨린 지친 사람"}>
+      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label={pose === "nap" ? "모니터 앞 책상에 볼을 대고 눈을 감은 지친 사람, 옆에는 김이 나는 머그잔과 엎어 둔 휴대폰" : "의자에 앉아 모니터 앞 책상에 얼굴을 묻고 팔을 늘어뜨린 지친 사람"}>
         <defs>
           <filter id="chalk-wobble" x="-5%" y="-5%" width="110%" height="110%">
             <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="5" result="n" />
@@ -245,7 +253,7 @@ export function HelloDesk({ onStart, logoFont = "poppins", pose = "desk" }: { on
             <feComposite in="w" in2="holes" operator="in" />
           </filter>
         </defs>
-        {pose === "lie" ? <LieScene /> : <DeskScene />}
+        {pose === "nap" ? <NapScene /> : <DeskScene />}
       </svg>
 
       <div className="hello-bottom2">
