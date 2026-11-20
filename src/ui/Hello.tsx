@@ -2,6 +2,7 @@
 // painted exactly as on the home screen, gathered around a watercolour cloud.
 import { PORTRAIT_ASPECT, portraitURL } from "../scene/portrait";
 import type { AnimalId } from "../scene/animals";
+import { kraftURL } from "./kraft";
 
 const PETALS = ["#F4B6C2", "#F6D46A", "#F29A7E", "#C9B6E8"];
 
@@ -117,66 +118,72 @@ export function Hello({ onStart }: { onStart: () => void }) {
 const CHALK = "#FFF8EC";
 const chalk = { stroke: CHALK, strokeWidth: 4.2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, fill: "none" };
 
-/** 뽀송이 melted over the desk after a long day: monitor, keyboard, a tall stack of books, a mug. */
+/** A tired person melted into a reclined office chair beside the desk: books piled high, monitor, mug. */
 function DeskScene() {
-  // a tall, slightly wobbly stack of books
+  // a tall, slightly wobbly stack of books on the desk
   const books: [number, number, number][] = [
-    [18, 104, 22], [24, 96, 20], [14, 108, 24], [22, 94, 18], [16, 102, 22], [26, 90, 20], [20, 98, 24], [28, 86, 18],
+    [184, 58, 20], [188, 52, 18], [182, 60, 22], [190, 48, 16], [184, 56, 20], [192, 46, 18], [186, 54, 22], [194, 42, 16],
   ];
-  let y = 262;
+  let y = 250;
   return (
     <g filter="url(#chalk-wobble)">
       {/* desk */}
-      <path d="M8 262 L 356 262 L 356 278 L 8 278 Z" {...chalk} />
-      <path d="M24 278 L 24 372 M340 278 L 340 372 M24 326 L 340 326" {...chalk} />
+      <path d="M176 250 L 360 250 L 360 264 L 176 264 Z" {...chalk} />
+      <path d="M190 264 L 190 366 M346 264 L 346 366 M190 318 L 346 318" {...chalk} />
 
-      {/* books stacked high on the left */}
       {books.map(([x, w, h], i) => {
         y -= h;
         const top = y;
         return (
           <g key={i}>
             <rect x={x} y={top} width={w} height={h} rx={3} {...chalk} />
-            <path d={`M${x + 10} ${top + 5} L ${x + 10} ${top + h - 5}`} {...chalk} strokeWidth={2.4} />
-            {i % 2 === 0 && <path d={`M${x + w - 24} ${top + h / 2} L ${x + w - 8} ${top + h / 2}`} {...chalk} strokeWidth={2.4} />}
+            <path d={`M${x + 9} ${top + 5} L ${x + 9} ${top + h - 5}`} {...chalk} strokeWidth={2.4} />
+            {i % 2 === 0 && <path d={`M${x + w - 18} ${top + h / 2} L ${x + w - 8} ${top + h / 2}`} {...chalk} strokeWidth={2.4} />}
           </g>
         );
       })}
 
-      {/* monitor and keyboard */}
-      <rect x="226" y="120" width="120" height="90" rx="9" {...chalk} />
-      <path d="M242 148 L 304 148 M242 164 L 326 164 M242 180 L 286 180" {...chalk} strokeWidth={2.6} />
-      <path d="M286 210 L 286 242 M262 250 C 266 240 306 240 310 250 Z" {...chalk} />
-      <rect x="244" y="252" width="62" height="10" rx="3" {...chalk} />
-      {/* mug with steam */}
-      <path d="M318 234 L 342 234 L 339 262 L 321 262 Z" {...chalk} />
-      <path d="M342 240 C 352 240 352 252 341 252" {...chalk} strokeWidth={3} />
-      <path d="M325 224 q -5 -7 0 -14 M335 224 q -5 -7 0 -14" {...chalk} strokeWidth={2.6} />
+      {/* monitor, keyboard, mug */}
+      <rect x="250" y="128" width="104" height="84" rx="9" {...chalk} />
+      <path d="M264 154 L 318 154 M264 170 L 338 170 M264 186 L 302 186" {...chalk} strokeWidth={2.6} />
+      <path d="M302 212 L 302 236 M280 244 C 284 234 320 234 324 244 Z" {...chalk} />
+      <rect x="252" y="240" width="54" height="10" rx="3" {...chalk} />
+      <path d="M326 222 L 348 222 L 345 250 L 329 250 Z" {...chalk} />
+      <path d="M348 228 C 357 228 357 240 347 240" {...chalk} strokeWidth={3} />
+      <path d="M333 212 q -5 -7 0 -14 M342 212 q -5 -7 0 -14" {...chalk} strokeWidth={2.6} />
 
-      {/* 뽀송이 melted over the desk: head down, body pouring over the front edge */}
+      {/* reclined office chair */}
+      <path d="M118 150 L 152 156 L 132 246 L 104 244 Z" {...chalk} />
+      <path d="M60 262 L 142 262 L 140 274 L 62 274 Z" {...chalk} />
+      <path d="M100 274 L 100 318 M70 332 L 100 318 L 130 332 M84 336 L 100 318 L 116 336" {...chalk} />
+      <circle cx="68" cy="336" r="5" {...chalk} strokeWidth={3} />
+      <circle cx="132" cy="336" r="5" {...chalk} strokeWidth={3} />
+      <circle cx="86" cy="340" r="4.5" {...chalk} strokeWidth={3} />
+      <circle cx="116" cy="340" r="4.5" {...chalk} strokeWidth={3} />
+      <path d="M118 236 L 150 238" {...chalk} />
+
+      {/* the person, slid all the way down the chair: long melted body pouring to the floor */}
       <path
-        d="M182 258 C 160 256 140 254 124 256 C 110 258 104 262 104 268 C 104 286 102 306 112 318 C 122 330 140 326 142 310 C 144 296 140 282 148 274 C 160 268 176 270 186 266 Z"
-        {...chalk} fill="rgba(255,248,236,0.16)"
+        d="M116 214 C 96 218 78 238 64 262 C 48 290 28 318 8 334 L 8 352 C 36 352 64 342 86 316 C 104 296 116 276 128 258 C 136 246 136 220 124 212 Z"
+        {...chalk} fill="#B88B63"
       />
-      <path d="M128 304 q 6 4 10 0" {...chalk} strokeWidth={2.4} />
-      {/* an arm dangling over the edge */}
-      <path d="M160 270 C 164 288 164 306 158 322" {...chalk} />
-      <path d="M150 322 C 152 332 168 332 166 322" {...chalk} />
-      {/* head resting on the desk */}
-      <circle cx="188" cy="212" r="11" {...chalk} fill="rgba(255,248,236,0.16)" />
-      <circle cx="232" cy="212" r="11" {...chalk} fill="rgba(255,248,236,0.16)" />
-      <path d="M176 262 C 168 234 186 206 210 206 C 234 206 250 232 242 262 Z" {...chalk} fill="rgba(255,248,236,0.16)" />
-      <path d="M192 236 q 5 4 10 0 M218 236 q 5 4 10 0" {...chalk} strokeWidth={2.8} />
-      <ellipse cx="210" cy="248" rx="5" ry="3.6" fill={CHALK} stroke="none" />
+      <path d="M40 330 C 54 322 66 306 76 292" {...chalk} strokeWidth={2.6} />
+      {/* an arm flopped over the armrest */}
+      <path d="M128 226 C 138 230 146 236 150 246" {...chalk} />
+      <circle cx="151" cy="252" r="6" {...chalk} strokeWidth={3} fill="#B88B63" />
+      {/* round head resting on the chair back, eyes closed, a small tired smile */}
+      <circle cx="128" cy="190" r="22" {...chalk} fill="#B88B63" />
+      <path d="M116 188 q 4 3 8 0 M132 186 q 4 3 8 0" {...chalk} strokeWidth={2.6} />
+      <path d="M122 200 q 6 5 12 0" {...chalk} strokeWidth={2.6} />
       {/* z z */}
-      <path d="M248 214 l 12 0 l -12 12 l 12 0 M266 194 l 8 0 l -8 8 l 8 0" {...chalk} strokeWidth={2.8} />
+      <path d="M150 168 l 12 0 l -12 12 l 12 0 M168 148 l 8 0 l -8 8 l 8 0" {...chalk} strokeWidth={2.8} />
     </g>
   );
 }
 
 export function HelloDesk({ onStart }: { onStart: () => void }) {
   return (
-    <div className="hello desk">
+    <div className="hello desk" style={{ backgroundImage: `url(${kraftURL()})` }}>
       <header className="hello-head">
         <h1 className="hello-logo2 chalk-logo" aria-label="So So">
           <span>So</span>
@@ -186,7 +193,7 @@ export function HelloDesk({ onStart }: { onStart: () => void }) {
         <p className="desk-ko">지친 하루 끝, 친구가 기다리고 있어요.<br />소소한 행복을 함께 모아요.</p>
       </header>
 
-      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="책상에 녹아내리듯 엎드린 뽀송이, 모니터와 높이 쌓인 책">
+      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="사무용 의자에 녹아내리듯 기대 누운 지친 사람, 옆 책상에 높이 쌓인 책과 모니터">
         <defs>
           <filter id="chalk-wobble" x="-5%" y="-5%" width="110%" height="110%">
             <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="5" result="n" />
