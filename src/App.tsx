@@ -13,9 +13,6 @@ import { DevBar } from "./ui/DevBar";
 import type { SceneId } from "./scene/palette";
 import { GIFTS, enjoyLine, type GiftId } from "./lib/gifts";
 
-const VIEWS = [0, 0.42, -0.42]; // rotate-view button cycles through these yaw angles (≈ ±24°)
-const MAX_YAW = 0.52;
-const MAX_PITCH = 0.1;
 
 function useNow(frozen: Date | null) {
   const [now, setNow] = useState(() => frozen ?? new Date());
@@ -104,40 +101,21 @@ export default function App() {
     });
   }, [today]);
 
-  // Rotate view: button cycles preset angles; dragging the scene turns it freely within limits.
+  // the camera stays put (the scene is a fixed painting)
   const view = useRef({ yaw: 0, pitch: 0 });
-  const viewIdx = useRef(0);
-  const drag = useRef<{ x: number; y: number; yaw: number; pitch: number } | null>(null);
-  const rotate = () => {
-    viewIdx.current = (viewIdx.current + 1) % VIEWS.length;
-    view.current = { yaw: VIEWS[viewIdx.current], pitch: viewIdx.current ? 0.04 : 0 };
-  };
-  const onDown = (e: React.PointerEvent) => {
-    drag.current = { x: e.clientX, y: e.clientY, ...view.current };
-  };
-  const onMove = (e: React.PointerEvent) => {
-    const d = drag.current;
-    if (!d) return;
-    const clamp = (v: number, m: number) => Math.max(-m, Math.min(m, v));
-    view.current = {
-      yaw: clamp(d.yaw - (e.clientX - d.x) * 0.004, MAX_YAW),
-      pitch: clamp(d.pitch + (e.clientY - d.y) * 0.002, MAX_PITCH),
-    };
-  };
-  const onUp = () => (drag.current = null);
 
   const bubble = useRef<HTMLDivElement>(null);
 
   return (
     <div className={`app phase-${phase} scene-${scene}`}>
-      <div className="stage" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onPointerLeave={onUp}>
+      <div className="stage">
         <Scene phase={phase} animal={animal} growth={growth} view={view} bubble={bubble} pokeAt={pokeAt} onPoke={onPoke} scene={scene} gift={giftShow} />
         <div className="bubble-anchor" ref={bubble} aria-live="polite">
           <div className="bubble" key={line}>{line}</div>
         </div>
       </div>
       <div className="grain" aria-hidden="true" />
-      <Hud time={clockText(now)} label={PHASE_LABEL[phase]} flowers={growth.flowers} days={growth.days} onRotate={rotate} />
+      <Hud time={clockText(now)} label={PHASE_LABEL[phase]} flowers={growth.flowers} days={growth.days} />
       <div className="bottom">
         <GiftPicker given={todaysGift} onGive={onGift} busy={giftShow !== null} />
         <Tabs tab={tab} onTab={setTab} />

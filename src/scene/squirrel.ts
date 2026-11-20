@@ -1,6 +1,7 @@
 // The gift friend: a brown squirrel with a huge striped tail that carries a teapot with its
 // tail tip. Drawn in squirrel space: x to the right, y up from the feet, facing left (toward Minimi).
 import { painted, type Painter, type Pt } from "../paint/painter";
+import { outlinedCup } from "./animals";
 
 const BROWN = "#9A6440";
 const BELLY = "#E6CDA8";
@@ -102,19 +103,34 @@ export function teapotTex() {
   }, { grain: 0.04 });
 }
 
-export function streamTex() {
-  return painted("tea-stream2", 0.05, 1.0, (p) => {
-    p.poly([[-0.014, 0.5], [0.014, 0.5], [0.011, -0.5], [-0.011, -0.5]], "#9DB86A", { wob: 0.002, fuzz: 0 });
-  }, { grain: 0.02 });
-}
-
 /** The same cup as the matcha latte, but empty (before the tea is poured). */
 export function emptyCupTex() {
-  return painted("cup-empty", 0.5, 0.5, (p) => {
-    const b = -0.15;
-    p.blob(0, b, 0.15, 0.025, "#F6F2EA");
-    p.poly([[-0.085, b + 0.17], [0.085, b + 0.17], [0.07, b + 0.02], [-0.07, b + 0.02]], "#F6F2EA");
-    p.stroke([[0.085, b + 0.14], [0.13, b + 0.12], [0.12, b + 0.07], [0.078, b + 0.06]], "#F6F2EA", 0.02);
-    p.blob(0, b + 0.17, 0.08, 0.017, "#E3DCD0", { fuzz: 0.004 });
-  }, { grain: 0.05 });
+  return painted("cup-empty2", 0.5, 0.5, (p) => outlinedCup(p, -0.15, null), { grain: 0.05 });
+}
+
+// ---- other things the tail can carry --------------------------------------------
+
+/** A little frying pan for the tteokbokki; the tail holds the end of the handle. */
+export const PAN_PIVOT: [number, number] = [0.26, 0.02];
+export function panTex() {
+  return painted("tail-pan", 0.6, 0.3, (p) => {
+    p.poly([[0.06, 0.03], [0.27, 0.035], [0.27, 0.005], [0.06, 0.0]], "#B07A4F", { wob: 0.002, fuzz: 0.002 });
+    p.poly([[-0.16, 0.035], [0.08, 0.035], [0.06, -0.035], [-0.14, -0.035]], "#3F3E46", { wob: 0.003, fuzz: 0.003 });
+    p.blob(-0.04, 0.035, 0.12, 0.018, "#2E2D33", { fuzz: 0.002 });
+    p.blob(-0.07, 0.042, 0.03, 0.012, "#E86A45", { rot: 0.3, fuzz: 0.002 });
+    p.blob(-0.01, 0.045, 0.03, 0.012, "#E86A45", { rot: -0.4, fuzz: 0.002 });
+    p.stroke([[-0.07, 0.07], [-0.08, 0.12], [-0.065, 0.16]], "#FFFFFF", 0.008);
+    p.stroke([[0.0, 0.07], [-0.01, 0.12], [0.005, 0.16]], "#FFFFFF", 0.008);
+  }, { grain: 0.04 });
+}
+
+/** A handheld microphone; the tail holds the bottom of the handle. */
+export const MIC_PIVOT: [number, number] = [0.06, -0.12];
+export function micTex() {
+  return painted("tail-mic", 0.4, 0.4, (p) => {
+    p.poly([[0.075, -0.13], [0.045, -0.13], [-0.02, 0.05], [0.0, 0.06]], "#2F2F38", { wob: 0.002, fuzz: 0.002 });
+    p.blob(-0.035, 0.085, 0.05, 0.05, "#9A9AA6", { fuzz: 0.003 });
+    p.glow(-0.05, 0.1, 0.035, "#FFFFFF", 0.6);
+    for (let i = -2; i <= 2; i++) p.stroke([[-0.07, 0.085 + i * 0.016], [0.0, 0.085 + i * 0.016]], "#7C7C88", 0.004);
+  }, { grain: 0.03 });
 }

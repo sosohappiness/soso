@@ -48,12 +48,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .side { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
 .counts { font-size: 15px; text-align: right; line-height: 1.5; }
 .counts b { font-weight: 400; font-variant-numeric: tabular-nums; }
-.rotate {
-  pointer-events: auto; width: 38px; height: 38px; border-radius: 50%;
-  border: 2px solid var(--ink-sky); background: transparent; color: var(--ink-sky);
-  display: grid; place-items: center; opacity: .8;
-}
-.rotate:active { transform: scale(.94); }
 
 /* ---- speech bubble (positioned by BubbleTracker) ---- */
 .bubble-anchor { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }

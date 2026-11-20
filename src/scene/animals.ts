@@ -157,15 +157,27 @@ export function shadowTex() {
   return painted("shadow", 1.4, 0.26, (p) => p.blob(0, 0, 0.6, 0.07, "#000000", { fuzz: 0.02, wob: 0.03 }), { grain: 0.15 });
 }
 
+const LINE = "#4a3b33";
+
+/** A cream cup on a saucer with a thin brown outline. `fill` is what's in it (null = empty). */
+export function outlinedCup(p: Painter, b: number, fill: string | null) {
+  const o = 0.007;
+  p.blob(0, b, 0.15 + o, 0.025 + o, LINE, { fuzz: 0, wob: 0.01 });
+  p.blob(0, b, 0.15, 0.025, "#F6F2EA", { fuzz: 0, wob: 0.01 });
+  p.stroke([[0.085, b + 0.14], [0.13, b + 0.12], [0.12, b + 0.07], [0.078, b + 0.06]], LINE, 0.02 + o * 2);
+  p.stroke([[0.085, b + 0.14], [0.13, b + 0.12], [0.12, b + 0.07], [0.078, b + 0.06]], "#F6F2EA", 0.02);
+  p.poly([[-0.085 - o, b + 0.17 + o * 0.5], [0.085 + o, b + 0.17 + o * 0.5], [0.07 + o, b + 0.02 - o], [-0.07 - o, b + 0.02 - o]], LINE, { wob: 0.002, fuzz: 0 });
+  p.poly([[-0.085, b + 0.17], [0.085, b + 0.17], [0.07, b + 0.02], [-0.07, b + 0.02]], "#F6F2EA", { wob: 0.002, fuzz: 0 });
+  p.blob(0, b + 0.17, 0.085 + o * 0.6, 0.018 + o * 0.6, LINE, { fuzz: 0, wob: 0.01 });
+  p.blob(0, b + 0.17, 0.08, 0.016, fill ?? "#E3DCD0", { fuzz: 0, wob: 0.01 });
+}
+
 /** The signature drink that sits beside each friend. Base of the cup is at painter y = -0.15. */
 export function cupTex(a: Animal) {
-  return painted(`cup-${a.cup}`, 0.5, 0.5, (p) => {
+  return painted(`cup2-${a.cup}`, 0.5, 0.5, (p) => {
     const b = -0.15;
     if (a.cup === "matcha") {
-      p.blob(0, b, 0.15, 0.025, "#F6F2EA");
-      p.poly([[-0.085, b + 0.17], [0.085, b + 0.17], [0.07, b + 0.02], [-0.07, b + 0.02]], "#F6F2EA");
-      p.stroke([[0.085, b + 0.14], [0.13, b + 0.12], [0.12, b + 0.07], [0.078, b + 0.06]], "#F6F2EA", 0.02);
-      p.blob(0, b + 0.17, 0.08, 0.017, "#9DB86A", { fuzz: 0.004 });
+      outlinedCup(p, b, "#9DB86A");
     } else if (a.cup === "iced") {
       p.ctx.globalAlpha = 0.55;
       p.poly([[-0.08, b + 0.27], [0.08, b + 0.27], [0.062, b], [-0.062, b]], "#F2F5F4", { fuzz: 0 });

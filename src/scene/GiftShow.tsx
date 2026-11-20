@@ -10,8 +10,8 @@ import type { Palette } from "./palette";
 import type { Seat } from "./Minimi";
 import { shadowTex } from "./animals";
 import {
-  PAWS_AT, SPOUT_FROM_PIVOT, SQ_BODY, SQ_TAIL, TAIL_TIP, TEAPOT_PIVOT,
-  emptyCupTex, squirrelBodyTex, squirrelPawTex, squirrelTailTex, teapotTex,
+  MIC_PIVOT, PAN_PIVOT, PAWS_AT, SPOUT_FROM_PIVOT, SQ_BODY, SQ_TAIL, TAIL_TIP, TEAPOT_PIVOT,
+  emptyCupTex, micTex, panTex, squirrelBodyTex, squirrelPawTex, squirrelTailTex, teapotTex,
 } from "./squirrel";
 
 // The gift friend: a squirrel hops in with a teapot held in its tail.
@@ -27,6 +27,7 @@ const ITEM_SCALE = 1.3 * MINIMI_SCALE;
 const PAW_ITEM_SCALE = 1.05;
 const DROPS = 7;
 const NOTES = 4;
+const TUB_S = 1.45; // the bath tub, drawn big
 
 const smooth = (x: number) => {
   const t = Math.min(1, Math.max(0, x));
@@ -49,6 +50,7 @@ export function GiftShow({ pal, seat, groundY, tubX, gift }: Props) {
     body: squirrelBodyTex(), tail: squirrelTailTex(), paw: squirrelPawTex(), teapot: teapotTex(),
     tea: streamArt("#9DB86A"), water: streamArt("#9FC8E6"), emptyCup: emptyCupTex(), shadow: shadowTex(),
     tubBack: tubBackTex(), tubWater: tubWaterTex(), tubFront: tubFrontTex(), drop: dropTex(), note: particleTex("note"),
+    pan: panTex(), mic: micTex(),
   }), []);
   const id = gift?.item ?? null;
   const itemArt = useMemo(() => (id ? giftItemTex(id) : null), [id]);
@@ -56,7 +58,7 @@ export function GiftShow({ pal, seat, groundY, tubX, gift }: Props) {
   const T = id ? GIFTS[id].t : { walkIn: 0, give: 0, drink: 0, leave: 0 };
   const pour = id ? pourWindow(id) : null;
   const holdY = seat.y + (id === "tteok" ? 0.28 : 0.5) * MINIMI_SCALE;
-  const standX = kind === "bath" ? tubX + 0.95 : kind === "music" ? seat.x + 1.0 : seat.x + 0.78;
+  const standX = kind === "bath" ? tubX + 1.22 : kind === "music" ? seat.x + 1.0 : seat.x + 0.78;
   const offX = seat.x + 2.8;
   const speakerX = seat.x + 0.32;
 
@@ -66,6 +68,8 @@ export function GiftShow({ pal, seat, groundY, tubX, gift }: Props) {
   const pot = useRef<THREE.Group>(null);
   const spout = useRef<THREE.Group>(null);
   const inPaws = useRef<THREE.Group>(null);
+  const paw = useRef<THREE.Group>(null);
+  const tailAim = useRef(0); // extra tail lean that keeps the spout right over the cup
   const emptyRef = useRef<THREE.Group>(null);
   const fullRef = useRef<THREE.Group>(null);
   const stream = useRef<THREE.Group>(null);
@@ -108,11 +112,11 @@ export function GiftShow({ pal, seat, groundY, tubX, gift }: Props) {
     const pouring = !!pour && g > pour[0] + 0.2 && g < pour[1] - 0.15;
     if (tail.current) {
       const wave = g > T.give + 0.3 && !leaving ? Math.sin(g * 6) * 0.08 : 0;
-      tail.current.rotation.z = Math.sin(g * 2.2) * 0.03 + pourK * 0.06 + wave;
+      tail.current.rotation.z = Math.sin(g * 2.2) * 0.03 + pourK * 0.06 + wave + tailAim.current;
     }
     if (pot.current) {
       const swing = moving ? Math.sin(g * 7 + 1) * 0.12 : Math.sin(g * 2) * 0.04;
-      pot.current.rotation.z = swing + pourK * 0.75;
+      pot.current.rotation.z = swing + pourK * 0.75 + (dancing ? Math.sin(g * 6) * 0.25 : 0);
     }
 
     // what the paws hold
@@ -126,14 +130,30 @@ export function GiftShow({ pal, seat, groundY, tubX, gift }: Props) {
     if (tub.current) {
       tub.current.visible = kind === "bath";
       tub.current.position.set(x - (standX - tubX), groundY, Z.minimi + 0.55);
+      tub.current.scale.setScalar(TUB_S);
       if (kind === "bath" && pour) {
-        const level = smooth((g - pour[0] - 0.2) / (pour[1] - pour[0] - 0.2));
-        const inTub = g > T.give && g < T.drink ? 0.025 : 0;
-        waterY = groundY + 0.12 + level * 0.4 + inTub;
+        // the water rises from the bottom while the teapot pours; Minimi's splash lifts it a touch
+        const level = smooth((g - pour[0] - 0.2) / (pour[1] - pour[0] - 0.1));
+        const inTub = g > T.give && g < T.drink ? 0.02 : 0;
+        const local = 0.14 + level * 0.34 + inTub; // tub space, rim at 0.55
+        waterY = groundY + local * TUB_S;
         if (water.current) {
-          water.current.visible = level > 0.03;
-          water.current.position.set(0, waterY - groundY, 0.01);
+          water.current.visible = level > 0.02;
+          water.current.position.set(0, local, 0.01);
         }
+      }
+    }
+
+    // matcha: the cup stays in the paws; the tail leans so the spout sits right over it
+    if (spout.current && inPaws.current) {
+      if (id === "matcha" && pour && g > pour[0] - 0.2 && g < pour[1]) {
+        spout.current.updateWorldMatrix(true, false);
+        spout.current.getWorldPosition(a);
+        inPaws.current.updateWorldMatrix(true, false);
+        inPaws.current.getWorldPosition(b);
+        tailAim.current = Math.max(-0.45, Math.min(0.25, tailAim.current + (a.x - b.x) * 0.5));
+      } else {
+        tailAim.current *= 0.9;
       }
     }
 
@@ -141,11 +161,14 @@ export function GiftShow({ pal, seat, groundY, tubX, gift }: Props) {
     if (stream.current && spout.current) {
       stream.current.visible = pouring;
       if (pouring) {
+        spout.current.updateWorldMatrix(true, false);
         spout.current.getWorldPosition(a);
         let bottom = waterY;
         if (id === "matcha" && inPaws.current) {
+          inPaws.current.updateWorldMatrix(true, false);
           inPaws.current.getWorldPosition(b);
-          bottom = b.y + 0.15 * PAW_ITEM_SCALE * HS;
+          bottom = b.y + 0.16 * PAW_ITEM_SCALE * HS; // just inside the rim
+          a.x = b.x;
         }
         const len = Math.max(0.05, a.y - bottom);
         stream.current.position.set(a.x, bottom + len / 2, Z.minimi + 0.92);
@@ -159,7 +182,7 @@ export function GiftShow({ pal, seat, groundY, tubX, gift }: Props) {
       const s = (g - T.give) / 0.9;
       d.visible = kind === "bath" && s > 0 && s < 1;
       const ang = Math.PI * (0.15 + (i / (DROPS - 1)) * 0.7);
-      d.position.set(tubX + Math.cos(ang) * 0.75 * s, waterY + Math.sin(ang) * 0.9 * s - 1.4 * s * s, Z.minimi + 0.97);
+      d.position.set(tubX + Math.cos(ang) * 1.0 * s, waterY + Math.sin(ang) * 1.0 * s - 1.4 * s * s, Z.minimi + 0.97);
     });
 
     // the speaker: carried in, set down, plays, carried out
@@ -206,7 +229,9 @@ export function GiftShow({ pal, seat, groundY, tubX, gift }: Props) {
           <group ref={tail} position={[0.18, 0.12, -0.01]}>
             <Sprite art={art.tail} position={[SQ_TAIL.at[0] - 0.18, SQ_TAIL.at[1] - 0.12, 0]} color={tint} order={34} />
             <group ref={pot} position={[TAIL_TIP[0] - 0.18, TAIL_TIP[1] - 0.12, 0.02]}>
-              <Sprite art={art.teapot} pivot={TEAPOT_PIVOT} color={tint} order={35} />
+              {(id === "matcha" || id === "bath" || !id) && <Sprite art={art.teapot} pivot={TEAPOT_PIVOT} color={tint} order={35} />}
+              {id === "tteok" && <Sprite art={art.pan} pivot={PAN_PIVOT} color={tint} order={35} />}
+              {id === "song" && <Sprite art={art.mic} pivot={MIC_PIVOT} color={tint} order={35} />}
               <group ref={spout} position={[SPOUT_FROM_PIVOT[0], SPOUT_FROM_PIVOT[1], 0]} />
             </group>
           </group>
@@ -215,11 +240,13 @@ export function GiftShow({ pal, seat, groundY, tubX, gift }: Props) {
             <group ref={emptyRef}><Sprite art={art.emptyCup} position={[0, 0.15, 0]} color={tint} order={37} /></group>
             <group ref={fullRef}>{itemArt && <Sprite art={itemArt} position={[0, 0.15, 0]} color={tint} order={37} />}</group>
           </group>
-          <Sprite art={art.paw} position={[PAWS_AT[0] + 0.02, PAWS_AT[1] - 0.03, 0.05]} color={tint} order={38} />
+          <group ref={paw} position={[PAWS_AT[0] + 0.02, PAWS_AT[1] - 0.03, 0.05]}>
+            <Sprite art={art.paw} color={tint} order={38} />
+          </group>
         </group>
       </group>
       <group ref={stream} visible={false}>
-        <Sprite art={id === "bath" ? art.water : art.tea} color={tint} order={36.5} />
+        <Sprite art={id === "bath" ? art.water : art.tea} color={tint} order={id === "bath" ? 32.3 : 36.5} />
       </group>
       <group ref={flying} visible={false} scale={ITEM_SCALE}>
         {kind === "hold" && itemArt && <Sprite art={itemArt} position={[0, 0.15, 0]} color={tint} order={39} />}

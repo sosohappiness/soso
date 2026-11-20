@@ -136,7 +136,7 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
     if (mover.current) {
       let mx = 0, my = 0, mz = 0;
       if (giving && kind === "bath" && stage) {
-        const tx = (stage.tubX - seat.x) / SCALE, ty = (stage.groundY + 0.06 - seat.y) / SCALE, tz = 0.55 / SCALE;
+        const tx = (stage.tubX - seat.x) / SCALE, ty = (stage.groundY + 0.16 - seat.y) / SCALE, tz = 0.55 / SCALE;
         const jumpIn = Math.min(1, Math.max(0, (g - (T.give - 0.6)) / 0.6));
         const jumpOut = Math.min(1, Math.max(0, (g - T.drink) / 0.6));
         const k2 = jumpIn * (1 - jumpOut);
