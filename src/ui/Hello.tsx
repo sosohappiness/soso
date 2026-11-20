@@ -176,55 +176,77 @@ function DeskScene() {
   );
 }
 
+// messy hair: short strands sticking out around the top of the head, plus a few stray curls
+const FRIZZ = (() => {
+  let seed = 7;
+  const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const out: string[] = [];
+  for (let k = 0; k < 20; k++) {
+    const a = (-196 + (212 * k) / 19 + (r() - 0.5) * 8) * (Math.PI / 180);
+    const x = 482 + Math.cos(a) * 140, y = 444 + Math.sin(a) * 120;
+    const len = 14 + r() * 22, tw = (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.6);
+    const ex = x + Math.cos(a + tw) * len, ey = y + Math.sin(a + tw) * len;
+    const cx = x + Math.cos(a - tw) * len * 0.6, cy = y + Math.sin(a - tw) * len * 0.6;
+    out.push(`M${x.toFixed(1)} ${y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+  }
+  return out.join(" ");
+})();
+
 /**
- * Option 2: someone with their head down on the desk, cheek on the table, eyes shut, a mug of
- * something warm still steaming beside them and the phone face-down, the monitor still on in
- * front. Drawn in the reference's coordinates and scaled down into the scene.
+ * Option 2: head down on the desk, cheek on the table, eyes shut, a big mop of messy hair, a mug
+ * still steaming and the phone face-down, the monitor still on in front. Drawn at the
+ * reference's scale and shrunk into the scene.
  */
 function NapScene() {
   const paper = "#BB8D65";
-  const ink = "#3B2818";
+  const ink = "#3A2717";
   const line = { ...chalk, strokeWidth: 11 };
   const thin = { ...chalk, strokeWidth: 6 };
+  const hair = { stroke: ink, strokeLinecap: "round" as const, fill: "none" };
   return (
     <g filter="url(#chalk-wobble)">
       <g transform="translate(26 50) scale(0.38)">
-        {/* monitor in front, still on */}
-        <path d="M-60 196 L 222 176 L 228 420 L -54 436 Z" {...line} fill={CHALK} />
-        <path d="M-34 218 L 200 200 L 204 396 L -28 410 Z" {...thin} fill={paper} />
-        <path d="M0 250 L 120 242 M 0 280 L 160 270 M 0 310 L 90 304" {...thin} />
-        <path d="M84 432 L 86 500" {...line} strokeWidth={16} />
-        <path d="M24 506 L 152 498" {...line} />
+        {/* monitor on the desk in front, still on */}
+        <path d="M-58 196 L 222 178 L 228 418 L -52 434 Z" {...line} />
+        <path d="M-34 220 L 200 204 L 204 394 L -28 408 Z" {...thin} />
+        <path d="M2 254 L 118 246 M 2 284 L 158 274 M 2 314 L 88 308" {...thin} />
+        <path d="M86 432 L 88 498" {...line} />
+        <path d="M26 504 L 150 496" {...line} />
 
         {/* steam curling up from the mug */}
         <path d="M312 556 C 300 524 262 508 270 476 C 278 444 330 432 322 394 C 316 364 284 352 294 318" {...line} />
         {/* mug */}
-        <path d="M276 596 C 300 584 350 586 366 598 L 356 690 C 340 706 300 706 286 690 Z" {...line} fill={paper} />
-        <ellipse cx="321" cy="602" rx="34" ry="10" fill={ink} />
-        <path d="M278 616 C 244 616 244 668 282 662" {...line} />
+        <path d="M282 600 L 288 690 C 304 704 340 704 354 690 L 364 600" {...line} />
+        <ellipse cx="323" cy="600" rx="41" ry="14" {...line} />
+        <ellipse cx="323" cy="602" rx="28" ry="7" fill={ink} />
+        <path d="M282 620 C 248 618 248 670 286 664" {...line} />
 
         {/* the desk's front edge, running under the arm */}
-        <path d="M600 520 L 815 765" {...line} />
+        <path d="M596 516 L 815 765" {...line} />
         {/* phone, face down */}
-        <path d="M498 712 L 576 656 C 588 648 606 656 612 670 L 538 734 C 524 744 502 732 498 712 Z" {...line} fill={CHALK} />
+        <path d="M498 712 L 576 656 C 588 648 606 656 612 670 L 538 734 C 524 744 502 732 498 712 Z" {...thin} fill={ink} />
+        <path d="M504 724 L 540 740 L 616 680" {...thin} />
 
-        {/* the jumper: shoulder, back, and the folded arm */}
-        <path d="M604 404 L 628 376 C 648 366 690 372 706 384" {...line} />
-        <path d="M700 384 L 650 560" {...line} />
-        <path d="M722 402 C 800 422 860 500 870 600 C 876 660 878 700 878 745" {...line} />
-        <path d="M660 588 C 664 520 694 488 736 482" {...line} />
-        <path d="M748 484 C 778 488 794 534 794 600 L 794 708" {...line} />
+        {/* the jumper: collar, rounded back, and the folded arm */}
+        <path d="M598 410 L 622 380 C 642 368 690 372 708 386" {...line} />
+        <path d="M690 392 L 646 560" {...line} />
+        <path d="M724 400 C 804 420 862 500 872 600 C 878 660 880 700 880 745" {...line} />
+        <path d="M662 590 C 666 520 696 488 738 482" {...line} />
+        <path d="M752 484 C 782 490 798 536 798 600 L 798 708" {...line} />
 
-        <g transform="rotate(14 480 470)">
-        {/* face peeking out under the fringe, cheek on the desk, eyes shut */}
-        <path d="M396 452 C 420 432 470 430 506 450 C 540 470 548 520 530 566 C 500 576 450 574 420 560 C 392 546 378 500 396 452 Z" fill={paper} />
-        <path d="M384 522 C 398 552 432 570 480 572" {...line} />
-        <path d="M448 488 L 450 512" {...line} />
-        <path d="M496 494 L 498 516" {...line} />
-        <path d="M472 530 L 474 542" {...thin} />
-        {/* hair: one soft mass around the face, spilling down onto the desk */}
-        <path d="M340 470 C 316 380 384 316 470 316 C 568 316 628 374 630 448 C 632 500 618 540 600 566 C 572 576 546 574 530 566 C 548 520 540 470 500 448 C 460 428 420 434 398 452 C 382 470 374 500 382 532 C 362 522 346 500 340 470 Z" {...line} fill={CHALK} />
-        <path d="M420 360 C 470 340 540 350 586 392" {...thin} stroke={paper} />
+        <g transform="rotate(10 480 470)">
+          {/* face peeking out under the fringe, cheek on the desk, eyes shut */}
+          <path d="M404 462 C 428 438 470 432 510 452 C 548 474 556 524 540 570 C 506 580 462 576 432 560 C 402 544 390 500 404 462 Z" fill={paper} />
+          <path d="M398 520 C 410 550 440 568 486 574" {...line} />
+          <path d="M470 478 L 472 504" {...line} />
+          <path d="M514 488 L 516 512" {...line} />
+          <path d="M488 524 L 490 536" {...thin} />
+          {/* a big messy mop of hair */}
+          <path d="M335 452 C 318 372 380 318 462 316 C 556 314 622 366 628 446 C 632 498 622 540 604 568 C 584 578 556 576 540 570 C 556 524 548 474 510 452 C 470 432 428 438 404 462 C 392 478 390 500 396 524 C 366 514 340 490 335 452 Z" fill={ink} />
+          <path d={FRIZZ} {...hair} strokeWidth={6} />
+          <path d="M470 314 C 462 280 494 268 506 292 M 586 352 C 616 330 642 352 622 372 M 336 432 C 304 430 302 460 326 464" {...hair} strokeWidth={6} />
+          {/* stray hairs falling across the cheek */}
+          <path d="M506 450 C 528 476 534 506 528 532" {...hair} strokeWidth={5} />
         </g>
       </g>
     </g>
