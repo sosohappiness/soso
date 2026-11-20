@@ -120,40 +120,58 @@ const CHALK = "#FFF8EC";
 const chalk = { stroke: CHALK, strokeWidth: 4.2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, fill: "none" };
 
 /**
- * A worn-out person on a stool, folded forward with the face down on the desk in front of the
- * monitor, both arms hanging straight down. Pens lie on the desk and on the floor.
+ * A worn-out person on a stool, folded forward with one cheek on the desk in front of a big
+ * monitor, eyes closed, hair spilling over the desk, one arm hanging limp. The jumper and the
+ * monitor's bezel are solid chalk; everything else is drawn in line.
  */
 function DeskScene() {
-  const fill = "#BB8D65";
+  const paper = "#BB8D65";
+  const thin = { ...chalk, strokeWidth: 2.2 };
   return (
     <g filter="url(#chalk-wobble)">
-      {/* desk running off to the right */}
-      <path d="M140 238 L 362 238 L 362 252 L 140 252 Z" {...chalk} />
-      <path d="M150 252 C 190 290 250 330 300 352" {...chalk} strokeWidth={2.6} />
-      {/* big monitor with a thick bezel */}
-      <path d="M244 96 L 352 92 L 356 184 L 248 190 Z" {...chalk} fill={CHALK} />
-      <path d="M256 106 L 342 103 L 345 174 L 259 178 Z" {...chalk} fill={fill} />
-      <path d="M300 190 L 304 222 M284 232 L 322 230" {...chalk} />
-      {/* pens: two on the desk, one on the floor */}
-      <path d="M204 246 L 232 250 M236 244 L 266 246" {...chalk} strokeWidth={5} />
-      <path d="M180 356 L 214 358" {...chalk} strokeWidth={5} />
+      {/* the desk, seen from the corner: back edge, and the front edge running away diagonally */}
+      <path d="M150 250 L 362 222" {...chalk} />
+      <path d="M150 250 C 196 284 248 322 304 366" {...chalk} />
+      {/* a sheet of paper and two pens on the desk */}
+      <path d="M214 262 L 262 254 L 272 276 L 224 284 Z" {...thin} />
+      <path d="M268 286 L 300 292" {...chalk} strokeWidth={5.5} />
+      <path d="M284 268 L 314 270" {...chalk} strokeWidth={5.5} />
 
-      {/* stool */}
-      <ellipse cx="74" cy="274" rx="38" ry="8" {...chalk} fill={fill} />
-      <path d="M74 282 L 74 350" {...chalk} />
-      <ellipse cx="74" cy="356" rx="28" ry="6" {...chalk} />
-      {/* legs: thighs forward, shins down, shoes on the floor */}
-      <path d="M70 266 L 124 266 L 128 346 M84 280 L 112 280 L 112 346" {...chalk} fill={fill} />
-      <path d="M110 346 C 108 356 136 358 146 354 C 146 348 136 344 128 344" {...chalk} />
-      {/* the jumper: torso folded forward from the hips to the desk */}
-      <path d="M46 268 C 42 246 64 226 96 216 C 120 208 140 206 156 212 L 160 232 C 140 236 118 246 104 262 C 96 270 74 274 46 268 Z" {...chalk} fill={CHALK} />
-      {/* an arm hanging straight down */}
-      <path d="M146 214 L 160 214 L 162 316 L 150 318 Z" {...chalk} fill={CHALK} />
-      <path d="M150 318 C 148 330 162 332 162 318" {...chalk} />
-      {/* head face-down on the desk, hair spilling forward, eyes closed */}
-      <path d="M156 226 C 156 214 172 208 190 210 C 206 212 212 222 208 232 C 198 238 166 238 156 226 Z" {...chalk} fill={fill} />
-      <path d="M172 222 q -3 4 0 8 M180 220 q -3 4 0 8" {...chalk} strokeWidth={2.4} />
-      <path d="M200 216 C 214 220 228 226 240 232 M204 224 C 216 228 228 234 236 238 M198 212 C 212 214 226 218 236 222" {...chalk} strokeWidth={2} />
+      {/* big monitor: thick solid bezel, chin, neck and foot */}
+      <path d="M232 82 L 352 70 L 358 182 L 240 194 Z" {...chalk} fill={CHALK} />
+      <path d="M244 94 L 340 84 L 344 162 L 248 172 Z" {...thin} fill={paper} />
+      <path d="M352 70 L 360 76 L 364 186 L 358 182" {...thin} />
+      <path d="M294 192 L 296 222 L 312 220 L 308 190" {...chalk} />
+      <path d="M278 228 L 330 222" {...chalk} />
+
+      {/* stool: saddle seat, post, round foot */}
+      <path d="M30 284 C 30 274 64 270 92 272 C 112 274 120 280 116 286 C 98 292 46 292 30 284 Z" {...chalk} fill={paper} />
+      <circle cx="46" cy="282" r="2.6" fill={CHALK} /><circle cx="70" cy="284" r="2.6" fill={CHALK} /><circle cx="94" cy="282" r="2.6" fill={CHALK} />
+      <path d="M72 290 L 72 350" {...chalk} />
+      <path d="M38 360 C 40 350 104 350 106 360 C 96 366 48 366 38 360 Z" {...chalk} />
+
+      {/* trousers: thighs forward over the seat, shins straight down, shoes on the floor */}
+      <path d="M56 274 C 80 270 112 268 128 270 C 134 272 134 280 130 286 L 134 344 L 120 344 L 116 290 C 96 290 72 288 58 284 Z" {...chalk} fill={paper} />
+      <path d="M112 346 C 108 352 112 358 124 358 C 136 358 150 358 152 352 C 150 344 138 342 132 342 Z" {...chalk} fill={paper} />
+      <path d="M180 352 L 210 354" {...chalk} strokeWidth={5.5} />
+
+      {/* the jumper: back curving from the hips up and over to the desk */}
+      <path d="M46 282 C 38 254 60 228 98 216 C 124 208 148 210 164 220 C 170 226 168 236 160 238 C 140 240 120 252 106 272 C 90 280 64 284 46 282 Z" {...chalk} fill={CHALK} />
+      {/* the arm hanging straight down, limp hand */}
+      <path d="M140 222 L 160 226 L 160 322 L 146 322 Z" {...chalk} fill={CHALK} />
+      <path d="M146 322 C 142 334 146 344 154 344 C 160 344 162 336 160 322" {...chalk} fill={paper} />
+      <path d="M150 330 L 150 340" {...thin} />
+
+      {/* head: cheek on the desk, face turned to us, eyes closed; hair over the top and across the desk */}
+      <path d="M164 236 C 162 220 176 210 194 210 C 214 210 226 222 224 236 C 222 248 206 254 192 252 C 176 250 166 246 164 236 Z" {...chalk} fill={paper} />
+      <path d="M176 238 q 5 5 10 0" {...thin} strokeWidth={2.6} />
+      <path d="M196 236 q 5 5 10 0" {...thin} strokeWidth={2.6} />
+      <path d="M190 244 q 2 2 4 0" {...thin} />
+      <path d="M166 230 C 168 216 182 208 198 208 C 214 208 224 216 226 226 C 216 222 206 220 196 222 C 184 224 174 228 166 230 Z" {...chalk} fill={CHALK} />
+      <path d="M222 220 C 236 222 252 228 266 238" {...thin} />
+      <path d="M224 228 C 238 232 252 238 262 248" {...thin} />
+      <path d="M220 214 C 236 214 250 220 262 228" {...thin} />
+      <path d="M216 234 C 230 240 242 248 250 256" {...thin} />
     </g>
   );
 }
