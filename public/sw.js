@@ -1,7 +1,7 @@
 // Soso service worker: app opens offline after the first visit.
 // Pages: network first (so updates show up), falling back to the cached shell.
 // Hashed assets and fonts: cache first.
-const CACHE = "soso-v1";
+const CACHE = "soso-v2";
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/manifest.webmanifest", "/icons/icon.svg"])));
