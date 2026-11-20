@@ -3,6 +3,7 @@
 import { PORTRAIT_ASPECT, portraitURL } from "../scene/portrait";
 import type { AnimalId } from "../scene/animals";
 import { kraftURL } from "./kraft";
+import { logoStyle, type LogoFontId } from "./logoFonts";
 
 const PETALS = ["#F4B6C2", "#F6D46A", "#F29A7E", "#C9B6E8"];
 
@@ -56,7 +57,7 @@ function Paper() {
   );
 }
 
-export function Hello({ onStart }: { onStart: () => void }) {
+export function Hello({ onStart, logoFont = "poppins" }: { onStart: () => void; logoFont?: LogoFontId }) {
   const blooms: [number, number, number][] = [
     [84, 268, 1], [104, 240, 0.9], [138, 222, 1.1], [258, 214, 1], [292, 234, 0.9], [318, 268, 1], [112, 300, 0.8], [300, 300, 0.8],
   ];
@@ -68,7 +69,7 @@ export function Hello({ onStart }: { onStart: () => void }) {
       </div>
 
       <header className="hello-head">
-        <h1 className="hello-logo2" aria-label="So So">
+        <h1 className="hello-logo2" aria-label="So So" style={logoStyle(logoFont)}>
           <span>So</span>
           <span>So<i aria-hidden="true" /></span>
         </h1>
@@ -118,74 +119,70 @@ export function Hello({ onStart }: { onStart: () => void }) {
 const CHALK = "#FFF8EC";
 const chalk = { stroke: CHALK, strokeWidth: 4.2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, fill: "none" };
 
-/** A tired person melted into a reclined office chair beside the desk: books piled high, monitor, mug. */
+/**
+ * A tired person, like the "Lay." sketch: a round head resting at the foot of a tall reclined
+ * office chair, the body poured out long and flat down to the floor, one arm hugging the armrest.
+ * Beside it, a small desk with books piled high, a monitor and a mug.
+ */
 function DeskScene() {
-  // a tall, slightly wobbly stack of books on the desk
+  const fill = "#BB8D65";
   const books: [number, number, number][] = [
-    [184, 58, 20], [188, 52, 18], [182, 60, 22], [190, 48, 16], [184, 56, 20], [192, 46, 18], [186, 54, 22], [194, 42, 16],
+    [244, 50, 18], [248, 44, 16], [242, 52, 20], [250, 40, 14], [244, 48, 18], [252, 38, 16], [246, 46, 20],
   ];
-  let y = 250;
+  let y = 252;
   return (
     <g filter="url(#chalk-wobble)">
-      {/* desk */}
-      <path d="M176 250 L 360 250 L 360 264 L 176 264 Z" {...chalk} />
-      <path d="M190 264 L 190 366 M346 264 L 346 366 M190 318 L 346 318" {...chalk} />
-
+      {/* small desk on the right with a tall book stack, monitor and mug */}
+      <path d="M234 252 L 362 252 L 362 264 L 234 264 Z" {...chalk} />
+      <path d="M244 264 L 244 368 M352 264 L 352 368" {...chalk} />
       {books.map(([x, w, h], i) => {
         y -= h;
         const top = y;
         return (
           <g key={i}>
             <rect x={x} y={top} width={w} height={h} rx={3} {...chalk} />
-            <path d={`M${x + 9} ${top + 5} L ${x + 9} ${top + h - 5}`} {...chalk} strokeWidth={2.4} />
-            {i % 2 === 0 && <path d={`M${x + w - 18} ${top + h / 2} L ${x + w - 8} ${top + h / 2}`} {...chalk} strokeWidth={2.4} />}
+            <path d={`M${x + 8} ${top + 4} L ${x + 8} ${top + h - 4}`} {...chalk} strokeWidth={2.2} />
           </g>
         );
       })}
+      <rect x="298" y="178" width="60" height="46" rx="6" {...chalk} />
+      <path d="M306 192 L 340 192 M306 204 L 350 204" {...chalk} strokeWidth={2.4} />
+      <path d="M328 224 L 328 244 M314 250 C 316 242 340 242 342 250 Z" {...chalk} />
 
-      {/* monitor, keyboard, mug */}
-      <rect x="250" y="128" width="104" height="84" rx="9" {...chalk} />
-      <path d="M264 154 L 318 154 M264 170 L 338 170 M264 186 L 302 186" {...chalk} strokeWidth={2.6} />
-      <path d="M302 212 L 302 236 M280 244 C 284 234 320 234 324 244 Z" {...chalk} />
-      <rect x="252" y="240" width="54" height="10" rx="3" {...chalk} />
-      <path d="M326 222 L 348 222 L 345 250 L 329 250 Z" {...chalk} />
-      <path d="M348 228 C 357 228 357 240 347 240" {...chalk} strokeWidth={3} />
-      <path d="M333 212 q -5 -7 0 -14 M342 212 q -5 -7 0 -14" {...chalk} strokeWidth={2.6} />
+      {/* the chair: a tall backrest leaning back to the upper right, seat, post, star base */}
+      <path d="M148 262 L 196 162 C 200 150 236 150 240 160 L 178 262 Z" {...chalk} fill={fill} />
+      <path d="M200 166 L 234 168" {...chalk} strokeWidth={2.6} />
+      <path d="M160 272 L 160 316" {...chalk} />
+      <path d="M118 334 L 160 316 L 202 334 M136 340 L 160 316 L 184 340" {...chalk} />
+      <circle cx="116" cy="338" r="5" {...chalk} strokeWidth={3} />
+      <circle cx="204" cy="338" r="5" {...chalk} strokeWidth={3} />
+      <circle cx="134" cy="344" r="4.5" {...chalk} strokeWidth={3} />
+      <circle cx="186" cy="344" r="4.5" {...chalk} strokeWidth={3} />
 
-      {/* reclined office chair */}
-      <path d="M118 150 L 152 156 L 132 246 L 104 244 Z" {...chalk} />
-      <path d="M60 262 L 142 262 L 140 274 L 62 274 Z" {...chalk} />
-      <path d="M100 274 L 100 318 M70 332 L 100 318 L 130 332 M84 336 L 100 318 L 116 336" {...chalk} />
-      <circle cx="68" cy="336" r="5" {...chalk} strokeWidth={3} />
-      <circle cx="132" cy="336" r="5" {...chalk} strokeWidth={3} />
-      <circle cx="86" cy="340" r="4.5" {...chalk} strokeWidth={3} />
-      <circle cx="116" cy="340" r="4.5" {...chalk} strokeWidth={3} />
-      <path d="M118 236 L 150 238" {...chalk} />
-
-      {/* the person, slid all the way down the chair: long melted body pouring to the floor */}
+      {/* the body, poured out long and flat from the chair to the floor */}
       <path
-        d="M116 214 C 96 218 78 238 64 262 C 48 290 28 318 8 334 L 8 352 C 36 352 64 342 86 316 C 104 296 116 276 128 258 C 136 246 136 220 124 212 Z"
-        {...chalk} fill="#B88B63"
+        d="M186 226 C 160 222 120 232 90 250 C 60 270 30 300 4 322 L 4 346 C 40 344 80 322 116 300 C 140 286 160 278 176 274 C 196 270 204 248 186 226 Z"
+        {...chalk} fill={fill}
       />
-      <path d="M40 330 C 54 322 66 306 76 292" {...chalk} strokeWidth={2.6} />
-      {/* an arm flopped over the armrest */}
-      <path d="M128 226 C 138 230 146 236 150 246" {...chalk} />
-      <circle cx="151" cy="252" r="6" {...chalk} strokeWidth={3} fill="#B88B63" />
-      {/* round head resting on the chair back, eyes closed, a small tired smile */}
-      <circle cx="128" cy="190" r="22" {...chalk} fill="#B88B63" />
-      <path d="M116 188 q 4 3 8 0 M132 186 q 4 3 8 0" {...chalk} strokeWidth={2.6} />
-      <path d="M122 200 q 6 5 12 0" {...chalk} strokeWidth={2.6} />
+      <path d="M150 248 C 116 260 76 286 40 316" {...chalk} strokeWidth={2.6} />
+      {/* armrest, with the arm wrapped over it */}
+      <path d="M168 250 L 222 244 M214 244 L 214 262" {...chalk} />
+      <path d="M140 244 C 156 256 190 256 214 248 C 220 246 222 238 214 236 C 196 240 170 242 150 236" {...chalk} fill={fill} />
+      {/* round head with a sleepy smile */}
+      <path d="M150 222 C 146 204 160 192 176 192 C 194 192 204 206 200 222 C 196 236 156 238 150 222 Z" {...chalk} fill={fill} />
+      <path d="M164 210 q 3 3 6 0 M180 210 q 3 3 6 0" {...chalk} strokeWidth={2.6} />
+      <path d="M170 220 q 5 4 10 0" {...chalk} strokeWidth={2.6} />
       {/* z z */}
-      <path d="M150 168 l 12 0 l -12 12 l 12 0 M168 148 l 8 0 l -8 8 l 8 0" {...chalk} strokeWidth={2.8} />
+      <path d="M128 186 l 10 0 l -10 10 l 10 0 M112 168 l 7 0 l -7 7 l 7 0" {...chalk} strokeWidth={2.6} />
     </g>
   );
 }
 
-export function HelloDesk({ onStart }: { onStart: () => void }) {
+export function HelloDesk({ onStart, logoFont = "poppins" }: { onStart: () => void; logoFont?: LogoFontId }) {
   return (
     <div className="hello desk" style={{ backgroundImage: `url(${kraftURL()})` }}>
       <header className="hello-head">
-        <h1 className="hello-logo2 chalk-logo" aria-label="So So">
+        <h1 className="hello-logo2 chalk-logo" aria-label="So So" style={logoStyle(logoFont)}>
           <span>So</span>
           <span>So<i aria-hidden="true" /></span>
         </h1>
@@ -193,7 +190,7 @@ export function HelloDesk({ onStart }: { onStart: () => void }) {
         <p className="desk-ko">지친 하루 끝, 친구가 기다리고 있어요.<br />소소한 행복을 함께 모아요.</p>
       </header>
 
-      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="사무용 의자에 녹아내리듯 기대 누운 지친 사람, 옆 책상에 높이 쌓인 책과 모니터">
+      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="뒤로 젖힌 사무용 의자에 몸을 길게 늘어뜨리고 누운 지친 사람, 옆 책상에 높이 쌓인 책과 모니터">
         <defs>
           <filter id="chalk-wobble" x="-5%" y="-5%" width="110%" height="110%">
             <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="5" result="n" />

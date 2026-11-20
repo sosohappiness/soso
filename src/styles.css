@@ -343,7 +343,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .hello-head { display: flex; flex-direction: column; gap: 14px; max-width: 480px; width: 100%; margin: 0 auto; }
 .hello-logo2 {
-  margin: 0; font-family: "Poppins", "Jua", sans-serif; font-weight: 800; font-size: clamp(64px, min(25vw, 13vh), 112px);
+  margin: 0; font-family: "Poppins", "Jua", sans-serif; font-weight: 800; font-size: calc(clamp(64px, min(25vw, 13vh), 112px) * var(--logo-scale, 1));
   line-height: .86; letter-spacing: -0.045em; display: flex; flex-direction: column;
 }
 .hello-logo2 span:nth-child(2) { position: relative; width: max-content; }
@@ -373,7 +373,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @media (max-height: 720px) {
   .hello.sketchbook { padding-top: calc(env(safe-area-inset-top, 0px) + 34px); }
   .hello-head { gap: 8px; }
-  .hello-logo2 { font-size: 62px; }
+  .hello-logo2 { font-size: calc(62px * var(--logo-scale, 1)); }
   .hello-ko { font-size: 13px; line-height: 1.5; }
   .hello-pill { font-size: 13px; padding: 2px 12px 1px; }
 }

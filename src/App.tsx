@@ -16,6 +16,7 @@ import { GIFTS, enjoyLine, type GiftId } from "./lib/gifts";
 import { CHATS, callName, isVisitDay, visitorFor } from "./lib/visits";
 import { Settings } from "./ui/Settings";
 import { Onboarding } from "./ui/Onboarding";
+import { LOGO_FONTS, LOGO_ORDER, type LogoFontId } from "./ui/logoFonts";
 import { loadAccount, signOut, type Account } from "./lib/auth";
 
 
@@ -58,6 +59,11 @@ export default function App() {
   // two first-screen styles to compare (preview only): kraft desk, watercolour sketchbook
   const [helloStyle, setHelloStyle] = useState<"desk" | "sketch">(() => load<"desk" | "sketch">("helloStyle", "desk"));
   useEffect(() => save("helloStyle", helloStyle), [helloStyle]);
+  const [logoFont, setLogoFont] = useState<LogoFontId>(() => {
+    const f = load<LogoFontId>("logoFont", "poppins");
+    return f in LOGO_FONTS ? f : "poppins";
+  });
+  useEffect(() => save("logoFont", logoFont), [logoFont]);
   const [tab, setTab] = useState<Tab>("home");
   const [gifts, setGifts] = useState<GiftEntry[]>(() => load<GiftEntry[]>("gifts", []));
   const today = localDay(now);
@@ -242,9 +248,10 @@ export default function App() {
       {tab === "journal" && <JournalWrite journal={journal} now={now} onSave={onSaveJournal} onClose={() => setTab("home")} />}
       {tab === "history" && <JournalHistory journal={journal} now={now} onClose={() => setTab("home")} />}
       {settingsOpen && <Settings animal={animal} email={account?.email ?? null} onAnimal={changeFriend} onSignOut={() => void onSignOut()} onClose={() => setSettingsOpen(false)} />}
-      {!account && <Onboarding key={helloStyle} hello={helloStyle} onDone={onSignedUp} />}
+      {!account && <Onboarding key={helloStyle} hello={helloStyle} logoFont={logoFont} onDone={onSignedUp} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
-        <DevBar phase={phase} onPhase={setPhaseOverride} onResetGift={resetToday} visiting={!!visitor} onVisit={() => (visitor ? endVisit() : startVisit(visitorFor(animal, now)))} onRestart={() => void onSignOut()} hello={helloStyle} onHello={() => { setHelloStyle((h) => (h === "desk" ? "sketch" : "desk")); void onSignOut(); }} />
+        <DevBar phase={phase} onPhase={setPhaseOverride} onResetGift={resetToday} visiting={!!visitor} onVisit={() => (visitor ? endVisit() : startVisit(visitorFor(animal, now)))} onRestart={() => void onSignOut()} hello={helloStyle} onHello={() => { setHelloStyle((h) => (h === "desk" ? "sketch" : "desk")); void onSignOut(); }}
+          logoFont={LOGO_FONTS[logoFont].label} onLogoFont={() => { setLogoFont((f) => LOGO_ORDER[(LOGO_ORDER.indexOf(f) + 1) % LOGO_ORDER.length]); void onSignOut(); }} />
       )}
     </div>
   );
