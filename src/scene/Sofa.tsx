@@ -15,7 +15,7 @@ const SEAT_TOP = -0.08; // painter y of the seat cushion top
 export const SOFA_SEAT: Seat = {
   x: SOFA_X - 0.12,
   y: GROUND + (SEAT_TOP - BASE) - 0.02,
-  cup: [0.98, 0.33], // on the right arm
+  cup: [-0.95, -0.5], // on the grass in front of the sofa
   shadow: false,
 };
 

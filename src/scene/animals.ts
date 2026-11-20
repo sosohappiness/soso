@@ -81,6 +81,62 @@ export function bodyTex(a: Animal) {
 
 // ---- ears: separate sprites so they can show the mood --------------------------
 
+// ---- lying pose: torso, head and limbs as separate fluffy pieces -----------------
+// Coordinates are world units in Minimi's own space: x along the sofa, y up from the seat.
+
+export const LIE = {
+  torso: { x: 0.15, y: 0.19 },
+  head: { x: -0.42, y: 0.36 },
+  armUp: { x: -0.12, y: 0.33, len: 0.42, w: 0.13 },
+  armRest: { x: -0.27, y: 0.2, len: 0.28, w: 0.13 },
+  legOut: { x: 0.55, y: 0.11, len: 0.36, w: 0.16 },
+  legTuck: { x: 0.42, y: 0.12, len: 0.28, w: 0.15 },
+  tail: { x: 0.74, y: 0.22 },
+  face: { eyeL: [-0.085, 0.035] as [number, number], eyeR: [0.085, 0.035] as [number, number], nose: [0, -0.055] as [number, number] },
+};
+
+export function torsoTex(a: Animal) {
+  return painted(`torso-${a.id}`, 1.5, 0.7, (p) => {
+    p.fill(p.ellipse(-0.04, 0, 0.56, 0.18, 0.03), a.body, 0.008, FUR);
+    p.fill(p.ellipse(0.3, 0.02, 0.27, 0.2, 0.04), a.body, 0.008, FUR);
+    p.strands(500, 0.035);
+  }, { grain: 0.06, mottle: 0.05 });
+}
+
+export function headTex(a: Animal) {
+  return painted(`head-lie-${a.id}`, 0.8, 0.75, (p) => {
+    p.fill(p.ellipse(0, 0, 0.27, 0.245, 0.03), a.body, 0.008, FUR);
+    if (a.muzzle) p.fill(p.ellipse(0, -0.07, 0.13, 0.085, 0.05), a.muzzle, 0.006, FUR * 0.35);
+    p.strands(160, 0.03);
+  }, { grain: 0.06, mottle: 0.05 });
+}
+
+/** A fluffy capsule limb that grows up from its joint at (0,0); the sprite pivot sits at the joint. */
+export function limbTex(a: Animal, len: number, w: number, kind: "arm" | "leg") {
+  const H = len + w + 0.12;
+  const y0 = -H / 2 + 0.06 + w / 2; // joint
+  const art = painted(`limb-${a.id}-${kind}-${len}-${w}`, w + 0.16, H, (p) => {
+    p.fill(p.ellipse(0, y0 + len / 2, w / 2, len / 2 + w / 2, 0.04), a.body, 0.006, FUR * 0.7);
+    // paw at the end: dark socks on the fox, the same fluff on the others
+    p.fill(p.ellipse(0, y0 + len - w * 0.05, w * 0.52, w * 0.5, 0.05), a.paw === a.body ? a.body : a.paw, 0.006, FUR * 0.5);
+    p.strands(60, 0.025);
+  }, { grain: 0.06, mottle: 0.05 });
+  return { art, pivot: [0, y0] as [number, number] };
+}
+
+export function tailTex(a: Animal) {
+  return painted(`tail-lie-${a.id}`, 0.6, 0.5, (p) => {
+    if (a.id === "fox") {
+      p.fill(p.ellipse(0.06, 0.02, 0.2, 0.1, 0.05, 0.35), a.body, 0.008, FUR);
+      p.fill(p.ellipse(0.2, 0.08, 0.07, 0.06, 0.05), "#F3E4CB", 0.006, FUR * 0.6);
+    } else if (a.id === "dog") {
+      p.fill(p.ellipse(0.04, 0.06, 0.07, 0.12, 0.05, -0.5), a.body, 0.008, FUR);
+    } else {
+      p.fill(p.ellipse(0, 0, 0.07, 0.06, 0.05), a.body, 0.008, FUR);
+    }
+  }, { grain: 0.06 });
+}
+
 export type EarArt = { art: ReturnType<typeof painted>; pivot: [number, number]; base: [number, number] };
 
 /** Ear for side sx (-1 left, 1 right). `base` is where it joins the head (sheet coords → world). */
