@@ -8,7 +8,7 @@ const B = -0.15;
 
 /** A plate of tteokbokki; `left` is how many pieces are still on it (eaten down to 0). */
 export function plateTex(left: number) {
-  return painted(`prop-plate-${left}`, 0.56, 0.4, (p) => {
+  return painted(`prop-plate2-${left}`, 0.56, 0.4, (p) => {
     p.blob(0, B + 0.03, 0.2, 0.05, "#F6F2EA", { wob: 0.02 });
     p.blob(0, B + 0.04, 0.15, 0.033, "#ECE6DA", { wob: 0.03, fuzz: 0.003 });
     if (left > 0) p.blob(0, B + 0.045, 0.06 + left * 0.025, 0.02 + left * 0.004, "#C8442E", { wob: 0.08, fuzz: 0.004 });
@@ -19,12 +19,12 @@ export function plateTex(left: number) {
       p.stroke([[-0.03, B + 0.1], [-0.04, B + 0.15], [-0.025, B + 0.2]], "#FFFFFF", 0.008);
       p.stroke([[0.04, B + 0.1], [0.03, B + 0.15], [0.045, B + 0.2]], "#FFFFFF", 0.008);
     }
-  }, { grain: 0.04 });
+  }, { grain: 0.04, outline: "#4a3b33" });
 }
 
 /** Speaker: a little wooden box with two cones and a handle. */
 export function speakerTex() {
-  return painted("prop-speaker", 0.6, 0.5, (p) => {
+  return painted("prop-speaker2", 0.6, 0.5, (p) => {
     p.poly([[-0.2, B + 0.27], [0.2, B + 0.27], [0.2, B], [-0.2, B]], "#B07A4F", { wob: 0.004 });
     p.glow(0, B + 0.22, 0.25, "#C99366", 0.6, 0.4);
     p.stroke([[-0.1, B + 0.27], [-0.08, B + 0.34], [0.08, B + 0.34], [0.1, B + 0.27]], "#6E4A2E", 0.02);
@@ -33,7 +33,7 @@ export function speakerTex() {
       p.blob(x, B + 0.12, 0.035, 0.035, "#6B5B55", { fuzz: 0.003 });
     }
     p.blob(0, B + 0.23, 0.012, 0.012, "#F2C230", { fuzz: 0.002 });
-  }, { grain: 0.05 });
+  }, { grain: 0.05, outline: "#4a3b33" });
 }
 
 // ---- the bath tub, in three layers so Minimi can sit inside it ----
@@ -42,10 +42,10 @@ export const TUB = { w: 1.4, h: 0.9, rimY: 0.55, halfW: 0.6 };
 const U = (x: number, y: number): [number, number] => [x, y - TUB.h / 2 + 0.02];
 
 export function tubBackTex() {
-  return painted("tub-back", TUB.w, TUB.h, (p) => {
+  return painted("tub-back2", TUB.w, TUB.h, (p) => {
     p.blob(...U(0, TUB.rimY), 0.6, 0.1, "#F7F4EE", { wob: 0.01 });
     p.blob(...U(0, TUB.rimY - 0.005), 0.54, 0.072, "#D8E3EA", { wob: 0.01, fuzz: 0.004 });
-  }, { grain: 0.04 });
+  }, { grain: 0.04, outline: "#4a3b33" });
 }
 
 /** The water surface; scaled from the bottom of the tub up to the rim as it fills. */
@@ -57,7 +57,7 @@ export function tubWaterTex() {
 }
 
 export function tubFrontTex() {
-  return painted("tub-front", TUB.w, TUB.h, (p) => {
+  return painted("tub-front2", TUB.w, TUB.h, (p) => {
     const pts = p.bezier(U(-0.6, TUB.rimY), [
       [U(-0.6, 0.25), U(-0.5, 0.1), U(-0.3, 0.09)],
       [U(-0.1, 0.08), U(0.1, 0.08), U(0.3, 0.09)],
@@ -69,7 +69,7 @@ export function tubFrontTex() {
     p.glow(-0.25, U(0, 0.42)[1], 0.2, "#FFFFFF", 0.7, 0.5);
     // little feet
     for (const x of [-0.42, 0.42]) p.blob(...U(x, 0.05), 0.05, 0.05, "#C9A27A", { fuzz: 0.003 });
-  }, { grain: 0.04 });
+  }, { grain: 0.04, outline: "#4a3b33" });
 }
 
 export function dropTex() {

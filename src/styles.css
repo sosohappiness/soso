@@ -135,23 +135,88 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .gc-link { font-size: 12px; color: #b3261e; }
 @keyframes card-in { from { opacity: 0; transform: translateX(-50%) translateY(-24px) rotate(-6deg); } }
 
-/* ---- sheets ---- */
-.sheet-wrap { position: absolute; inset: 0; background: rgba(30,36,86,.35); display: flex; align-items: flex-end; justify-content: center; animation: fade .2s both; }
-.sheet {
-  position: relative; width: 100%; max-width: 480px; max-height: 78%; overflow: auto;
-  background: var(--cream); color: var(--navy); border-radius: 26px 26px 0 0; border: 2.5px solid var(--navy); border-bottom: 0;
-  padding: 26px 26px calc(env(safe-area-inset-bottom, 0px) + 30px); font-size: 15px; animation: up .3s cubic-bezier(.2,.9,.3,1) both;
-  user-select: text;
+/* ---- journal panels (감사일기 · 기록): paper sheets above the tab bar ---- */
+.panel-wrap {
+  position: absolute; left: 0; right: 0; top: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 56px);
+  display: flex; justify-content: center; align-items: flex-end; z-index: 4; animation: fade .2s both;
+  background: linear-gradient(to bottom, rgba(30,36,86,.0), rgba(30,36,86,.18));
 }
-.sheet h2 { margin: 0 0 8px; font-size: 22px; }
-.sheet p { margin: 0 0 12px; line-height: 1.4; }
-.sheet-close { position: absolute; right: 16px; top: 12px; border: 0; background: none; font-size: 28px; line-height: 1; padding: 4px 8px; }
-.lines-demo { margin: 6px 0 14px; padding-left: 26px; opacity: .55; }
-.soon { color: var(--terracotta); font-weight: 400; }
-.gift-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-.gift-list li { display: flex; align-items: center; gap: 12px; border-bottom: 2px dashed rgba(30,36,86,.2); padding-bottom: 10px; }
-.g-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.g-day { opacity: .6; font-variant-numeric: tabular-nums; }
+.bottom { z-index: 5; }
+.panel {
+  position: relative; width: 100%; max-width: 480px; height: calc(100% - env(safe-area-inset-top, 0px) - 14px);
+  display: flex; flex-direction: column; background: #fffaf2; color: var(--navy);
+  border: 2.5px solid #4a3b33; border-bottom: 0; border-radius: 28px 28px 0 0;
+  box-shadow: 0 -4px 0 rgba(74,59,51,.08); animation: up .32s cubic-bezier(.2,.9,.3,1) both; user-select: text;
+}
+.panel-head {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  padding: 20px max(22px, env(safe-area-inset-left, 0px)) 10px; border-bottom: 2px dashed rgba(74,59,51,.18);
+}
+.panel-head h2 { margin: 0; font-size: 24px; font-weight: 400; }
+.panel-sub { margin: 4px 0 0; font-size: 14px; color: #8a7a6c; }
+.panel-close { border: 0; background: none; font-size: 28px; line-height: 1; padding: 0 4px; color: #4a3b33; }
+.panel-body { flex: 1; overflow-y: auto; padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+
+.day-switch { display: flex; gap: 8px; }
+.day-switch button {
+  border: 2px solid #4a3b33; background: #fff9f0; color: #4a3b33; border-radius: 999px; padding: 6px 14px; font-size: 14px;
+}
+.day-switch button.on { background: var(--yellow); }
+.journal-hint { margin: 0; font-size: 14px; line-height: 1.5; color: #8a7a6c; }
+.journal-form { display: flex; flex-direction: column; gap: 10px; }
+.journal-line {
+  display: flex; align-items: center; gap: 10px; padding: 6px 4px 6px 2px;
+  border-bottom: 2px solid rgba(74,59,51,.14);
+}
+.journal-line:focus-within { border-bottom-color: var(--yellow); }
+.jl-flower { flex: 0 0 auto; display: grid; place-items: center; }
+.journal-line input {
+  flex: 1; min-width: 0; border: 0; background: transparent; outline: none; font: inherit; font-size: 17px;
+  color: var(--navy); padding: 8px 0; user-select: text; -webkit-user-select: text;
+}
+.journal-line input::placeholder { color: #b9ab9b; }
+.journal-save {
+  margin-top: 8px; height: 52px; border-radius: 26px; border: 2.5px solid var(--navy); background: var(--yellow);
+  color: var(--navy); font-size: 17px; box-shadow: 0 4px 0 rgba(30,36,86,.18);
+}
+.journal-save:disabled { opacity: .5; box-shadow: none; }
+.journal-done { display: flex; flex-direction: column; gap: 12px; }
+.journal-edit { align-self: flex-start; border: 2px solid #4a3b33; background: #fff9f0; border-radius: 999px; padding: 6px 16px; font-size: 14px; color: #4a3b33; }
+
+.entry-lines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.entry-lines li { display: flex; align-items: center; gap: 10px; font-size: 17px; line-height: 1.35; }
+.entry-lines.small li { font-size: 14px; color: #5a4d44; }
+.entry-lines span { overflow-wrap: anywhere; }
+
+/* calendar: a flower on every day a journal was written */
+.cal { background: #fff; border: 2px solid rgba(74,59,51,.2); border-radius: 20px; padding: 12px 10px 10px; }
+.cal-head { display: flex; justify-content: space-between; align-items: center; padding: 0 4px 8px; font-size: 17px; }
+.cal-head small { font-size: 13px; color: #8a7a6c; }
+.cal-head button { border: 0; background: none; font-size: 26px; line-height: 1; padding: 0 10px; color: #4a3b33; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; }
+.cal-w { text-align: center; font-size: 12px; color: #8a7a6c; padding-bottom: 4px; }
+.cal-w:first-child { color: #c8604a; }
+.cal-day {
+  position: relative; aspect-ratio: 1; border: 0; background: none; border-radius: 12px; padding: 0;
+  display: grid; place-items: center; color: #4a3b33;
+}
+.cal-day:disabled { cursor: default; }
+.cal-day .cal-n { position: absolute; bottom: 1px; right: 4px; font-size: 10px; color: #8a7a6c; }
+.cal-day:not(.has) .cal-n { position: static; font-size: 13px; color: #b9ab9b; }
+.cal-day.today { box-shadow: inset 0 0 0 2px var(--yellow); }
+.cal-day.picked { background: #fff3d6; }
+.cal-day.has svg { animation: bloom .4s cubic-bezier(.3,1.6,.5,1) both; }
+@keyframes bloom { from { transform: scale(.3); opacity: 0; } }
+
+.entry-card {
+  text-align: left; background: #fff; border: 2px solid rgba(74,59,51,.18); border-radius: 18px; padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 8px; color: var(--navy); width: 100%;
+}
+.entry-card h3 { margin: 0; font-size: 15px; font-weight: 400; display: flex; align-items: center; gap: 6px; }
+.entry-card.on, .picked-card { border-color: #4a3b33; box-shadow: 3px 4px 0 rgba(74,59,51,.12); }
+.list-title { margin: 6px 0 0; font-size: 17px; font-weight: 400; }
+.entry-list { display: flex; flex-direction: column; gap: 10px; }
+
 @keyframes fade { from { opacity: 0; } }
 @keyframes up { from { transform: translateY(40px); opacity: 0; } }
 
@@ -166,6 +231,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .devbar .sep { width: 1px; background: rgba(247,242,232,.4); margin: 2px 3px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .bubble, .sheet, .sheet-wrap { animation: none; }
+  .bubble, .panel, .panel-wrap, .gift-emo, .cal-day.has svg { animation: none; }
 }
 .gift-btn .gift-box { background: #fff9f0; border: 1.5px solid var(--navy); }

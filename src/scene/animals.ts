@@ -174,7 +174,7 @@ export function outlinedCup(p: Painter, b: number, fill: string | null) {
 
 /** The signature drink that sits beside each friend. Base of the cup is at painter y = -0.15. */
 export function cupTex(a: Animal) {
-  return painted(`cup2-${a.cup}`, 0.5, 0.5, (p) => {
+  return painted(`cup3-${a.cup}`, 0.5, 0.5, (p) => {
     const b = -0.15;
     if (a.cup === "matcha") {
       outlinedCup(p, b, "#9DB86A");
@@ -195,5 +195,5 @@ export function cupTex(a: Animal) {
       p.blob(-0.03, b + 0.18, 0.018, 0.012, "#FBF8F1", { fuzz: 0.003 });
       p.blob(0.025, b + 0.183, 0.016, 0.011, "#FBF8F1", { fuzz: 0.003 });
     }
-  }, { grain: 0.05 });
+  }, { grain: 0.05, outline: a.cup === "matcha" ? undefined : LINE });
 }

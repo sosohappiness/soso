@@ -9,8 +9,9 @@ export function growthFromDays(days: number): Growth {
   return { days, flowers: days * 3, bigFlowers: Math.floor(days / 7) };
 }
 
-export function demoGrowth(search: string): Growth {
+/** ?days=N fakes N logged days; returns null when the real journal should be used. */
+export function demoGrowth(search: string): Growth | null {
   const raw = new URLSearchParams(search).get("days");
   const n = raw == null ? NaN : Number(raw);
-  return growthFromDays(Number.isFinite(n) && n >= 0 ? Math.min(400, Math.floor(n)) : 21);
+  return Number.isFinite(n) && n >= 0 ? growthFromDays(Math.min(400, Math.floor(n))) : null;
 }

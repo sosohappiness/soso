@@ -246,8 +246,31 @@ export class Painter {
     ctx.putImageData(img, 0, 0);
   }
 
-  finish(opts: { grain?: number; mottle?: number } = {}): THREE.CanvasTexture {
+  /** A thin outline around the silhouette of everything painted (props and cups). */
+  private outline(color: string, px: number) {
+    const { canvas, ctx } = this;
+    const tmp = document.createElement("canvas");
+    tmp.width = canvas.width;
+    tmp.height = canvas.height;
+    const t = tmp.getContext("2d");
+    if (!t) return;
+    t.drawImage(canvas, 0, 0);
+    t.globalCompositeOperation = "source-in";
+    t.fillStyle = color;
+    t.fillRect(0, 0, tmp.width, tmp.height);
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = "destination-over";
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      ctx.drawImage(tmp, Math.cos(a) * px, Math.sin(a) * px);
+    }
+    ctx.restore();
+  }
+
+  finish(opts: { grain?: number; mottle?: number; outline?: string; outlinePx?: number } = {}): THREE.CanvasTexture {
     this.fuzzEdges();
+    if (opts.outline) this.outline(opts.outline, opts.outlinePx ?? 2);
     this.grain(opts.grain ?? 0.07, opts.mottle ?? 0.05);
     const tex = new THREE.CanvasTexture(this.canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
@@ -262,7 +285,7 @@ export type Painted = { tex: THREE.Texture; w: number; h: number };
 const cache = new Map<string, Painted>();
 
 /** Paint once per key and reuse. */
-export function painted(key: string, w: number, h: number, draw: (p: Painter) => void, opts?: { grain?: number; mottle?: number; seed?: number; ppu?: number }): Painted {
+export function painted(key: string, w: number, h: number, draw: (p: Painter) => void, opts?: { grain?: number; mottle?: number; seed?: number; ppu?: number; outline?: string; outlinePx?: number }): Painted {
   const hit = cache.get(key);
   if (hit) return hit;
   let seed = opts?.seed ?? 0;

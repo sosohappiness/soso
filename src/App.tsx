@@ -8,7 +8,8 @@ import { load, save } from "./lib/storage";
 import { Hud } from "./ui/Hud";
 import { GiftPicker, type GiftEntry } from "./ui/GiftPicker";
 import { Tabs, type Tab } from "./ui/Tabs";
-import { Sheet } from "./ui/Sheet";
+import { JournalHistory, JournalWrite } from "./ui/JournalViews";
+import { growthFromJournal, loadJournal, sampleJournal, saveJournal, type Journal } from "./lib/journal";
 import { DevBar } from "./ui/DevBar";
 import type { SceneId } from "./scene/palette";
 import { GIFTS, enjoyLine, type GiftId } from "./lib/gifts";
@@ -35,7 +36,17 @@ export default function App() {
   });
   const phase = phaseOverride ?? phaseAt(now);
   const [animal, setAnimal] = useState<AnimalId>(() => animalFromSearch(search) ?? load<AnimalId>("animal", "polar"));
-  const growth = useMemo(() => demoGrowth(search), [search]);
+  // the gratitude journal drives the cloud's flowers (?days=N still fakes it for testing)
+  const [journal, setJournal] = useState<Journal>(() => {
+    const j = loadJournal();
+    if (import.meta.env.VITE_PREVIEW && Object.keys(j).length === 0) {
+      const sample = sampleJournal(new Date());
+      saveJournal(sample);
+      return sample;
+    }
+    return j;
+  });
+  const growth = useMemo(() => demoGrowth(search) ?? growthFromJournal(journal), [search, journal]);
   const [scene, setScene] = useState<SceneId>(() => (params.get("scene") === "dusk" ? "dusk" : load<SceneId>("scene", "sofa")));
   useEffect(() => save("scene", scene), [scene]);
   const [tab, setTab] = useState<Tab>("home");
@@ -93,6 +104,19 @@ export default function App() {
     later(T.drink + 3.8, () => setCard(null));
   }, [today, phase]);
 
+  const onSaveJournal = useCallback((day: string, lines: string[]) => {
+    setJournal((j) => {
+      const next = { ...j, [day]: lines.filter((l) => l.length > 0) };
+      saveJournal(next);
+      return next;
+    });
+    window.setTimeout(() => {
+      setTab("home");
+      setPokeAt(performance.now());
+      setLine("고마워! 구름에 꽃이 소복이 피었어");
+    }, 900);
+  }, []);
+
   const resetToday = useCallback(() => {
     setGifts((g) => {
       const next = g.filter((x) => x.day !== today);
@@ -117,7 +141,7 @@ export default function App() {
       <div className="grain" aria-hidden="true" />
       <Hud time={clockText(now)} label={PHASE_LABEL[phase]} flowers={growth.flowers} days={growth.days} />
       <div className="bottom">
-        <GiftPicker given={todaysGift} onGive={onGift} busy={giftShow !== null} />
+        {tab === "home" && <GiftPicker given={todaysGift} onGive={onGift} busy={giftShow !== null} />}
         <Tabs tab={tab} onTab={setTab} />
       </div>
       {card && (
@@ -129,7 +153,8 @@ export default function App() {
           </span>
         </button>
       )}
-      {tab !== "home" && <Sheet onClose={() => setTab("home")} />}
+      {tab === "journal" && <JournalWrite journal={journal} now={now} onSave={onSaveJournal} onClose={() => setTab("home")} />}
+      {tab === "history" && <JournalHistory journal={journal} now={now} onClose={() => setTab("home")} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
         <DevBar phase={phase} animal={animal} scene={scene} onPhase={setPhaseOverride} onAnimal={setAnimal} onScene={setScene} onResetGift={resetToday} />
       )}
