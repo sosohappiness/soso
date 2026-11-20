@@ -10,7 +10,7 @@ export function FriendPortrait({ id, size = 64 }: { id: AnimalId; size?: number 
 
 /** The invite message friends receive, with the app's link. */
 function inviteText(link: string) {
-  return `So So에서 같이 감사일기 써요! 작은 친구에게 하루 하나 선물하고, 고마운 일을 적으면 구름에 꽃이 피어요.\n${link}`;
+  return `함께 더 행복해져요. 감사일기를 쓰면 뭉게구름에 꽃이 소복소복 피어나요.\n${link}`;
 }
 
 /** 설정: change the friend (with a gentle check first), invite friends, and the account. */
