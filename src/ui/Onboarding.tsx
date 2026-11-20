@@ -3,6 +3,7 @@ import { ANIMALS, type AnimalId } from "../scene/animals";
 import { validEmail } from "../lib/auth";
 import { FriendPortrait } from "./Settings";
 import { Hello, HelloDesk } from "./Hello";
+import { kraftURL } from "./kraft";
 import type { LogoFontId } from "./logoFonts";
 
 type Step = "hello" | "email" | "friend";
@@ -29,7 +30,7 @@ export function Onboarding({ onDone, hello = "desk", logoFont = "poppins" }: { o
   if (step === "hello") return hello !== "sketch" ? <HelloDesk pose={hello} logoFont={logoFont} onStart={() => setStep("email")} /> : <Hello logoFont={logoFont} onStart={() => setStep("email")} />;
 
   return (
-    <div className="onboard">
+    <div className="onboard" style={{ backgroundImage: `url(${kraftURL()})` }}>
       <div className="ob-card">
         {step === "email" && (
           <form className="ob-form" onSubmit={(e) => { e.preventDefault(); next(); }}>

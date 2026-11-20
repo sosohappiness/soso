@@ -59,6 +59,11 @@ export default function App() {
   // two first-screen styles to compare (preview only): kraft desk, watercolour sketchbook
   const [helloStyle, setHelloStyle] = useState<"desk" | "nap" | "mine" | "sketch">(() => { const h = load<string>("helloStyle2", "mine"); return h === "desk" || h === "sketch" || h === "nap" ? h : "mine"; });
   useEffect(() => save("helloStyle2", helloStyle), [helloStyle]);
+  // the strip outside the app (behind the home bar / browser chrome) matches the screen
+  useEffect(() => {
+    document.body.style.background = account ? "#87a55d" : "#be9068";
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", account ? "#d3e3ec" : "#be9068");
+  }, [account]);
   const [logoFont, setLogoFont] = useState<LogoFontId>(() => {
     const f = load<LogoFontId>("logoFont2", "marker");
     return f in LOGO_FONTS ? f : "marker";
