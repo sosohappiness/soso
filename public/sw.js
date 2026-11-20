@@ -1,10 +1,10 @@
 // Soso service worker: app opens offline after the first visit.
 // Pages: network first (so updates show up), falling back to the cached shell.
 // Hashed assets and fonts: cache first.
-const CACHE = "soso-v2";
+const CACHE = "soso-v3";
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/manifest.webmanifest", "/icons/icon.svg"])));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["./", "./manifest.webmanifest", "./icons/icon.svg"])));
   self.skipWaiting();
 });
 
@@ -23,14 +23,14 @@ self.addEventListener("fetch", (e) => {
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put("/", copy));
+          caches.open(CACHE).then((c) => c.put("./", copy));
           return res;
         })
-        .catch(() => caches.match("/")),
+        .catch(() => caches.match("./")),
     );
     return;
   }
-  const cacheable = (url.origin === location.origin && url.pathname.startsWith("/assets/")) ||
+  const cacheable = (url.origin === location.origin && url.pathname.includes("/assets/")) ||
     url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com";
   if (!cacheable) return;
   e.respondWith(

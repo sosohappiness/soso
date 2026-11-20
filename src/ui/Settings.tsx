@@ -21,7 +21,7 @@ export function Settings({ animal, email, onAnimal, onSignOut, onClose }: {
   const [inviteNote, setInviteNote] = useState("");
   // the link friends open: set VITE_INVITE_URL when the app lives somewhere other than where it runs
   // (e.g. shared as a claude.ai link); otherwise this page's own address
-  const link = (import.meta.env.VITE_INVITE_URL as string | undefined) || (typeof location !== "undefined" ? location.origin + "/" : "");
+  const link = (import.meta.env.VITE_INVITE_URL as string | undefined) || (typeof location !== "undefined" ? location.origin + location.pathname : "");
   const invite = async () => {
     const text = inviteText(link);
     if (typeof navigator.share === "function") {
