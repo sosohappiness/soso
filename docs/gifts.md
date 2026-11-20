@@ -1,7 +1,7 @@
 # Gifts
 
 You choose one of five gifts a day (no free text). Defined in `src/lib/gifts.ts`.
-The helper polar bear in a matcha apron brings each one on a tray (`src/scene/GiftShow.tsx`);
+The squirrel friend brings each one, carrying a teapot with its tail; for the matcha latte it pours the tea into the cup first (`src/scene/GiftShow.tsx`, art in `src/scene/squirrel.ts`);
 Minimi's reaction lives in `src/scene/Minimi.tsx`, props in `src/scene/props.ts`.
 
 | Gift | How Minimi enjoys it | Particles |

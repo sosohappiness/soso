@@ -48,4 +48,4 @@ export function enjoyLine(id: GiftId): string {
 }
 
 /** The beats of every gift scene, in seconds. */
-export const GIFT_T = { walkIn: 1.8, give: 2.6, drink: 5.4, leave: 7.0 };
+export const GIFT_T = { walkIn: 1.8, give: 3.6, drink: 6.2, leave: 7.8 };

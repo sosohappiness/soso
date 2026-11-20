@@ -33,6 +33,7 @@ export const Sprite = forwardRef<THREE.Group, Props>(function Sprite(
           transparent
           opacity={opacity}
           depthWrite={false}
+          side={THREE.DoubleSide}
           toneMapped={false}
         />
       </mesh>

@@ -156,7 +156,7 @@ export function Minimi({ animal, phase, pal, anchor, pokeAt, onPoke, seat = GROU
     happyRefs.forEach((e) => e.current && (e.current.visible = pleased));
 
     // paws come up to hold the cup, then go back down
-    const reach = giving && kind === "hold" && g > GIFT_T.walkIn ? Math.min(1, (g - GIFT_T.walkIn) / 0.5) * (g < GIFT_T.drink ? 1 : Math.max(0, 1 - (g - GIFT_T.drink) / 0.4)) : 0;
+    const reach = giving && kind === "hold" && g > GIFT_T.give - 0.7 ? Math.min(1, (g - GIFT_T.give + 0.7) / 0.5) * (g < GIFT_T.drink ? 1 : Math.max(0, 1 - (g - GIFT_T.drink) / 0.4)) : 0;
     pawRefs.forEach((e, i) => {
       if (!e.current) return;
       const [px, py] = at(i === 0 ? -34 : 34, 4);

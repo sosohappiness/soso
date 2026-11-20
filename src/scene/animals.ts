@@ -113,56 +113,6 @@ export function earTex(a: Animal, sx: -1 | 1): EarArt {
   return { art, pivot: [0, oy], base };
 }
 
-// ---- the gift helper and gift props ------------------------------------------------
-
-/** The helper: a polar bear in a matcha-green apron. Same one-mass silhouette, warmer white. */
-export function helperTex() {
-  return painted("helper-polar-apron", BODY_TEX.w, BODY_TEX.h, (p) => {
-    const white = "#F3ECE1";
-    for (const sx of [-1, 1]) p.fill(p.ellipse(...s(sx * 54, 226), 22 * K, 22 * K, 0.04), white, 0.006, FUR * 0.8);
-    p.fill(silhouette(p), white, 0.008, FUR);
-    // apron: bib and skirt, a pocket, and the neck strap
-    p.poly([s(-50, 150), s(50, 150), s(60, 96), s(78, 6), s(-78, 6), s(-60, 96)], "#8FB06A", { wob: 0.006, fuzz: 0.006 });
-    p.poly([s(-26, 64), s(26, 64), s(24, 30), s(-24, 30)], "#A9C487", { wob: 0.005, fuzz: 0.004 });
-    p.stroke([s(-44, 148), s(-30, 196), s(0, 210), s(30, 196), s(44, 148)], "#8FB06A", 0.022);
-    p.stroke([s(-62, 96), s(-92, 92)], "#8FB06A", 0.016);
-    p.stroke([s(62, 96), s(92, 92)], "#8FB06A", 0.016);
-    // face: dot eyes and nose like everyone else
-    p.blob(...s(-26, 174), 6.5 * K, 7.5 * K, "#151213", { fuzz: 0.003 });
-    p.blob(...s(26, 174), 6.5 * K, 7.5 * K, "#151213", { fuzz: 0.003 });
-    p.blob(...s(0, 144), 12 * K, 9 * K, "#151213", { fuzz: 0.003 });
-    p.strands(700, 0.035);
-  }, { grain: 0.06, mottle: 0.05 });
-}
-
-export function helperPawTex() {
-  return painted("helper-paw", 0.3, 0.2, (p) => p.fill(p.ellipse(0, 0, 0.075, 0.055, 0.05), "#F3ECE1", 0.006, FUR * 0.45));
-}
-
-export function trayTex() {
-  return painted("tray", 0.6, 0.12, (p) => p.poly([[-0.24, 0.02], [0.24, 0.02], [0.22, -0.02], [-0.22, -0.02]], "#C9A27A", { wob: 0.003, fuzz: 0.004 }));
-}
-
-export function giftBoxTex() {
-  return painted("gift-box", 0.5, 0.5, (p) => {
-    const b = -0.15;
-    p.poly([[-0.13, b + 0.2], [0.13, b + 0.2], [0.13, b], [-0.13, b]], "#F2C230", { wob: 0.004 });
-    p.poly([[-0.025, b + 0.2], [0.025, b + 0.2], [0.025, b], [-0.025, b]], "#C8513A", { wob: 0.003, fuzz: 0.003 });
-    p.poly([[-0.15, b + 0.24], [0.15, b + 0.24], [0.15, b + 0.19], [-0.15, b + 0.19]], "#F6D46A", { wob: 0.004 });
-    p.blob(-0.04, b + 0.27, 0.045, 0.03, "#C8513A", { rot: 0.5, fuzz: 0.003 });
-    p.blob(0.04, b + 0.27, 0.045, 0.03, "#C8513A", { rot: -0.5, fuzz: 0.003 });
-    p.poly([[0.13, b + 0.12], [0.2, b + 0.08], [0.2, b + 0.02], [0.13, b + 0.04]], "#FBF6EC", { wob: 0.002, fuzz: 0.002 });
-  }, { grain: 0.04 });
-}
-
-export function heartTex() {
-  return painted("heart", 0.16, 0.16, (p) => {
-    p.blob(-0.022, 0.012, 0.026, 0.024, "#F4A3B4", { fuzz: 0.004 });
-    p.blob(0.022, 0.012, 0.026, 0.024, "#F4A3B4", { fuzz: 0.004 });
-    p.poly([[-0.046, 0.008], [0.046, 0.008], [0, -0.045]], "#F4A3B4", { wob: 0.003, fuzz: 0.004 });
-  }, { grain: 0.02 });
-}
-
 export function happyEyeTex() {
   return painted("eye-happy", 0.12, 0.12, (p) => p.stroke([[-0.03, -0.008], [0, 0.012], [0.03, -0.008]], "#151213", 0.014), { grain: 0.02 });
 }
