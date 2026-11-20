@@ -1,107 +1,107 @@
-// The first screen: kraft paper, a big bold "So So", and the three friends drawn in simple
-// black line art (white bodies, black accents).
+// The first screen: a watercolour sketchbook page with a big "So So", and the three friends
+// painted exactly as on the home screen, gathered around a watercolour cloud.
+import { PORTRAIT_ASPECT, portraitURL } from "../scene/portrait";
+import type { AnimalId } from "../scene/animals";
 
-const INK = "#1C1A17";
-const PAPER = "#FFFAF2";
-const line = { stroke: INK, strokeWidth: 3.2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+const PETALS = ["#F4B6C2", "#F6D46A", "#F29A7E", "#C9B6E8"];
 
-/** 뽀송이: sitting on a puffy cloud cushion, looking up at a thought about a flower. */
-function Bear() {
+function Bloom({ x, y, s = 1, c }: { x: number; y: number; s?: number; c: string }) {
   return (
-    <g>
-      {/* the cloud cushion */}
-      <path d="M150 316 C 126 316 122 282 148 278 C 144 252 178 238 196 254 C 206 228 252 226 264 250 C 284 236 318 248 312 276 C 340 278 342 316 314 318 C 300 336 168 336 150 316 Z" fill={PAPER} {...line} />
-      <path d="M176 300 C 200 308 262 308 286 298" fill="none" {...line} strokeWidth={2.2} />
-      {/* bear, head tilted up */}
-      <g transform="translate(232 262) rotate(-6)">
-        <circle cx="-22" cy="-82" r="11" fill={PAPER} {...line} />
-        <circle cx="22" cy="-82" r="11" fill={PAPER} {...line} />
-        <path d="M-40 0 C -40 -30 -34 -54 -28 -68 C -22 -84 -12 -90 0 -90 C 12 -90 22 -84 28 -68 C 34 -54 40 -30 40 0 Z" fill={PAPER} {...line} />
-        <circle cx="-10" cy="-62" r="3.4" fill={INK} />
-        <circle cx="10" cy="-62" r="3.4" fill={INK} />
-        <ellipse cx="0" cy="-50" rx="6.5" ry="4.8" fill={INK} />
-        <path d="M-30 -30 C -40 -18 -38 -6 -28 -4" fill="none" {...line} />
-        <path d="M30 -30 C 40 -18 38 -6 28 -4" fill="none" {...line} />
-        <ellipse cx="-16" cy="2" rx="12" ry="7" fill={PAPER} {...line} />
-        <ellipse cx="16" cy="2" rx="12" ry="7" fill={PAPER} {...line} />
-      </g>
-      {/* thought bubble with a little flower */}
-      <ellipse cx="318" cy="96" rx="44" ry="28" fill="none" {...line} strokeDasharray="70 10" />
-      <circle cx="288" cy="138" r="5" fill="none" {...line} strokeWidth={2.6} />
-      <circle cx="274" cy="154" r="3" fill="none" {...line} strokeWidth={2.4} />
-      <g transform="translate(318 96)">
-        {[0, 1, 2, 3, 4].map((i) => {
-          const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
-          return <circle key={i} cx={Math.cos(a) * 8} cy={Math.sin(a) * 8} r={7} fill={PAPER} {...line} strokeWidth={2.4} />;
-        })}
-        <circle r="4.5" fill={INK} />
-      </g>
+    <g transform={`translate(${x} ${y}) scale(${s})`} filter="url(#wc-edge)">
+      {[0, 1, 2, 3, 4].map((i) => {
+        const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+        return <circle key={i} cx={Math.cos(a) * 4.6} cy={Math.sin(a) * 4.6} r={4.4} fill={c} opacity={0.92} />;
+      })}
+      <circle r={2.6} fill="#F6D46A" />
     </g>
   );
 }
 
-/** 살랑이: standing, holding a cup of tea, tail swishing. */
-function Fox() {
+function Friend({ id, x, base, h, cls }: { id: AnimalId; x: number; base: number; h: number; cls: string }) {
+  const w = h * PORTRAIT_ASPECT;
   return (
-    <g transform="translate(92 412)">
-      <path d="M30 -24 C 70 -30 78 -70 58 -92 C 70 -60 52 -44 28 -40" fill={PAPER} {...line} />
-      <path d="M58 -92 C 64 -84 66 -76 64 -70 C 58 -76 54 -82 52 -88 Z" fill={INK} {...line} strokeWidth={2} />
-      <path d="M78 -86 q 6 4 6 10 M86 -94 q 7 5 7 13" fill="none" {...line} strokeWidth={2.4} />
-      <path d="M-26 -104 L -30 -138 L -6 -116 Z" fill={PAPER} {...line} />
-      <path d="M26 -104 L 30 -138 L 6 -116 Z" fill={PAPER} {...line} />
-      <path d="M-25 -112 L -27 -128 L -15 -118 Z" fill={INK} />
-      <path d="M25 -112 L 27 -128 L 15 -118 Z" fill={INK} />
-      <path d="M-36 -2 C -36 -40 -32 -72 -26 -90 C -20 -110 -10 -118 0 -118 C 10 -118 20 -110 26 -90 C 32 -72 36 -40 36 -2 Z" fill={PAPER} {...line} />
-      <circle cx="-9" cy="-90" r="3.2" fill={INK} />
-      <circle cx="9" cy="-90" r="3.2" fill={INK} />
-      <ellipse cx="0" cy="-79" rx="5.6" ry="4.2" fill={INK} />
-      <path d="M-16 -2 L -16 10 M16 -2 L 16 10" fill="none" {...line} />
-      <path d="M-24 10 L -10 10 M10 10 L 24 10" fill="none" {...line} />
-      <path d="M-28 -60 C -18 -50 -4 -48 6 -52" fill="none" {...line} />
-      <path d="M28 -60 C 22 -50 18 -48 12 -50" fill="none" {...line} />
-      <path d="M-4 -64 L 24 -64 L 21 -44 C 20 -40 0 -40 -1 -44 Z" fill={PAPER} {...line} />
-      <path d="M24 -60 C 32 -60 32 -50 22 -50" fill="none" {...line} strokeWidth={2.6} />
-      <path d="M4 -72 q -4 -6 0 -12 M14 -72 q -4 -6 0 -12" fill="none" {...line} strokeWidth={2.2} />
+    <g className={`hello-bob ${cls}`}>
+      <ellipse cx={x} cy={base - 2} rx={w * 0.42} ry={5} fill="#6E7F5A" opacity={0.18} />
+      <image href={portraitURL(id)} x={x - w / 2} y={base - h} width={w} height={h} />
     </g>
   );
 }
 
-/** 토닥이: lying on its tummy, floppy black ears, tail wagging. */
-function Dog() {
+/** The watercolour paper itself: soft washes of colour that bleed at the edges, plus paper tooth. */
+function Paper() {
   return (
-    <g transform="translate(276 404)">
-      <path d="M44 -26 C 58 -40 62 -56 56 -66" fill="none" {...line} />
-      <path d="M66 -60 q 6 4 5 11 M72 -70 q 7 5 6 13" fill="none" {...line} strokeWidth={2.4} />
-      <path d="M-34 0 C -40 -22 -30 -40 -6 -40 L 34 -40 C 56 -40 60 -12 50 0 Z" fill={PAPER} {...line} />
-      <path d="M-20 0 L -20 8 L -8 8 M 30 0 L 30 8 L 42 8" fill="none" {...line} />
-      <circle cx="-38" cy="-46" r="24" fill={PAPER} {...line} />
-      <path d="M-56 -60 C -70 -56 -72 -30 -62 -20 C -56 -16 -52 -24 -52 -32 C -52 -42 -54 -52 -50 -62 Z" fill={INK} />
-      <path d="M-24 -64 C -10 -62 -6 -40 -12 -30 C -18 -26 -22 -32 -22 -40 C -22 -48 -24 -56 -28 -64 Z" fill={INK} />
-      <circle cx="-44" cy="-50" r="3" fill={INK} />
-      <circle cx="-32" cy="-50" r="3" fill={INK} />
-      <ellipse cx="-38" cy="-38" rx="5.4" ry="4" fill={INK} />
-    </g>
+    <svg className="wc-paper" preserveAspectRatio="none" viewBox="0 0 400 860" aria-hidden="true">
+      <defs>
+        <filter id="wc-bleed" x="-30%" y="-30%" width="160%" height="160%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="7" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="38" result="d" />
+          <feGaussianBlur in="d" stdDeviation="6" />
+        </filter>
+        <filter id="wc-tooth">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="2" stitchTiles="stitch" />
+          <feColorMatrix values="0 0 0 0 .45  0 0 0 0 .4  0 0 0 0 .35  0 0 0 .55 -.08" />
+        </filter>
+      </defs>
+      <rect width="400" height="860" fill="#FAF5EC" />
+      <g filter="url(#wc-bleed)">
+        <ellipse cx="310" cy="150" rx="150" ry="110" fill="#BFDCEB" opacity="0.55" />
+        <ellipse cx="60" cy="320" rx="120" ry="90" fill="#F6CFD6" opacity="0.45" />
+        <ellipse cx="220" cy="430" rx="190" ry="120" fill="#D6E7F2" opacity="0.5" />
+        <ellipse cx="200" cy="700" rx="260" ry="110" fill="#CFE2B5" opacity="0.6" />
+        <ellipse cx="340" cy="620" rx="90" ry="60" fill="#F7E3A8" opacity="0.45" />
+      </g>
+      <rect width="400" height="860" filter="url(#wc-tooth)" opacity="0.5" />
+    </svg>
   );
 }
 
 export function Hello({ onStart }: { onStart: () => void }) {
+  const blooms: [number, number, number][] = [
+    [84, 268, 1], [104, 240, 0.9], [138, 222, 1.1], [258, 214, 1], [292, 234, 0.9], [318, 268, 1], [112, 300, 0.8], [300, 300, 0.8],
+  ];
   return (
-    <div className="hello kraft">
+    <div className="hello sketchbook">
+      <Paper />
+      <div className="sb-rings" aria-hidden="true">
+        {Array.from({ length: 12 }, (_, i) => <span key={i} />)}
+      </div>
+
       <header className="hello-head">
         <h1 className="hello-logo2" aria-label="So So">
           <span>So</span>
           <span>So<i aria-hidden="true" /></span>
         </h1>
-        <p className="hello-en">A Tiny Friend Waits For One Gift A Day<br />Write Three Thank-Yous, Grow A Cloud Of Flowers</p>
+        <p className="hello-ko">지친 하루 끝, 작은 친구가 기다리고 있어요<br />오늘의 소소한 행복을 함께 모아요</p>
         <span className="hello-pill">하루 하나</span>
       </header>
 
-      <svg className="hello-art2" viewBox="40 40 330 400" preserveAspectRatio="xMidYMax meet" role="img" aria-label="구름 쿠션에 앉은 뽀송이, 찻잔을 든 살랑이, 엎드려 꼬리를 흔드는 토닥이">
-        <Bear />
-        <Fox />
-        <Dog />
-        <path d="M70 160 l0 12 M64 166 l12 0" {...line} strokeWidth={2.4} />
-        <path d="M352 210 l0 10 M347 215 l10 0" {...line} strokeWidth={2.4} />
+      <svg className="hello-art2" viewBox="40 120 320 320" preserveAspectRatio="xMidYMax meet" role="img" aria-label="수채화 뭉게구름 쿠션에 앉은 뽀송이와 양옆에 앉은 살랑이, 토닥이">
+        <defs>
+          <filter id="wc-edge" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="4" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="5" />
+          </filter>
+          <linearGradient id="wc-cloud" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0.45" stopColor="#FFFFFF" />
+            <stop offset="1" stopColor="#E3DDF0" />
+          </linearGradient>
+        </defs>
+        {/* a soft watercolour cloud cushion, with flowers along its edge */}
+        <g className="hello-float">
+          <path filter="url(#wc-edge)" fill="url(#wc-cloud)" opacity="0.95"
+            d="M92 300 C 64 300 64 262 94 258 C 90 226 128 212 150 230 C 160 200 214 194 228 222 C 248 200 296 210 294 242 C 326 240 340 286 310 300 C 300 322 112 324 92 300 Z" />
+          {blooms.map(([x, y, s], i) => <Bloom key={i} x={x} y={y} s={s} c={PETALS[i % PETALS.length]} />)}
+        </g>
+        {/* thought bubble: 뽀송이 is dreaming of a flower */}
+        <g filter="url(#wc-edge)" opacity="0.9">
+          <ellipse cx="292" cy="150" rx="34" ry="24" fill="#FFFFFF" />
+          <circle cx="262" cy="186" r="6" fill="#FFFFFF" />
+          <circle cx="250" cy="200" r="3.5" fill="#FFFFFF" />
+        </g>
+        <Bloom x={292} y={150} s={1.8} c="#F4B6C2" />
+        <Friend id="polar" x={200} base={276} h={128} cls="b2" />
+        <Friend id="fox" x={92} base={432} h={118} cls="b1" />
+        <Friend id="dog" x={310} base={432} h={118} cls="b3" />
       </svg>
 
       <div className="hello-bottom2">
