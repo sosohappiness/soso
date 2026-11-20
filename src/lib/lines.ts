@@ -22,13 +22,51 @@ export const LINES: Record<Phase, string[]> = {
   night: ["쿨쿨…", "음냐… 말차라떼…", "새근새근…"],
 };
 
-/** What Minimi says when poked. */
-export const POKE: Record<Phase, string[]> = {
-  morning: ["헤헤, 간지러워!", "아침부터 반가워!"],
-  day: ["히히!", "왜 불렀어?", "같이 있어서 좋다"],
-  evening: ["으응..? 나 불렀어..?", "조금만 더 누워 있을래.."],
-  night: ["음냐.. 지금은 자는 시간이야..", "zzz.. 내일 놀자.."],
+/** Warm words Minimi says when you tap it, any time you are both awake. */
+export const WARM: string[] = [
+  "넌 할 수 있어!",
+  "힘들면 쉬어도 돼",
+  "오늘도 충분히 잘하고 있어",
+  "천천히 가도 괜찮아",
+  "네가 있어서 참 좋아",
+  "물 한 잔 마시고 오자",
+  "숨 한번 크게 쉬어 봐",
+  "오늘 하늘 봤어? 예쁘더라",
+  "너는 생각보다 멋진 사람이야",
+  "잘 안 돼도 괜찮아, 내일 또 있잖아",
+  "작은 것부터 하나씩!",
+  "어깨 쭉 펴고~ 기지개!",
+  "오늘 하루 수고 많았어",
+  "나는 항상 네 편이야",
+  "웃는 얼굴 보고 싶다",
+  "맛있는 거 꼭 챙겨 먹어",
+];
+
+/** Lines that only make sense on certain days (0 = Sunday … 6 = Saturday). */
+const BY_DAY: Record<number, string[]> = {
+  0: ["일요일엔 푹 쉬자~", "내일을 위해 오늘은 느긋하게"],
+  1: ["월요일도 화이팅!", "한 주의 시작, 천천히 가자"],
+  2: ["화요일, 벌써 하루 지났다!"],
+  3: ["수요일! 벌써 반이나 왔어", "주말까지 반 남았어, 힘내!"],
+  4: ["주말이 다가온다!", "목요일만 버티면 돼!"],
+  5: ["해피 금요일!", "불금이다~ 오늘 뭐 할 거야?", "주말이 코앞이야!"],
+  6: ["토요일이다! 늦잠 잤어?", "주말엔 하고 싶은 거 하자"],
 };
+
+const TIME_POKE: Record<Phase, string[]> = {
+  morning: ["헤헤, 간지러워!", "좋은 아침이야!"],
+  day: ["히히!", "왜 불렀어?"],
+  evening: ["으응..? 나 불렀어..?"],
+  night: ["음냐.. 지금은 자는 시간이야..", "푹 자, 내일 또 만나..", "꿈에서 만나.."],
+};
+
+/** A new line every tap: mostly warm words, sometimes about the day of the week. Never the same twice in a row. */
+export function pokeLine(phase: Phase, now: Date, prev?: string): string {
+  if (phase === "night") return pick(TIME_POKE.night, prev);
+  const r = Math.random();
+  const pool = r < 0.3 ? BY_DAY[now.getDay()] : r < 0.42 ? TIME_POKE[phase] : WARM;
+  return pick(pool, prev);
+}
 
 export const MISSED_YOU = "보고 싶었어!";
 

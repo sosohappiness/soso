@@ -1,4 +1,4 @@
-import type { GiftEntry } from "./GiftBar";
+import { GiftIcon, type GiftEntry } from "./GiftPicker";
 import type { Tab } from "./Tabs";
 
 /** Week 1 placeholder sheets. The journal arrives in week 3; gifts already list what you gave. */
@@ -27,7 +27,7 @@ export function Sheet({ tab, gifts, animalName, onClose }: { tab: Tab; gifts: Gi
               <ul className="gift-list">
                 {gifts.map((g) => (
                   <li key={g.day}>
-                    <span className="gift-box" aria-hidden="true" />
+                    {g.item ? <GiftIcon id={g.item} size={26} /> : <span className="gift-box" aria-hidden="true" />}
                     <span className="g-text">{g.caption ?? g.label ?? g.text}</span>
                     <span className="g-day">{g.day.slice(5).replace("-", ".")}</span>
                   </li>

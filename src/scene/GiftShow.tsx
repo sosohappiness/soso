@@ -1,12 +1,13 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { GIFT_T, type GiftItem } from "../lib/giftReader";
+import { GIFT_T, GIFTS, type GiftId } from "../lib/gifts";
+import { giftItemTex } from "./props";
 import { Sprite } from "./Sprite";
 import { Z } from "./Backdrop";
 import type { Palette } from "./palette";
 import type { Seat } from "./Minimi";
-import { ANIMALS, BODY_TEX, cupTex, giftBoxTex, helperPawTex, helperTex, shadowTex, trayTex } from "./animals";
+import { BODY_TEX, helperPawTex, helperTex, shadowTex, trayTex } from "./animals";
 
 // The gift helper: a polar bear in an apron walks in from the right with the gift on a tray,
 // hands it to Minimi, waves, and walks off again. Minimi's own reaction lives in Minimi.tsx.
@@ -20,13 +21,16 @@ const smooth = (x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-type Props = { pal: Palette; seat: Seat; groundY: number; gift: { at: number; item: GiftItem } | null };
+type Props = { pal: Palette; seat: Seat; groundY: number; gift: { at: number; item: GiftId } | null };
 
 export function GiftShow({ pal, seat, groundY, gift }: Props) {
   const art = useMemo(() => ({
     body: helperTex(), paw: helperPawTex(), tray: trayTex(), shadow: shadowTex(),
-    cup: cupTex(ANIMALS.polar), box: giftBoxTex(),
   }), []);
+  const itemArt = useMemo(() => (gift ? giftItemTex(gift.item) : null), [gift?.item]);
+  // where the gift ends up: in Minimi's paws, on its head, or on its face
+  const kind = gift ? GIFTS[gift.item].kind : "hold";
+  const targetY = kind === "head" ? 1.15 : kind === "face" ? 0.8 : 0.5;
   const root = useRef<THREE.Group>(null);
   const bodyRef = useRef<THREE.Group>(null);
   const trayRef = useRef<THREE.Group>(null);
@@ -37,7 +41,7 @@ export function GiftShow({ pal, seat, groundY, gift }: Props) {
 
   // where Minimi holds the gift, in world space
   const holdX = seat.x;
-  const holdY = seat.y + 0.5 * MINIMI_SCALE;
+  const holdY = seat.y + targetY * MINIMI_SCALE;
   const standX = seat.x + 0.95;
   const offX = seat.x + 2.6;
 
@@ -84,7 +88,6 @@ export function GiftShow({ pal, seat, groundY, gift }: Props) {
   });
 
   const tint = pal.tint;
-  const itemArt = gift?.item === "matcha_latte" ? art.cup : art.box;
   return (
     <>
       <group ref={root} visible={false} scale={HS}>
@@ -99,7 +102,7 @@ export function GiftShow({ pal, seat, groundY, gift }: Props) {
         </group>
       </group>
       <group ref={item} visible={false} scale={ITEM_SCALE}>
-        <Sprite art={itemArt} position={[0, 0.15, 0]} color={tint} order={37} />
+        {itemArt && <Sprite art={itemArt} position={[0, 0.15, 0]} color={tint} order={37} />}
       </group>
     </>
   );

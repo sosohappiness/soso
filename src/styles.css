@@ -58,17 +58,28 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* ---- speech bubble (positioned by BubbleTracker) ---- */
 .bubble-anchor { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
 .bubble {
-  position: absolute; left: 0; bottom: 14px; transform: translateX(-50%);
-  background: var(--cream); color: var(--navy); border: 2.5px solid var(--navy); border-radius: 22px;
-  padding: 9px 16px; font-size: 15px; font-weight: 400; line-height: 1.35; white-space: nowrap; max-width: 78vw;
-  animation: pop .35s cubic-bezier(.3,1.6,.6,1) both;
+  position: absolute; left: 0; bottom: 22px; transform: translateX(-50%);
+  background: #fff9f0; color: #4a3b33; border: 2.5px solid #4a3b33; border-radius: 999px;
+  padding: 10px 20px 9px; font-size: 16px; line-height: 1.3; white-space: nowrap; max-width: 80vw;
+  box-shadow: 3px 4px 0 rgba(74, 59, 51, .16);
+  animation: boing .55s cubic-bezier(.3, 1.8, .5, 1) both;
 }
+/* a pink cheek-dot on the bubble's corner */
+.bubble::before {
+  content: ""; position: absolute; right: 12px; top: -5px; width: 10px; height: 10px; border-radius: 50%;
+  background: #f4b6c2; border: 2px solid #4a3b33;
+}
+/* tail: two little round dots stepping down toward Minimi */
 .bubble::after {
-  content: ""; position: absolute; left: calc(50% + var(--tail, 0px) - 8px); bottom: -11px; width: 16px; height: 16px;
-  background: var(--cream); border-right: 2.5px solid var(--navy); border-bottom: 2.5px solid var(--navy);
-  transform: rotate(45deg); border-bottom-right-radius: 3px;
+  content: ""; position: absolute; left: calc(50% + var(--tail, 0px) - 7px); bottom: -15px; width: 12px; height: 12px;
+  border-radius: 50%; background: #fff9f0; border: 2.5px solid #4a3b33;
+  box-shadow: 8px 10px 0 -3px #fff9f0, 8px 10px 0 -0.5px #4a3b33;
 }
-@keyframes pop { from { opacity: 0; transform: translateX(-50%) translateY(6px) scale(.9); } to { opacity: 1; transform: translateX(-50%); } }
+@keyframes boing {
+  0% { opacity: 0; transform: translateX(-50%) translateY(8px) scale(.7); }
+  60% { opacity: 1; transform: translateX(-50%) translateY(-3px) scale(1.06); }
+  100% { opacity: 1; transform: translateX(-50%); }
+}
 @media (max-width: 360px) { .bubble { white-space: normal; width: 70vw; text-align: center; } }
 
 /* ---- bottom: gift bar + tabs ---- */
@@ -94,6 +105,15 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .send:disabled { opacity: .75; }
 .send:not(:disabled):active { transform: scale(.94); }
+.gift-choices { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.gift-choice {
+  display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 2px 6px; min-height: 66px;
+  background: rgba(255, 249, 240, .88); border: 2.5px solid var(--navy); border-radius: 18px; color: var(--navy);
+  transition: transform .15s, background .15s;
+}
+.gift-choice .gc-label { font-size: 12px; white-space: nowrap; }
+.gift-choice.on { background: var(--yellow); transform: translateY(-4px) rotate(-2deg); box-shadow: 0 4px 0 rgba(30,36,86,.2); }
+.gift-choice:active { transform: scale(.95); }
 .gift-given {
   display: flex; align-items: center; gap: 12px; height: 50px; border-radius: 25px; padding: 0 18px;
   background: rgba(247,242,232,.55); color: var(--navy); font-size: 15px; border: 2.5px dashed var(--navy);

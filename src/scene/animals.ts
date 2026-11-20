@@ -168,9 +168,20 @@ export function happyEyeTex() {
 }
 
 export function pawTex(a: Animal) {
-  return painted(`paw-${a.id}`, 0.34, 0.2, (p) => {
+  return painted(`paw2-${a.id}`, 0.34, 0.2, (p) => {
     p.fill(p.ellipse(0, 0, 21 * K, 12 * K, 0.05), a.paw, 0.006, FUR * 0.45);
+    const light = parseInt(a.paw.slice(1, 3), 16) > 0xc0;
+    if (light) {
+      // white paws on a white body need shade to read: darker underside and two toe creases
+      p.glow(0, -0.05, 0.12, "#B8ADA0", 0.75, 0.45);
+      p.stroke([[-0.025, 0.0], [-0.03, -0.035]], "#C2B6A8", 0.007);
+      p.stroke([[0.025, 0.0], [0.03, -0.035]], "#C2B6A8", 0.007);
+    }
   });
+}
+
+export function pawShadowTex() {
+  return painted("paw-shadow", 0.36, 0.22, (p) => p.blob(0, 0, 0.13, 0.065, "#000000", { fuzz: 0.02 }), { grain: 0.05 });
 }
 
 export function eyeTex(closed: boolean) {

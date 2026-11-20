@@ -11,7 +11,7 @@ import { Sofa, SOFA_SEAT } from "./Sofa";
 import { MeadowLife } from "./MeadowLife";
 import { GiftShow } from "./GiftShow";
 import { GROUND_SEAT } from "./Minimi";
-import type { GiftItem } from "../lib/giftReader";
+import type { GiftId } from "../lib/gifts";
 import type { AnimalId } from "./animals";
 
 const FOV = 30;
@@ -77,7 +77,7 @@ type Props = {
   pokeAt: number;
   onPoke: () => void;
   scene: SceneId;
-  gift: { at: number; item: GiftItem } | null;
+  gift: { at: number; item: GiftId } | null;
 };
 
 export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, scene, gift }: Props) {

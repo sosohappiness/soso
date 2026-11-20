@@ -40,7 +40,7 @@ function cushion(x0: number, y0: number, x1: number, y1: number, r: number, bulg
 }
 
 function sofaArt() {
-  return painted("sofa-puffy2", W, H, (p: Painter) => {
+  return painted("sofa-puffy3", W, H, (p: Painter) => {
     const opt = { wob: 0.01, fuzz: 0.01 };
     // two overstuffed back pillows that bulge over each other
     p.poly(cushion(-1.0, SEAT_TOP - 0.12, 0.08, 0.6, 0.24, 0.1), RED, opt);
@@ -67,6 +67,12 @@ function sofaArt() {
     ];
     for (const [x, y, r, sq] of shades) p.glow(x, y, r, DEEP, 0.5, sq);
 
+    // the seat: a lit top face, a shaded front face, and shade where the back pillows meet it
+    p.glow(0, SEAT_TOP - 0.03, 1.15, LIGHT, 0.9, 0.07);
+    p.glow(0, SEAT_TOP - 0.2, 1.2, DEEP, 0.75, 0.1);
+    p.glow(0, SEAT_TOP + 0.07, 1.05, DEEP, 0.8, 0.06);
+    p.glow(0, BASE + 0.12, 1.3, DEEP, 0.55, 0.16);
+
     // a few soft fabric lines, much quieter than before
     const { ctx, rand: r } = p;
     ctx.save();
@@ -88,6 +94,8 @@ function sofaArt() {
     // where the pillows press into each other and the seat
     p.stroke([[0.02, SEAT_TOP + 0.08], [0.0, 0.25], [0.03, 0.5]], DEEP, 0.01);
     p.stroke([[-0.98, SEAT_TOP - 0.2], [-0.3, SEAT_TOP - 0.22], [0.3, SEAT_TOP - 0.22], [1.0, SEAT_TOP - 0.2]], DEEP, 0.008);
+    // the seat's front edge, drawn firmly so the seat reads as a seat
+    p.stroke([[-1.02, SEAT_TOP - 0.06], [-0.4, SEAT_TOP - 0.075], [0.4, SEAT_TOP - 0.075], [1.04, SEAT_TOP - 0.06]], "#7A1712", 0.014);
   }, { grain: 0.05, mottle: 0.05 });
 }
 
