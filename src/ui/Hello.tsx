@@ -176,7 +176,54 @@ function DeskScene() {
   );
 }
 
-export function HelloDesk({ onStart, logoFont = "poppins" }: { onStart: () => void; logoFont?: LogoFontId }) {
+/**
+ * Option 2: a worn-out person flat on the floor, legs out, a laptop propped on the belly, staring
+ * at the ceiling with big round eyes. Line drawing on kraft; only the eyes are solid chalk.
+ */
+function LieScene() {
+  const paper = "#BB8D65";
+  const ink = "#3B2818";
+  const body = { ...chalk, fill: paper };
+  const thin = { ...chalk, strokeWidth: 2.2 };
+  return (
+    <g filter="url(#chalk-wobble)">
+      {/* a soft floor shadow */}
+      <ellipse cx="178" cy="300" rx="150" ry="34" fill="#8E6440" opacity="0.28" />
+      {/* the far arm, reaching out behind the laptop */}
+      <path d="M184 206 L 122 222 L 124 238 L 188 224 Z" {...body} />
+      <path d="M122 222 C 110 218 104 228 110 233 C 102 236 106 246 116 244 C 118 246 122 242 124 238" {...body} />
+      {/* legs out flat, feet tipped up */}
+      <path d="M178 248 L 66 286 L 70 310 L 184 274 Z" {...body} />
+      <path d="M66 286 C 58 270 42 276 44 294 C 44 308 58 316 70 310" {...body} />
+      <path d="M186 268 L 110 330 L 124 348 L 204 288 Z" {...body} />
+      <path d="M110 330 C 96 324 86 340 96 352 C 104 360 118 358 124 348" {...body} />
+      {/* torso */}
+      <path d="M204 192 C 236 192 266 218 266 248 C 266 280 236 298 198 298 C 168 298 152 278 158 252 C 164 224 180 194 204 192 Z" {...body} />
+      {/* near arm lying by the side, limp hand */}
+      <path d="M252 238 L 268 232 L 300 312 L 284 318 Z" {...body} />
+      <path d="M284 318 C 280 330 290 338 298 334 C 304 330 304 320 300 312" {...body} />
+      <path d="M290 326 L 288 334 M 296 324 L 296 332" {...thin} />
+      {/* laptop on the belly: keyboard base, then the lid seen from behind */}
+      <path d="M164 256 L 226 244 L 272 290 L 218 304 Z" {...body} />
+      <path d="M188 262 L 232 254 M 196 272 L 244 264 M 204 282 L 254 274 M 212 292 L 238 287" {...thin} />
+      <path d="M164 256 L 136 166 L 190 214 L 218 304 Z" {...body} />
+      <circle cx="177" cy="236" r="6" {...thin} />
+      {/* head: a big round blob, face turned up to the ceiling */}
+      <ellipse cx="266" cy="172" rx="56" ry="47" transform="rotate(-28 266 172)" {...body} />
+      {/* big blank eyes and a tiny mouth */}
+      <ellipse cx="236" cy="150" rx="16" ry="12" transform="rotate(-28 236 150)" {...chalk} fill={CHALK} />
+      <circle cx="231" cy="149" r="8" fill={ink} />
+      <ellipse cx="282" cy="180" rx="18" ry="13" transform="rotate(-28 282 180)" {...chalk} fill={CHALK} />
+      <circle cx="276" cy="178" r="9" fill={ink} />
+      <path d="M252 170 q -5 4 1 8" {...thin} />
+      {/* droopy lids: tired */}
+      <path d="M222 148 C 228 138 244 134 252 140" {...chalk} />
+      <path d="M266 176 C 272 166 290 164 300 172" {...chalk} />
+    </g>
+  );
+}
+
+export function HelloDesk({ onStart, logoFont = "poppins", pose = "desk" }: { onStart: () => void; logoFont?: LogoFontId; pose?: "desk" | "lie" }) {
   return (
     <div className="hello desk" style={{ backgroundImage: `url(${kraftURL()})` }}>
       <header className="hello-head">
@@ -188,7 +235,7 @@ export function HelloDesk({ onStart, logoFont = "poppins" }: { onStart: () => vo
         <p className="desk-ko">지친 하루 끝, 친구가 기다리고 있어요.<br />소소한 행복을 함께 모아요.</p>
       </header>
 
-      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="의자에 앉아 모니터 앞 책상에 얼굴을 묻고 팔을 늘어뜨린 지친 사람">
+      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label={pose === "lie" ? "바닥에 대자로 누워 배 위에 노트북을 올려놓고 천장을 멍하니 보는 지친 사람" : "의자에 앉아 모니터 앞 책상에 얼굴을 묻고 팔을 늘어뜨린 지친 사람"}>
         <defs>
           <filter id="chalk-wobble" x="-5%" y="-5%" width="110%" height="110%">
             <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="5" result="n" />
@@ -198,7 +245,7 @@ export function HelloDesk({ onStart, logoFont = "poppins" }: { onStart: () => vo
             <feComposite in="w" in2="holes" operator="in" />
           </filter>
         </defs>
-        <DeskScene />
+        {pose === "lie" ? <LieScene /> : <DeskScene />}
       </svg>
 
       <div className="hello-bottom2">

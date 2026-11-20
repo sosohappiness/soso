@@ -6,7 +6,7 @@ const NAMES: Record<Phase, string> = { morning: "아침", day: "낮", evening: "
 /** Shown with ?dev and in preview builds: flip time of day, replay today's gift, call a friend over. */
 export function DevBar({ phase, onPhase, onResetGift, visiting, onVisit, onRestart, hello, onHello, logoFont, onLogoFont }: {
   phase: Phase; onPhase: (p: Phase) => void; onResetGift: () => void; visiting: boolean; onVisit: () => void; onRestart: () => void;
-  hello: "desk" | "sketch"; onHello: () => void; logoFont: string; onLogoFont: () => void;
+  hello: "desk" | "lie" | "sketch"; onHello: () => void; logoFont: string; onLogoFont: () => void;
 }) {
   return (
     <div className="devbar">
@@ -20,7 +20,7 @@ export function DevBar({ phase, onPhase, onResetGift, visiting, onVisit, onResta
       <span className="sep" />
       <button onClick={onRestart}>가입 처음부터</button>
       <button onClick={onLogoFont}>로고 폰트: {logoFont}</button>
-      <button onClick={onHello}>첫 화면: {hello === "desk" ? "책상 → 스케치북" : "스케치북 → 책상"}</button>
+      <button onClick={onHello}>첫 화면: {hello === "desk" ? "책상 → 누운 사람" : hello === "lie" ? "누운 사람 → 스케치북" : "스케치북 → 책상"}</button>
     </div>
   );
 }
