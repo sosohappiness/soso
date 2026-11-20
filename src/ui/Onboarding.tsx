@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { ANIMALS, type AnimalId } from "../scene/animals";
 import { sendCode, testMode, validEmail, verifyCode } from "../lib/auth";
 import { FriendPortrait } from "./Settings";
-import { Hello } from "./Hello";
+import { Hello, HelloDesk } from "./Hello";
 
 type Step = "hello" | "email" | "code" | "friend";
 
 /**
  * First launch: say hello → sign up with email → enter the 6-digit code → pick a friend.
  */
-export function Onboarding({ onDone }: { onDone: (email: string, animal: AnimalId) => void }) {
+export function Onboarding({ onDone, hello = "desk" }: { onDone: (email: string, animal: AnimalId) => void; hello?: "desk" | "sketch" }) {
   const [step, setStep] = useState<Step>("hello");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -49,7 +49,7 @@ export function Onboarding({ onDone }: { onDone: (email: string, animal: AnimalI
     setStep("friend");
   };
 
-  if (step === "hello") return <Hello onStart={() => setStep("email")} />;
+  if (step === "hello") return hello === "desk" ? <HelloDesk onStart={() => setStep("email")} /> : <Hello onStart={() => setStep("email")} />;
 
   return (
     <div className="onboard">

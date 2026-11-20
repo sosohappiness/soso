@@ -377,3 +377,24 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .hello-ko { font-size: 13px; line-height: 1.5; }
   .hello-pill { font-size: 13px; padding: 2px 12px 1px; }
 }
+
+/* ---- first screen, desk style: kraft paper, white chalk lines ---- */
+.hello.desk {
+  position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; overflow: hidden; color: #fff8ec;
+  background-color: #b8916a;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='k'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .24  0 0 0 0 .14  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23k)'/></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.012 .08' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .85  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+  padding: calc(env(safe-area-inset-top, 0px) + 40px) max(28px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 22px) max(28px, env(safe-area-inset-left, 0px));
+}
+.chalk-logo { color: #fff8ec; }
+.chalk-logo i, .chalk-logo i::after { background: #fff8ec; }
+.desk-ask { margin: 6px 0 0; font-size: 24px; color: #fff8ec; }
+.desk-ko { margin: 0; font-size: 15px; line-height: 1.65; color: #fbefdd; }
+.hello-start.chalk { background: #fff8ec; color: #6b4a2e; box-shadow: 0 4px 0 rgba(74,52,32,.25); }
+.hello-start.chalk b { color: #c8604a; }
+@media (max-height: 720px) {
+  .hello.desk { padding-top: calc(env(safe-area-inset-top, 0px) + 24px); }
+  .desk-ask { font-size: 19px; margin-top: 2px; }
+  .desk-ko { font-size: 13px; line-height: 1.5; }
+}

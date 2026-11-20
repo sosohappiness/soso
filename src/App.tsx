@@ -55,6 +55,9 @@ export default function App() {
   const scene: SceneId = "sofa";
   // sign-up: email + 6-digit code on first launch
   const [account, setAccount] = useState<Account | null>(() => loadAccount());
+  // two first-screen styles to compare (preview only): kraft desk, watercolour sketchbook
+  const [helloStyle, setHelloStyle] = useState<"desk" | "sketch">(() => load<"desk" | "sketch">("helloStyle", "desk"));
+  useEffect(() => save("helloStyle", helloStyle), [helloStyle]);
   const [tab, setTab] = useState<Tab>("home");
   const [gifts, setGifts] = useState<GiftEntry[]>(() => load<GiftEntry[]>("gifts", []));
   const today = localDay(now);
@@ -239,9 +242,9 @@ export default function App() {
       {tab === "journal" && <JournalWrite journal={journal} now={now} onSave={onSaveJournal} onClose={() => setTab("home")} />}
       {tab === "history" && <JournalHistory journal={journal} now={now} onClose={() => setTab("home")} />}
       {settingsOpen && <Settings animal={animal} email={account?.email ?? null} onAnimal={changeFriend} onSignOut={() => void onSignOut()} onClose={() => setSettingsOpen(false)} />}
-      {!account && <Onboarding onDone={onSignedUp} />}
+      {!account && <Onboarding key={helloStyle} hello={helloStyle} onDone={onSignedUp} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
-        <DevBar phase={phase} onPhase={setPhaseOverride} onResetGift={resetToday} visiting={!!visitor} onVisit={() => (visitor ? endVisit() : startVisit(visitorFor(animal, now)))} onRestart={() => void onSignOut()} />
+        <DevBar phase={phase} onPhase={setPhaseOverride} onResetGift={resetToday} visiting={!!visitor} onVisit={() => (visitor ? endVisit() : startVisit(visitorFor(animal, now)))} onRestart={() => void onSignOut()} hello={helloStyle} onHello={() => { setHelloStyle((h) => (h === "desk" ? "sketch" : "desk")); void onSignOut(); }} />
       )}
     </div>
   );

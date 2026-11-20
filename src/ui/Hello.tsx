@@ -111,3 +111,97 @@ export function Hello({ onStart }: { onStart: () => void }) {
     </div>
   );
 }
+
+// ---- another style: kraft paper, everything drawn in white chalky lines ----
+
+const CHALK = "#FFF8EC";
+const chalk = { stroke: CHALK, strokeWidth: 4.2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, fill: "none" };
+
+/** 뽀송이 melted over the desk after a long day: monitor, keyboard, a tall stack of books, a mug. */
+function DeskScene() {
+  // a tall, slightly wobbly stack of books
+  const books: [number, number, number][] = [
+    [18, 104, 22], [24, 96, 20], [14, 108, 24], [22, 94, 18], [16, 102, 22], [26, 90, 20], [20, 98, 24], [28, 86, 18],
+  ];
+  let y = 262;
+  return (
+    <g filter="url(#chalk-wobble)">
+      {/* desk */}
+      <path d="M8 262 L 356 262 L 356 278 L 8 278 Z" {...chalk} />
+      <path d="M24 278 L 24 372 M340 278 L 340 372 M24 326 L 340 326" {...chalk} />
+
+      {/* books stacked high on the left */}
+      {books.map(([x, w, h], i) => {
+        y -= h;
+        const top = y;
+        return (
+          <g key={i}>
+            <rect x={x} y={top} width={w} height={h} rx={3} {...chalk} />
+            <path d={`M${x + 10} ${top + 5} L ${x + 10} ${top + h - 5}`} {...chalk} strokeWidth={2.4} />
+            {i % 2 === 0 && <path d={`M${x + w - 24} ${top + h / 2} L ${x + w - 8} ${top + h / 2}`} {...chalk} strokeWidth={2.4} />}
+          </g>
+        );
+      })}
+
+      {/* monitor and keyboard */}
+      <rect x="226" y="120" width="120" height="90" rx="9" {...chalk} />
+      <path d="M242 148 L 304 148 M242 164 L 326 164 M242 180 L 286 180" {...chalk} strokeWidth={2.6} />
+      <path d="M286 210 L 286 242 M262 250 C 266 240 306 240 310 250 Z" {...chalk} />
+      <rect x="244" y="252" width="62" height="10" rx="3" {...chalk} />
+      {/* mug with steam */}
+      <path d="M318 234 L 342 234 L 339 262 L 321 262 Z" {...chalk} />
+      <path d="M342 240 C 352 240 352 252 341 252" {...chalk} strokeWidth={3} />
+      <path d="M325 224 q -5 -7 0 -14 M335 224 q -5 -7 0 -14" {...chalk} strokeWidth={2.6} />
+
+      {/* 뽀송이 melted over the desk: head down, body pouring over the front edge */}
+      <path
+        d="M182 258 C 160 256 140 254 124 256 C 110 258 104 262 104 268 C 104 286 102 306 112 318 C 122 330 140 326 142 310 C 144 296 140 282 148 274 C 160 268 176 270 186 266 Z"
+        {...chalk} fill="rgba(255,248,236,0.16)"
+      />
+      <path d="M128 304 q 6 4 10 0" {...chalk} strokeWidth={2.4} />
+      {/* an arm dangling over the edge */}
+      <path d="M160 270 C 164 288 164 306 158 322" {...chalk} />
+      <path d="M150 322 C 152 332 168 332 166 322" {...chalk} />
+      {/* head resting on the desk */}
+      <circle cx="188" cy="212" r="11" {...chalk} fill="rgba(255,248,236,0.16)" />
+      <circle cx="232" cy="212" r="11" {...chalk} fill="rgba(255,248,236,0.16)" />
+      <path d="M176 262 C 168 234 186 206 210 206 C 234 206 250 232 242 262 Z" {...chalk} fill="rgba(255,248,236,0.16)" />
+      <path d="M192 236 q 5 4 10 0 M218 236 q 5 4 10 0" {...chalk} strokeWidth={2.8} />
+      <ellipse cx="210" cy="248" rx="5" ry="3.6" fill={CHALK} stroke="none" />
+      {/* z z */}
+      <path d="M248 214 l 12 0 l -12 12 l 12 0 M266 194 l 8 0 l -8 8 l 8 0" {...chalk} strokeWidth={2.8} />
+    </g>
+  );
+}
+
+export function HelloDesk({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="hello desk">
+      <header className="hello-head">
+        <h1 className="hello-logo2 chalk-logo" aria-label="So So">
+          <span>So</span>
+          <span>So<i aria-hidden="true" /></span>
+        </h1>
+        <p className="desk-ask">지치셨나요?</p>
+        <p className="desk-ko">지친 하루 끝, 친구가 기다리고 있어요.<br />소소한 행복을 함께 모아요.</p>
+      </header>
+
+      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="책상에 녹아내리듯 엎드린 뽀송이, 모니터와 높이 쌓인 책">
+        <defs>
+          <filter id="chalk-wobble" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="5" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" result="w" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="9" result="g" />
+            <feColorMatrix in="g" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 1.75" result="holes" />
+            <feComposite in="w" in2="holes" operator="in" />
+          </filter>
+        </defs>
+        <DeskScene />
+      </svg>
+
+      <div className="hello-bottom2">
+        <button className="hello-start chalk" onClick={onStart}>소소한 행복 속으로 <b>Go</b></button>
+      </div>
+    </div>
+  );
+}
