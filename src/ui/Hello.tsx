@@ -181,10 +181,10 @@ const FRIZZ = (() => {
   let seed = 7;
   const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
   const out: string[] = [];
-  for (let k = 0; k < 20; k++) {
-    const a = (-196 + (212 * k) / 19 + (r() - 0.5) * 8) * (Math.PI / 180);
+  for (let k = 0; k < 12; k++) {
+    const a = (-190 + (170 * k) / 11 + (r() - 0.5) * 8) * (Math.PI / 180);
     const x = 482 + Math.cos(a) * 140, y = 444 + Math.sin(a) * 120;
-    const len = 14 + r() * 22, tw = (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.6);
+    const len = 10 + r() * 16, tw = (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.6);
     const ex = x + Math.cos(a + tw) * len, ey = y + Math.sin(a + tw) * len;
     const cx = x + Math.cos(a - tw) * len * 0.6, cy = y + Math.sin(a - tw) * len * 0.6;
     out.push(`M${x.toFixed(1)} ${y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
@@ -227,10 +227,13 @@ function NapScene() {
         <path d="M498 712 L 576 656 C 588 648 606 656 612 670 L 538 734 C 524 744 502 732 498 712 Z" {...thin} fill={ink} />
         <path d="M504 724 L 540 740 L 616 680" {...thin} />
 
-        {/* the jumper: collar, rounded back, and the folded arm */}
-        <path d="M598 410 L 622 380 C 642 368 690 372 708 386" {...line} />
-        <path d="M690 392 L 646 560" {...line} />
-        <path d="M724 400 C 804 420 862 500 872 600 C 878 660 880 700 880 745" {...line} />
+        {/* the hoodie: hood bunched up behind the neck, drawstrings, rounded back, folded arm */}
+        <path d="M600 436 C 594 386 652 358 714 366 C 776 374 812 414 796 454 C 778 484 718 486 664 472" {...line} fill={paper} />
+        <path d="M636 410 C 680 394 744 404 774 446" {...thin} />
+        <path d="M664 474 C 662 494 660 512 658 528 M 694 480 C 694 498 692 516 690 532" {...thin} />
+        <circle cx="658" cy="536" r="7" {...thin} /><circle cx="690" cy="540" r="7" {...thin} />
+        <path d="M720 484 L 676 572" {...line} />
+        <path d="M796 454 C 842 494 868 540 874 600 C 878 660 880 700 880 745" {...line} />
         <path d="M662 590 C 666 520 696 488 738 482" {...line} />
         <path d="M752 484 C 782 490 798 536 798 600 L 798 708" {...line} />
 
@@ -244,7 +247,13 @@ function NapScene() {
           {/* a big messy mop of hair */}
           <path d="M335 452 C 318 372 380 318 462 316 C 556 314 622 366 628 446 C 632 498 622 540 604 568 C 584 578 556 576 540 570 C 556 524 548 474 510 452 C 470 432 428 438 404 462 C 392 478 390 500 396 524 C 366 514 340 490 335 452 Z" fill={ink} />
           <path d={FRIZZ} {...hair} strokeWidth={6} />
-          <path d="M470 314 C 462 280 494 268 506 292 M 586 352 C 616 330 642 352 622 372 M 336 432 C 304 430 302 460 326 464" {...hair} strokeWidth={6} />
+          <path d="M470 314 C 462 280 494 268 506 292 M 336 432 C 304 430 302 460 326 464" {...hair} strokeWidth={6} />
+          {/* ponytail: tied at the back of the head, flopping over the hood */}
+          <g transform="translate(600 364) scale(0.72) translate(-600 -364)">
+            <path d="M588 352 C 622 300 704 286 744 330 C 774 364 770 420 742 446 C 730 456 716 452 722 438 C 740 402 728 364 694 354 C 660 346 626 362 606 384 Z" fill={ink} />
+            <path d="M742 446 C 754 458 756 474 746 482 M 726 444 C 730 462 724 476 712 480" {...hair} strokeWidth={7} />
+          </g>
+          <ellipse cx="598" cy="370" rx="12" ry="20" transform="rotate(-40 598 370)" {...thin} fill={CHALK} />
           {/* stray hairs falling across the cheek */}
           <path d="M506 450 C 528 476 534 506 528 532" {...hair} strokeWidth={5} />
         </g>
