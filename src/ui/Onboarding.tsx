@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ANIMALS, type AnimalId } from "../scene/animals";
 import { sendCode, testMode, validEmail, verifyCode } from "../lib/auth";
 import { FriendPortrait } from "./Settings";
+import { Hello } from "./Hello";
 
 type Step = "hello" | "email" | "code" | "friend";
 
@@ -48,22 +49,11 @@ export function Onboarding({ onDone }: { onDone: (email: string, animal: AnimalI
     setStep("friend");
   };
 
+  if (step === "hello") return <Hello onStart={() => setStep("email")} />;
+
   return (
     <div className="onboard">
       <div className="ob-card">
-        {step === "hello" && (
-          <>
-            <div className="ob-friends" aria-hidden="true">
-              <FriendPortrait id="fox" size={78} />
-              <FriendPortrait id="polar" size={96} />
-              <FriendPortrait id="dog" size={78} />
-            </div>
-            <h1 className="ob-logo">소소</h1>
-            <p className="ob-lead">작고 지친 친구에게 하루 하나, 좋아하는 걸 선물해요.<br />고마운 일 세 가지를 적으면 뭉게구름에 꽃이 소복이 피어나요.</p>
-            <button className="ob-primary" onClick={() => setStep("email")}>시작하기</button>
-          </>
-        )}
-
         {step === "email" && (
           <form className="ob-form" onSubmit={(e) => { e.preventDefault(); void send(); }}>
             <h2>이메일로 시작해요</h2>
@@ -102,9 +92,9 @@ export function Onboarding({ onDone }: { onDone: (email: string, animal: AnimalI
             <div className="friend-cards">
               {(Object.keys(ANIMALS) as AnimalId[]).map((id) => (
                 <button key={id} className={`friend-card${friend === id ? " mine" : ""}`} onClick={() => setFriend(id)} aria-pressed={friend === id}>
-                  <FriendPortrait id={id} />
+                  <FriendPortrait id={id} size={84} />
                   <span className="fc-name">{ANIMALS[id].name}</span>
-                  <span className="fc-meta">{ANIMALS[id].species} · {ANIMALS[id].drink}</span>
+                  <span className="fc-meta">{ANIMALS[id].species}</span>
                 </button>
               ))}
             </div>

@@ -1,25 +1,11 @@
 import { useState } from "react";
 import { ANIMALS, type AnimalId } from "../scene/animals";
+import { PORTRAIT_ASPECT, portraitURL } from "../scene/portrait";
 import { Panel } from "./JournalViews";
 
-/** A tiny flat portrait of each friend: one-mass body, ears, dot eyes, nose. */
+/** The friend exactly as on the home screen (same painted body, ears, eyes, nose, paws). */
 export function FriendPortrait({ id, size = 64 }: { id: AnimalId; size?: number }) {
-  const a = ANIMALS[id];
-  const body = "M-30 40 C-30 14 -26 -4 -22 -16 C-18 -30 -10 -36 0 -36 C10 -36 18 -30 22 -16 C26 -4 30 14 30 40 Z";
-  return (
-    <svg width={size} height={size} viewBox="-40 -48 80 90" aria-hidden="true">
-      {a.ears === "round" && <><circle cx="-17" cy="-31" r="8" fill={a.ear} stroke="#4a3b33" strokeWidth="2" /><circle cx="17" cy="-31" r="8" fill={a.ear} stroke="#4a3b33" strokeWidth="2" /></>}
-      {a.ears === "pointy" && <><path d="M-24 -22 L-23 -44 L-8 -32 Z" fill={a.ear} stroke="#4a3b33" strokeWidth="2" strokeLinejoin="round" /><path d="M24 -22 L23 -44 L8 -32 Z" fill={a.ear} stroke="#4a3b33" strokeWidth="2" strokeLinejoin="round" /></>}
-      <path d={body} fill={a.body} stroke="#4a3b33" strokeWidth="2" />
-      {a.muzzle && <ellipse cx="0" cy="-3" rx="11" ry="8" fill={a.muzzle} />}
-      {a.ears === "floppy" && <><path d="M-17 -30 C-29 -28 -31 -8 -27 4 C-24 10 -18 8 -17 0 C-16 -10 -15 -20 -12 -28 Z" fill={a.ear} /><path d="M17 -30 C29 -28 31 -8 27 4 C24 10 18 8 17 0 C16 -10 15 -20 12 -28 Z" fill={a.ear} /></>}
-      <circle cx="-8" cy="-12" r="2.6" fill="#151213" />
-      <circle cx="8" cy="-12" r="2.6" fill="#151213" />
-      <ellipse cx="0" cy="-4" rx="4" ry="3" fill="#151213" />
-      <ellipse cx="-11" cy="38" rx="7" ry="4" fill={a.paw} stroke="#4a3b33" strokeWidth="1.5" />
-      <ellipse cx="11" cy="38" rx="7" ry="4" fill={a.paw} stroke="#4a3b33" strokeWidth="1.5" />
-    </svg>
-  );
+  return <img className="friend-portrait" src={portraitURL(id)} width={Math.round(size * PORTRAIT_ASPECT)} height={size} alt="" draggable={false} />;
 }
 
 /** The invite message friends receive, with the app's link. */
@@ -60,9 +46,9 @@ export function Settings({ animal, email, onAnimal, onSignOut, onClose }: {
           const mine = id === animal;
           return (
             <button key={id} className={`friend-card${mine ? " mine" : ""}${asking === id ? " asking" : ""}`} onClick={() => !mine && setAsking(id)} aria-pressed={mine}>
-              <FriendPortrait id={id} />
+              <FriendPortrait id={id} size={84} />
               <span className="fc-name">{a.name}</span>
-              <span className="fc-meta">{a.species} · {a.drink}</span>
+              <span className="fc-meta">{a.species}</span>
               {mine && <span className="fc-tag">지금 내 친구</span>}
             </button>
           );

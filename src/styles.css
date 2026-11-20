@@ -299,10 +299,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
   width: 100%; max-width: 420px; background: #fffaf2; border: 2.5px solid #4a3b33; border-radius: 28px; padding: 26px 22px 22px;
   box-shadow: 4px 6px 0 rgba(74,59,51,.14); color: var(--navy); animation: up .35s cubic-bezier(.2,.9,.3,1) both;
 }
-.ob-friends { display: flex; justify-content: center; align-items: flex-end; gap: 0; margin-bottom: 6px; }
-.ob-friends svg:nth-child(2) { margin: 0 -8px; position: relative; z-index: 1; }
-.ob-logo { margin: 4px 0 6px; text-align: center; font-size: 46px; font-weight: 400; letter-spacing: 2px; color: #b3261e; }
-.ob-lead { margin: 0 0 18px; text-align: center; font-size: 15px; line-height: 1.6; color: #5a4d44; }
 .ob-form { display: flex; flex-direction: column; gap: 10px; }
 .ob-form h2 { margin: 0; font-size: 22px; font-weight: 400; }
 .ob-sub { margin: 0 0 4px; font-size: 14px; line-height: 1.55; color: #8a7a6c; }
@@ -327,3 +323,43 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .ob-steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; }
 .ob-steps li { width: 8px; height: 8px; border-radius: 50%; background: rgba(74,59,51,.25); }
 .ob-steps li.on { width: 22px; border-radius: 4px; background: #4a3b33; }
+
+/* ---- the first screen ---- */
+.hello {
+  position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  background: #cfe1ec;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); overflow: hidden;
+}
+.hello-art { width: 100%; max-width: 480px; flex: 1 1 auto; min-height: 0; display: block; overflow: visible; position: relative; z-index: 0; }
+.hello-bottom {
+  width: 100%; max-width: 480px; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 6px max(22px, env(safe-area-inset-right, 0px)) 0 max(22px, env(safe-area-inset-left, 0px));
+}
+.hello-lead { margin: 0; text-align: center; text-wrap: balance; word-break: keep-all; font-size: 15px; line-height: 1.65; color: #fffaf2; text-shadow: 0 1px 0 rgba(47,74,26,.35); }
+.hello-note { margin: 0; font-size: 12px; color: #eef3e2; }
+/* 소소: round Dongle letters, coral with a brown outline, hopping one after the other */
+.hello-logo text {
+  font-family: "Dongle", "Jua", sans-serif; font-weight: 700; font-size: 150px; fill: #E8735A;
+  stroke: #4a3b33; stroke-width: 6px; paint-order: stroke; stroke-linejoin: round;
+}
+.hello-logo .hl-1, .hello-logo .hl-2 { transform-box: fill-box; transform-origin: 50% 90%; animation: hl-hop 2.4s ease-in-out infinite; }
+.hello-logo .hl-1 { transform: rotate(-7deg); }
+.hello-logo .hl-2 { transform: rotate(6deg); animation-delay: 1.2s; }
+@keyframes hl-hop {
+  0%, 100% { translate: 0 0; }
+  12% { translate: 0 -10px; }
+  24% { translate: 0 0; }
+}
+.hello-float { animation: h-float 6s ease-in-out infinite; }
+@keyframes h-float { 50% { transform: translateY(-6px); } }
+.hello-bob { transform-box: fill-box; transform-origin: 50% 100%; animation: h-bob 3s ease-in-out infinite; }
+.hello-bob.b2 { animation-delay: .5s; }
+.hello-bob.b3 { animation-delay: 1s; }
+@keyframes h-bob { 50% { transform: scale(1.03, .97) rotate(1.5deg); } }
+.hello-sway { transform-box: view-box; animation: h-sway 3.5s ease-in-out infinite; }
+@keyframes h-sway { 50% { transform: rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .hello-logo text, .hello-float, .hello-bob, .hello-sway { animation: none; }
+}
+
+.friend-portrait { display: block; user-select: none; -webkit-user-drag: none; }
