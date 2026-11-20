@@ -1,4 +1,4 @@
-import myDesk from "../assets/my-desk.png?inline";
+import myDesk from "../assets/my-desk.png";
 // The first screen: a watercolour sketchbook page with a big "So So", and the three friends
 // painted exactly as on the home screen, gathered around a watercolour cloud.
 import { PORTRAIT_ASPECT, portraitURL } from "../scene/portrait";
