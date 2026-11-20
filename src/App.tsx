@@ -17,7 +17,7 @@ import { CHATS, callName, isVisitDay, visitorFor } from "./lib/visits";
 import { Settings } from "./ui/Settings";
 import { Onboarding } from "./ui/Onboarding";
 import { LOGO_FONTS, LOGO_ORDER, type LogoFontId } from "./ui/logoFonts";
-import { loadAccount, signOut, type Account } from "./lib/auth";
+import { loadAccount, saveAccount, signOut, type Account } from "./lib/auth";
 
 
 function useNow(frozen: Date | null) {
@@ -192,9 +192,11 @@ export default function App() {
     setLine("안녕! 오늘부터 잘 부탁해");
   }, [visitor]);
 
-  const onSignedUp = useCallback((_email: string, friend: AnimalId) => {
+  const onSignedUp = useCallback((email: string, friend: AnimalId) => {
     setAnimal(friend);
-    setAccount(loadAccount());
+    const acct = { email: email.trim(), since: Date.now() };
+    saveAccount(acct);
+    setAccount(acct);
     setPokeAt(performance.now());
     setLine("안녕! 만나서 반가워, 오늘부터 잘 부탁해");
   }, []);
