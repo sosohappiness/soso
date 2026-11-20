@@ -81,62 +81,6 @@ export function bodyTex(a: Animal) {
 
 // ---- ears: separate sprites so they can show the mood --------------------------
 
-// ---- lying pose: torso, head and limbs as separate fluffy pieces -----------------
-// Coordinates are world units in Minimi's own space: x along the sofa, y up from the seat.
-
-export const LIE = {
-  torso: { x: 0.15, y: 0.19 },
-  head: { x: -0.42, y: 0.36 },
-  armUp: { x: -0.12, y: 0.33, len: 0.42, w: 0.13 },
-  armRest: { x: -0.27, y: 0.2, len: 0.28, w: 0.13 },
-  legOut: { x: 0.55, y: 0.11, len: 0.36, w: 0.16 },
-  legTuck: { x: 0.42, y: 0.12, len: 0.28, w: 0.15 },
-  tail: { x: 0.74, y: 0.22 },
-  face: { eyeL: [-0.085, 0.035] as [number, number], eyeR: [0.085, 0.035] as [number, number], nose: [0, -0.055] as [number, number] },
-};
-
-export function torsoTex(a: Animal) {
-  return painted(`torso-${a.id}`, 1.5, 0.7, (p) => {
-    p.fill(p.ellipse(-0.04, 0, 0.56, 0.18, 0.03), a.body, 0.008, FUR);
-    p.fill(p.ellipse(0.3, 0.02, 0.27, 0.2, 0.04), a.body, 0.008, FUR);
-    p.strands(500, 0.035);
-  }, { grain: 0.06, mottle: 0.05 });
-}
-
-export function headTex(a: Animal) {
-  return painted(`head-lie-${a.id}`, 0.8, 0.75, (p) => {
-    p.fill(p.ellipse(0, 0, 0.27, 0.245, 0.03), a.body, 0.008, FUR);
-    if (a.muzzle) p.fill(p.ellipse(0, -0.07, 0.13, 0.085, 0.05), a.muzzle, 0.006, FUR * 0.35);
-    p.strands(160, 0.03);
-  }, { grain: 0.06, mottle: 0.05 });
-}
-
-/** A fluffy capsule limb that grows up from its joint at (0,0); the sprite pivot sits at the joint. */
-export function limbTex(a: Animal, len: number, w: number, kind: "arm" | "leg") {
-  const H = len + w + 0.12;
-  const y0 = -H / 2 + 0.06 + w / 2; // joint
-  const art = painted(`limb-${a.id}-${kind}-${len}-${w}`, w + 0.16, H, (p) => {
-    p.fill(p.ellipse(0, y0 + len / 2, w / 2, len / 2 + w / 2, 0.04), a.body, 0.006, FUR * 0.7);
-    // paw at the end: dark socks on the fox, the same fluff on the others
-    p.fill(p.ellipse(0, y0 + len - w * 0.05, w * 0.52, w * 0.5, 0.05), a.paw === a.body ? a.body : a.paw, 0.006, FUR * 0.5);
-    p.strands(60, 0.025);
-  }, { grain: 0.06, mottle: 0.05 });
-  return { art, pivot: [0, y0] as [number, number] };
-}
-
-export function tailTex(a: Animal) {
-  return painted(`tail-lie-${a.id}`, 0.6, 0.5, (p) => {
-    if (a.id === "fox") {
-      p.fill(p.ellipse(0.06, 0.02, 0.2, 0.1, 0.05, 0.35), a.body, 0.008, FUR);
-      p.fill(p.ellipse(0.2, 0.08, 0.07, 0.06, 0.05), "#F3E4CB", 0.006, FUR * 0.6);
-    } else if (a.id === "dog") {
-      p.fill(p.ellipse(0.04, 0.06, 0.07, 0.12, 0.05, -0.5), a.body, 0.008, FUR);
-    } else {
-      p.fill(p.ellipse(0, 0, 0.07, 0.06, 0.05), a.body, 0.008, FUR);
-    }
-  }, { grain: 0.06 });
-}
-
 export type EarArt = { art: ReturnType<typeof painted>; pivot: [number, number]; base: [number, number] };
 
 /** Ear for side sx (-1 left, 1 right). `base` is where it joins the head (sheet coords → world). */
@@ -167,6 +111,60 @@ export function earTex(a: Animal, sx: -1 | 1): EarArt {
     p.strands(60, 0.03);
   }, { grain: 0.06, mottle: 0.05 });
   return { art, pivot: [0, oy], base };
+}
+
+// ---- the gift helper and gift props ------------------------------------------------
+
+/** The helper: a polar bear in a matcha-green apron. Same one-mass silhouette, warmer white. */
+export function helperTex() {
+  return painted("helper-polar-apron", BODY_TEX.w, BODY_TEX.h, (p) => {
+    const white = "#F3ECE1";
+    for (const sx of [-1, 1]) p.fill(p.ellipse(...s(sx * 54, 226), 22 * K, 22 * K, 0.04), white, 0.006, FUR * 0.8);
+    p.fill(silhouette(p), white, 0.008, FUR);
+    // apron: bib and skirt, a pocket, and the neck strap
+    p.poly([s(-50, 150), s(50, 150), s(60, 96), s(78, 6), s(-78, 6), s(-60, 96)], "#8FB06A", { wob: 0.006, fuzz: 0.006 });
+    p.poly([s(-26, 64), s(26, 64), s(24, 30), s(-24, 30)], "#A9C487", { wob: 0.005, fuzz: 0.004 });
+    p.stroke([s(-44, 148), s(-30, 196), s(0, 210), s(30, 196), s(44, 148)], "#8FB06A", 0.022);
+    p.stroke([s(-62, 96), s(-92, 92)], "#8FB06A", 0.016);
+    p.stroke([s(62, 96), s(92, 92)], "#8FB06A", 0.016);
+    // face: dot eyes and nose like everyone else
+    p.blob(...s(-26, 174), 6.5 * K, 7.5 * K, "#151213", { fuzz: 0.003 });
+    p.blob(...s(26, 174), 6.5 * K, 7.5 * K, "#151213", { fuzz: 0.003 });
+    p.blob(...s(0, 144), 12 * K, 9 * K, "#151213", { fuzz: 0.003 });
+    p.strands(700, 0.035);
+  }, { grain: 0.06, mottle: 0.05 });
+}
+
+export function helperPawTex() {
+  return painted("helper-paw", 0.3, 0.2, (p) => p.fill(p.ellipse(0, 0, 0.075, 0.055, 0.05), "#F3ECE1", 0.006, FUR * 0.45));
+}
+
+export function trayTex() {
+  return painted("tray", 0.6, 0.12, (p) => p.poly([[-0.24, 0.02], [0.24, 0.02], [0.22, -0.02], [-0.22, -0.02]], "#C9A27A", { wob: 0.003, fuzz: 0.004 }));
+}
+
+export function giftBoxTex() {
+  return painted("gift-box", 0.5, 0.5, (p) => {
+    const b = -0.15;
+    p.poly([[-0.13, b + 0.2], [0.13, b + 0.2], [0.13, b], [-0.13, b]], "#F2C230", { wob: 0.004 });
+    p.poly([[-0.025, b + 0.2], [0.025, b + 0.2], [0.025, b], [-0.025, b]], "#C8513A", { wob: 0.003, fuzz: 0.003 });
+    p.poly([[-0.15, b + 0.24], [0.15, b + 0.24], [0.15, b + 0.19], [-0.15, b + 0.19]], "#F6D46A", { wob: 0.004 });
+    p.blob(-0.04, b + 0.27, 0.045, 0.03, "#C8513A", { rot: 0.5, fuzz: 0.003 });
+    p.blob(0.04, b + 0.27, 0.045, 0.03, "#C8513A", { rot: -0.5, fuzz: 0.003 });
+    p.poly([[0.13, b + 0.12], [0.2, b + 0.08], [0.2, b + 0.02], [0.13, b + 0.04]], "#FBF6EC", { wob: 0.002, fuzz: 0.002 });
+  }, { grain: 0.04 });
+}
+
+export function heartTex() {
+  return painted("heart", 0.16, 0.16, (p) => {
+    p.blob(-0.022, 0.012, 0.026, 0.024, "#F4A3B4", { fuzz: 0.004 });
+    p.blob(0.022, 0.012, 0.026, 0.024, "#F4A3B4", { fuzz: 0.004 });
+    p.poly([[-0.046, 0.008], [0.046, 0.008], [0, -0.045]], "#F4A3B4", { wob: 0.003, fuzz: 0.004 });
+  }, { grain: 0.02 });
+}
+
+export function happyEyeTex() {
+  return painted("eye-happy", 0.12, 0.12, (p) => p.stroke([[-0.03, -0.008], [0, 0.012], [0.03, -0.008]], "#151213", 0.014), { grain: 0.02 });
 }
 
 export function pawTex(a: Animal) {

@@ -4,7 +4,7 @@ From the owner, 2026-11-18. Each needs a keyword entry, a category, and an anima
 
 | Gift | Likely category | Notes |
 |---|---|---|
-| 말차라떼 | drink | First template (polar-bear helper in an apron) |
+| 말차라떼 | drink | Done: polar-bear helper in a matcha apron brings it on a tray (src/scene/GiftShow.tsx) |
 | 커피 | drink | Shares the drink template |
 | 떡볶이 | food | |
 | 따뜻한 목욕 | activity | Not an object: Minimi takes a bath |
@@ -13,3 +13,5 @@ From the owner, 2026-11-18. Each needs a keyword entry, a category, and an anima
 | 파스타먹기 | food | |
 | 노래부르기 | activity | Music notes, Minimi sways |
 | 소파에 늘어지기 | activity | Fits the red-sofa scene |
+
+The free reader lives in `src/lib/giftReader.ts`. Gifts without their own animation arrive as a gift box.

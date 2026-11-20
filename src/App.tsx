@@ -12,6 +12,7 @@ import { Sheet } from "./ui/Sheet";
 import { DevBar } from "./ui/DevBar";
 import type { SceneId } from "./scene/palette";
 import { FONTS, useFontStack, type FontId } from "./lib/fonts";
+import { GIFT_T, readGift, type GiftItem } from "./lib/giftReader";
 
 const VIEWS = [0, 0.42, -0.42]; // rotate-view button cycles through these yaw angles (≈ ±24°)
 const MAX_YAW = 0.52;
@@ -74,16 +75,40 @@ export default function App() {
     setLine((l) => pick(POKE[phase], l));
   }, [phase]);
 
+  // The gift scene: the helper brings it, Minimi enjoys it, then a card files it away.
+  const [giftShow, setGiftShow] = useState<{ at: number; item: GiftItem } | null>(null);
+  const [card, setCard] = useState<{ caption: string; day: string } | null>(null);
+  const timers = useRef<number[]>([]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  const later = (s: number, fn: () => void) => timers.current.push(window.setTimeout(fn, s * 1000));
+
   const onGift = useCallback((text: string) => {
-    const entry: GiftEntry = { day: today, text, at: Date.now() };
+    const parsed = readGift(text);
+    const entry: GiftEntry = { day: today, text, at: Date.now(), label: parsed.label, caption: parsed.caption };
     setGifts((g) => {
       const next = [entry, ...g.filter((x) => x.day !== today)];
       save("gifts", next);
       return next;
     });
-    setPokeAt(performance.now());
-    setLine(phase === "night" ? "음냐.. 고마워.. 내일 아침에 꼭 열어볼게.." : "와아, 나 주는 거야? 고마워!");
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    setCard(null);
+    setGiftShow({ at: performance.now(), item: parsed.item });
+    later(0.3, () => setLine(phase === "night" ? "음냐..? 누구야..?" : "어? 그거 나 주는 거야?"));
+    later(GIFT_T.give, () => setLine(parsed.line));
+    later(GIFT_T.drink + 0.2, () => setLine("고마워! 오늘 최고야"));
+    later(GIFT_T.drink + 0.4, () => setCard({ caption: parsed.caption, day: today }));
+    later(GIFT_T.leave + 0.3, () => setGiftShow(null));
+    later(GIFT_T.drink + 3.8, () => setCard(null));
   }, [today, phase]);
+
+  const resetToday = useCallback(() => {
+    setGifts((g) => {
+      const next = g.filter((x) => x.day !== today);
+      save("gifts", next);
+      return next;
+    });
+  }, [today]);
 
   // Rotate view: button cycles preset angles; dragging the scene turns it freely within limits.
   const view = useRef({ yaw: 0, pitch: 0 });
@@ -112,7 +137,7 @@ export default function App() {
   return (
     <div className={`app phase-${phase} scene-${scene}`} style={{ "--hand": fontStack } as React.CSSProperties}>
       <div className="stage" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onPointerLeave={onUp}>
-        <Scene phase={phase} animal={animal} growth={growth} view={view} bubble={bubble} pokeAt={pokeAt} onPoke={onPoke} scene={scene} />
+        <Scene phase={phase} animal={animal} growth={growth} view={view} bubble={bubble} pokeAt={pokeAt} onPoke={onPoke} scene={scene} gift={giftShow} />
         <div className="bubble-anchor" ref={bubble} aria-live="polite">
           <div className="bubble" key={line}>{line}</div>
         </div>
@@ -123,9 +148,19 @@ export default function App() {
         <GiftBar given={todaysGift} onGive={onGift} />
         <Tabs tab={tab} onTab={setTab} />
       </div>
+      {card && (
+        <button className="gift-card" onClick={() => { setCard(null); setTab("gifts"); }}>
+          <span className="gift-box" aria-hidden="true" />
+          <span className="gc-text">
+            <span className="gc-small">오늘의 선물 · {card.day.slice(5).replace("-", "월 ")}일</span>
+            <span className="gc-title">{card.caption}</span>
+            <span className="gc-link">선물기록에 담았어요 ›</span>
+          </span>
+        </button>
+      )}
       {tab !== "home" && <Sheet tab={tab} gifts={gifts} animalName={ANIMALS[animal].name} onClose={() => setTab("home")} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
-        <DevBar phase={phase} animal={animal} scene={scene} font={font} onPhase={setPhaseOverride} onAnimal={setAnimal} onScene={setScene} onFont={setFont} />
+        <DevBar phase={phase} animal={animal} scene={scene} font={font} onPhase={setPhaseOverride} onAnimal={setAnimal} onScene={setScene} onFont={setFont} onResetGift={resetToday} />
       )}
     </div>
   );

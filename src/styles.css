@@ -108,6 +108,21 @@ button { font: inherit; color: inherit; cursor: pointer; }
   background: var(--yellow); border-radius: 3px; border: 1.5px solid var(--navy);
 }
 
+/* ---- gift card: drops in after a gift, then files itself into 선물기록 ---- */
+.gift-card {
+  position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 120px); transform: translateX(-50%) rotate(-2deg);
+  display: flex; align-items: center; gap: 14px; width: min(270px, 80vw); text-align: left;
+  background: #fffbf4; color: var(--navy); border: 2.5px solid var(--navy); border-radius: 20px; padding: 14px 16px;
+  box-shadow: 0 4px 0 rgba(30,36,86,.15); animation: card-in .5s cubic-bezier(.3,1.5,.6,1) both;
+}
+.gift-card .gift-box { width: 34px; height: 28px; }
+.gift-card .gift-box::before { left: 14px; width: 6px; }
+.gc-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gc-small { font-size: 12px; opacity: .7; }
+.gc-title { font-size: 19px; overflow-wrap: anywhere; }
+.gc-link { font-size: 12px; color: #b3261e; }
+@keyframes card-in { from { opacity: 0; transform: translateX(-50%) translateY(-24px) rotate(-6deg); } }
+
 /* ---- sheets ---- */
 .sheet-wrap { position: absolute; inset: 0; background: rgba(30,36,86,.35); display: flex; align-items: flex-end; justify-content: center; animation: fade .2s both; }
 .sheet {

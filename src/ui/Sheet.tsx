@@ -28,7 +28,7 @@ export function Sheet({ tab, gifts, animalName, onClose }: { tab: Tab; gifts: Gi
                 {gifts.map((g) => (
                   <li key={g.day}>
                     <span className="gift-box" aria-hidden="true" />
-                    <span className="g-text">{g.text}</span>
+                    <span className="g-text">{g.caption ?? g.label ?? g.text}</span>
                     <span className="g-day">{g.day.slice(5).replace("-", ".")}</span>
                   </li>
                 ))}

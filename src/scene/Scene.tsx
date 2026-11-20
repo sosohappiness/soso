@@ -9,6 +9,9 @@ import { Minimi } from "./Minimi";
 import { paletteFor, type SceneId } from "./palette";
 import { Sofa, SOFA_SEAT } from "./Sofa";
 import { MeadowLife } from "./MeadowLife";
+import { GiftShow } from "./GiftShow";
+import { GROUND_SEAT } from "./Minimi";
+import type { GiftItem } from "../lib/giftReader";
 import type { AnimalId } from "./animals";
 
 const FOV = 30;
@@ -74,9 +77,10 @@ type Props = {
   pokeAt: number;
   onPoke: () => void;
   scene: SceneId;
+  gift: { at: number; item: GiftItem } | null;
 };
 
-export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, scene }: Props) {
+export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, scene, gift }: Props) {
   const pal = paletteFor(scene, phase);
   const anchor = useMemo(() => new THREE.Vector3(), []);
   return (
@@ -93,7 +97,8 @@ export function Scene({ phase, animal, growth, view, bubble, pokeAt, onPoke, sce
       <CloudFlower pal={pal} growth={growth} night={phase === "night"} />
       {scene === "sofa" && <Sofa pal={pal} />}
       {scene === "sofa" && <MeadowLife pal={pal} />}
-      <Minimi animal={animal} phase={phase} pal={pal} anchor={anchor} pokeAt={pokeAt} onPoke={onPoke} seat={scene === "sofa" ? SOFA_SEAT : undefined} />
+      <Minimi animal={animal} phase={phase} pal={pal} anchor={anchor} pokeAt={pokeAt} onPoke={onPoke} seat={scene === "sofa" ? SOFA_SEAT : undefined} gift={gift} />
+      <GiftShow pal={pal} seat={scene === "sofa" ? SOFA_SEAT : GROUND_SEAT} groundY={scene === "sofa" ? -0.32 : GROUND_SEAT.y - 0.15} gift={gift} />
       <BubbleTracker anchor={anchor} el={bubble} />
     </Canvas>
   );

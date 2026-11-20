@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export type GiftEntry = { day: string; text: string; at: number };
+export type GiftEntry = { day: string; text: string; at: number; label?: string; caption?: string };
 
 const MAX = 60;
 
