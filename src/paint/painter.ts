@@ -270,7 +270,7 @@ export class Painter {
 
   finish(opts: { grain?: number; mottle?: number; outline?: string; outlinePx?: number } = {}): THREE.CanvasTexture {
     this.fuzzEdges();
-    if (opts.outline) this.outline(opts.outline, opts.outlinePx ?? 2);
+    if (opts.outline) this.outline(opts.outline, opts.outlinePx ?? 3.6);
     this.grain(opts.grain ?? 0.07, opts.mottle ?? 0.05);
     const tex = new THREE.CanvasTexture(this.canvas);
     tex.colorSpace = THREE.SRGBColorSpace;

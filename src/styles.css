@@ -282,3 +282,48 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* the visiting friend's bubble: same shape, a soft blush so you can tell who's talking */
 .bubble.guest { background: #fff1f3; }
 .bubble.guest::before { background: #c9b6e8; }
+
+/* ---- settings boxes ---- */
+.set-box { background: #fff; border: 2px solid rgba(74,59,51,.2); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.set-box .export-action.primary { grid-column: auto; }
+.set-account { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+.invite-link { margin: 0; font-size: 13px; color: #5a4d44; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
+
+/* ---- first launch: hello → email → code → friend ---- */
+.onboard {
+  position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) max(18px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 20px) max(18px, env(safe-area-inset-left, 0px));
+  background: linear-gradient(#d3e3ec, #f3ede0 62%, #9dba6e 62.2%, #8ead62);
+}
+.ob-card {
+  width: 100%; max-width: 420px; background: #fffaf2; border: 2.5px solid #4a3b33; border-radius: 28px; padding: 26px 22px 22px;
+  box-shadow: 4px 6px 0 rgba(74,59,51,.14); color: var(--navy); animation: up .35s cubic-bezier(.2,.9,.3,1) both;
+}
+.ob-friends { display: flex; justify-content: center; align-items: flex-end; gap: 0; margin-bottom: 6px; }
+.ob-friends svg:nth-child(2) { margin: 0 -8px; position: relative; z-index: 1; }
+.ob-logo { margin: 4px 0 6px; text-align: center; font-size: 46px; font-weight: 400; letter-spacing: 2px; color: #b3261e; }
+.ob-lead { margin: 0 0 18px; text-align: center; font-size: 15px; line-height: 1.6; color: #5a4d44; }
+.ob-form { display: flex; flex-direction: column; gap: 10px; }
+.ob-form h2 { margin: 0; font-size: 22px; font-weight: 400; }
+.ob-sub { margin: 0 0 4px; font-size: 14px; line-height: 1.55; color: #8a7a6c; }
+.ob-sub b { font-weight: 400; color: var(--navy); overflow-wrap: anywhere; }
+.ob-label { font-size: 13px; color: #8a7a6c; margin-top: 4px; }
+.ob-input {
+  height: 52px; border-radius: 16px; border: 2.5px solid #4a3b33; background: #fff; padding: 0 16px; font: inherit; font-size: 17px;
+  color: var(--navy); outline: none; user-select: text; -webkit-user-select: text;
+}
+.ob-input:focus { box-shadow: 0 0 0 3px rgba(242,194,48,.6); }
+.ob-code { text-align: center; letter-spacing: 10px; font-size: 24px; }
+.ob-primary {
+  margin-top: 6px; height: 54px; border-radius: 27px; border: 2.5px solid var(--navy); background: var(--yellow);
+  color: var(--navy); font-size: 18px; box-shadow: 0 4px 0 rgba(30,36,86,.18); width: 100%;
+}
+.ob-primary:disabled { opacity: .5; box-shadow: none; }
+.ob-error { margin: 0; font-size: 14px; color: #b3261e; }
+.ob-test { margin: 0; font-size: 13px; color: #8a6d1a; background: #fff3d6; border-radius: 10px; padding: 8px 10px; line-height: 1.5; }
+.ob-links { display: flex; justify-content: space-between; gap: 8px; }
+.ob-link { border: 0; background: none; padding: 8px 2px; font-size: 14px; color: #5a4d44; text-decoration: underline; text-underline-offset: 3px; }
+.ob-link:disabled { opacity: .5; text-decoration: none; }
+.ob-steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; }
+.ob-steps li { width: 8px; height: 8px; border-radius: 50%; background: rgba(74,59,51,.25); }
+.ob-steps li.on { width: 22px; border-radius: 4px; background: #4a3b33; }

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ANIMALS, type AnimalId } from "../scene/animals";
-import type { SceneId } from "../scene/palette";
 import { Panel } from "./JournalViews";
 
 /** A tiny flat portrait of each friend: one-mass body, ears, dot eyes, nose. */
@@ -9,8 +8,8 @@ export function FriendPortrait({ id, size = 64 }: { id: AnimalId; size?: number 
   const body = "M-30 40 C-30 14 -26 -4 -22 -16 C-18 -30 -10 -36 0 -36 C10 -36 18 -30 22 -16 C26 -4 30 14 30 40 Z";
   return (
     <svg width={size} height={size} viewBox="-40 -48 80 90" aria-hidden="true">
-      {a.ears === "round" && <><circle cx="-17" cy="-31" r="8" fill={a.ear} /><circle cx="17" cy="-31" r="8" fill={a.ear} /></>}
-      {a.ears === "pointy" && <><path d="M-24 -22 L-23 -44 L-8 -32 Z" fill={a.ear} /><path d="M24 -22 L23 -44 L8 -32 Z" fill={a.ear} /></>}
+      {a.ears === "round" && <><circle cx="-17" cy="-31" r="8" fill={a.ear} stroke="#4a3b33" strokeWidth="2" /><circle cx="17" cy="-31" r="8" fill={a.ear} stroke="#4a3b33" strokeWidth="2" /></>}
+      {a.ears === "pointy" && <><path d="M-24 -22 L-23 -44 L-8 -32 Z" fill={a.ear} stroke="#4a3b33" strokeWidth="2" strokeLinejoin="round" /><path d="M24 -22 L23 -44 L8 -32 Z" fill={a.ear} stroke="#4a3b33" strokeWidth="2" strokeLinejoin="round" /></>}
       <path d={body} fill={a.body} stroke="#4a3b33" strokeWidth="2" />
       {a.muzzle && <ellipse cx="0" cy="-3" rx="11" ry="8" fill={a.muzzle} />}
       {a.ears === "floppy" && <><path d="M-17 -30 C-29 -28 -31 -8 -27 4 C-24 10 -18 8 -17 0 C-16 -10 -15 -20 -12 -28 Z" fill={a.ear} /><path d="M17 -30 C29 -28 31 -8 27 4 C24 10 18 8 17 0 C16 -10 15 -20 12 -28 Z" fill={a.ear} /></>}
@@ -23,16 +22,35 @@ export function FriendPortrait({ id, size = 64 }: { id: AnimalId; size?: number 
   );
 }
 
-const SCENES: { id: SceneId; label: string; desc: string; sky: string; ground: string; accent: string }[] = [
-  { id: "sofa", label: "소파 초원", desc: "몽실한 하늘, 초록 들판, 빨간 소파", sky: "#D3E3EC", ground: "#9DBA6E", accent: "#B3261E" },
-  { id: "dusk", label: "노을 언덕", desc: "주황 하늘, 파란 언덕, 남색 달", sky: "#B4552F", ground: "#8EA6CC", accent: "#1E2456" },
-];
+/** The invite message friends receive, with the app's link. */
+function inviteText(link: string) {
+  return `소소에서 같이 감사일기 써요! 작은 친구에게 하루 하나 선물하고, 고마운 일을 적으면 구름에 꽃이 피어요.\n${link}`;
+}
 
-/** 설정: change the friend (with a gentle check first) and the background. */
-export function Settings({ animal, scene, onAnimal, onScene, onClose }: {
-  animal: AnimalId; scene: SceneId; onAnimal: (a: AnimalId) => void; onScene: (s: SceneId) => void; onClose: () => void;
+/** 설정: change the friend (with a gentle check first), invite friends, and the account. */
+export function Settings({ animal, email, onAnimal, onSignOut, onClose }: {
+  animal: AnimalId; email: string | null; onAnimal: (a: AnimalId) => void; onSignOut: () => void; onClose: () => void;
 }) {
   const [asking, setAsking] = useState<AnimalId | null>(null);
+  const [inviteNote, setInviteNote] = useState("");
+  const link = typeof location !== "undefined" ? location.origin + "/" : "";
+  const invite = async () => {
+    const text = inviteText(link);
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title: "소소", text, url: link });
+        return;
+      } catch {
+        /* closed the share sheet, fall through to copy */
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setInviteNote("초대 메시지를 복사했어요. 카카오톡이나 문자에 붙여넣어 보내 주세요.");
+    } catch {
+      setInviteNote("이 화면에서는 복사가 막혀 있어요. 아래 링크를 길게 눌러 복사해 주세요.");
+    }
+  };
   return (
     <Panel title="설정" onClose={onClose}>
       <h3 className="set-title">친구 바꾸기</h3>
@@ -61,21 +79,18 @@ export function Settings({ animal, scene, onAnimal, onScene, onClose }: {
         </div>
       )}
 
-      <h3 className="set-title">배경 바꾸기</h3>
-      <div className="scene-cards">
-        {SCENES.map((s) => (
-          <button key={s.id} className={`scene-card${scene === s.id ? " mine" : ""}`} onClick={() => onScene(s.id)} aria-pressed={scene === s.id}>
-            <svg viewBox="0 0 120 80" width="100%" aria-hidden="true">
-              <rect width="120" height="80" fill={s.sky} />
-              <path d="M0 52 C 40 48 80 54 120 50 L120 80 L0 80 Z" fill={s.ground} />
-              {s.id === "sofa"
-                ? <><ellipse cx="34" cy="26" rx="22" ry="10" fill="#FFFBF4" /><rect x="64" y="40" width="40" height="18" rx="7" fill={s.accent} /></>
-                : <><path d="M78 22 A12 12 0 0 1 102 22 Z" fill={s.accent} /><circle cx="90" cy="24" r="5" fill="#F2C230" /><ellipse cx="34" cy="26" rx="22" ry="10" fill="#FFFBF4" /></>}
-            </svg>
-            <span className="fc-name">{s.label}</span>
-            <span className="fc-meta">{s.desc}</span>
-          </button>
-        ))}
+      <h3 className="set-title">친구 초대</h3>
+      <div className="set-box">
+        <p className="journal-hint">소소를 친구에게 소개해 보세요. 링크를 받은 친구도 자기만의 미니미와 구름을 키울 수 있어요.</p>
+        <button className="export-action primary" onClick={invite}>친구 초대하기</button>
+        {inviteNote && <p className="export-note" role="status">{inviteNote}</p>}
+        {inviteNote && <p className="invite-link">{link}</p>}
+      </div>
+
+      <h3 className="set-title">계정</h3>
+      <div className="set-box">
+        <p className="set-account">{email ?? "로그인하지 않았어요"}</p>
+        {email && <button className="export-action" onClick={onSignOut}>로그아웃</button>}
       </div>
     </Panel>
   );

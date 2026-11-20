@@ -15,6 +15,8 @@ import type { SceneId } from "./scene/palette";
 import { GIFTS, enjoyLine, type GiftId } from "./lib/gifts";
 import { CHATS, callName, isVisitDay, visitorFor } from "./lib/visits";
 import { Settings } from "./ui/Settings";
+import { Onboarding } from "./ui/Onboarding";
+import { loadAccount, signOut, type Account } from "./lib/auth";
 
 
 function useNow(frozen: Date | null) {
@@ -49,8 +51,10 @@ export default function App() {
     return j;
   });
   const growth = useMemo(() => demoGrowth(search) ?? growthFromJournal(journal), [search, journal]);
-  const [scene, setScene] = useState<SceneId>(() => (params.get("scene") === "dusk" ? "dusk" : load<SceneId>("scene", "sofa")));
-  useEffect(() => save("scene", scene), [scene]);
+  // one background for now: the meadow with the red sofa
+  const scene: SceneId = "sofa";
+  // sign-up: email + 6-digit code on first launch
+  const [account, setAccount] = useState<Account | null>(() => loadAccount());
   const [tab, setTab] = useState<Tab>("home");
   const [gifts, setGifts] = useState<GiftEntry[]>(() => load<GiftEntry[]>("gifts", []));
   const today = localDay(now);
@@ -179,6 +183,18 @@ export default function App() {
     setLine("안녕! 오늘부터 잘 부탁해");
   }, [visitor]);
 
+  const onSignedUp = useCallback((_email: string, friend: AnimalId) => {
+    setAnimal(friend);
+    setAccount(loadAccount());
+    setPokeAt(performance.now());
+    setLine("안녕! 만나서 반가워, 오늘부터 잘 부탁해");
+  }, []);
+  const onSignOut = useCallback(async () => {
+    await signOut();
+    setSettingsOpen(false);
+    setAccount(null);
+  }, []);
+
   const resetToday = useCallback(() => {
     setGifts((g) => {
       const next = g.filter((x) => x.day !== today);
@@ -222,9 +238,10 @@ export default function App() {
       )}
       {tab === "journal" && <JournalWrite journal={journal} now={now} onSave={onSaveJournal} onClose={() => setTab("home")} />}
       {tab === "history" && <JournalHistory journal={journal} now={now} onClose={() => setTab("home")} />}
-      {settingsOpen && <Settings animal={animal} scene={scene} onAnimal={changeFriend} onScene={setScene} onClose={() => setSettingsOpen(false)} />}
+      {settingsOpen && <Settings animal={animal} email={account?.email ?? null} onAnimal={changeFriend} onSignOut={() => void onSignOut()} onClose={() => setSettingsOpen(false)} />}
+      {!account && <Onboarding onDone={onSignedUp} />}
       {(params.has("dev") || import.meta.env.VITE_PREVIEW) && (
-        <DevBar phase={phase} onPhase={setPhaseOverride} onResetGift={resetToday} visiting={!!visitor} onVisit={() => (visitor ? endVisit() : startVisit(visitorFor(animal, now)))} />
+        <DevBar phase={phase} onPhase={setPhaseOverride} onResetGift={resetToday} visiting={!!visitor} onVisit={() => (visitor ? endVisit() : startVisit(visitorFor(animal, now)))} onRestart={() => void onSignOut()} />
       )}
     </div>
   );

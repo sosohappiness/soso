@@ -161,7 +161,7 @@ const LINE = "#4a3b33";
 
 /** A cream cup on a saucer with a thin brown outline. `fill` is what's in it (null = empty). */
 export function outlinedCup(p: Painter, b: number, fill: string | null) {
-  const o = 0.007;
+  const o = 0.012;
   p.blob(0, b, 0.15 + o, 0.025 + o, LINE, { fuzz: 0, wob: 0.01 });
   p.blob(0, b, 0.15, 0.025, "#F6F2EA", { fuzz: 0, wob: 0.01 });
   p.stroke([[0.085, b + 0.14], [0.13, b + 0.12], [0.12, b + 0.07], [0.078, b + 0.06]], LINE, 0.02 + o * 2);

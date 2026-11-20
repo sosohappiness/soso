@@ -13,6 +13,18 @@ npm run dev        # http://localhost:5173
 npm run build      # production build in dist/ (installable PWA)
 ```
 
+### Email sign-up (Supabase)
+
+First launch asks for an email and a 6-digit code, then a friend to live with.
+
+1. Create a Supabase project, then copy `.env.example` to `.env.local` and fill in the URL and anon key.
+2. In Supabase → Authentication → Providers, keep **Email** on.
+3. In Authentication → Email Templates → **Magic Link**, put the code in the mail so people can type it:
+   `소소 인증 코드: {{ .Token }}` (a code works inside the home-screen app; a link would open Safari).
+4. For real use, set up custom SMTP (Authentication → SMTP); Supabase's built-in mailer only sends a few mails per hour.
+
+Without `.env.local` the app runs in **test mode**: no email is sent and any 6 digits are accepted.
+
 ### Test switches (URL parameters)
 
 | Parameter | Example | Effect |
