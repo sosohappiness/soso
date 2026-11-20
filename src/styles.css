@@ -409,6 +409,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .onboard .ob-input::placeholder { color: #b39a82; }
 .onboard .ob-input:focus { box-shadow: 0 0 0 3px rgba(255,248,236,.45); }
 .onboard .ob-primary { background: #fff8ec; color: #6b4a2e; border: 0; box-shadow: 0 4px 0 rgba(74,52,32,.25); }
-.onboard .ob-error { color: #ffe1d6; }
+.onboard .ob-error { color: #7a2412; background: #ffe7dc; border-radius: 12px; padding: 8px 12px; font-size: 14px; }
 .onboard .friend-card { background: rgba(255,248,236,.9); border-color: transparent; }
 .onboard .friend-card.mine { background: #fff8ec; border-color: #6b4a2e; }
+.ob-modes { display: flex; gap: 6px; padding: 4px; border-radius: 999px; background: rgba(74,52,32,.18); margin-bottom: 8px; }
+.ob-modes button { flex: 1; height: 40px; border: 0; border-radius: 999px; background: none; color: rgba(255,248,236,.85); font-size: 16px; }
+.ob-modes button.on { background: #fff8ec; color: #6b4a2e; }
+.ob-note { margin: 2px 0 0; font-size: 13px; line-height: 1.5; color: rgba(255,248,236,.8); }
+.onboard .ob-form { gap: 8px; }

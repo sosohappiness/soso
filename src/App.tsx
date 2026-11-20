@@ -17,7 +17,8 @@ import { CHATS, callName, isVisitDay, visitorFor } from "./lib/visits";
 import { Settings } from "./ui/Settings";
 import { Onboarding } from "./ui/Onboarding";
 import { LOGO_FONTS, LOGO_ORDER, type LogoFontId } from "./ui/logoFonts";
-import { loadAccount, saveAccount, signOut, type Account } from "./lib/auth";
+import { loadAccount, signOut, type Account } from "./lib/auth";
+import { pullFromServer, startSync } from "./lib/sync";
 
 
 function useNow(frozen: Date | null) {
@@ -30,7 +31,13 @@ function useNow(frozen: Date | null) {
   return frozen ?? now;
 }
 
-export default function App() {
+type Welcome = "new" | "back" | null;
+
+/**
+ * The app for whoever is signed in. Signing in or out remounts it (see Root) so every piece of
+ * state is read again from that account's own storage.
+ */
+export default function App({ welcome = null, onAccountChange }: { welcome?: Welcome; onAccountChange?: (w: Welcome) => void }) {
   const search = window.location.search;
   const params = useMemo(() => new URLSearchParams(search), [search]);
   const frozen = useMemo(() => timeOverride(search), [search]);
@@ -55,7 +62,17 @@ export default function App() {
   // one background for now: the meadow with the red sofa
   const scene: SceneId = "sofa";
   // sign-up: email + 6-digit code on first launch
-  const [account, setAccount] = useState<Account | null>(() => loadAccount());
+  const [account] = useState<Account | null>(() => loadAccount());
+  // keep this account's things on the sync server too (when there is one)
+  useEffect(() => {
+    startSync(account?.email ?? null);
+    if (account) void pullFromServer(account.email).then((changed) => {
+      if (!changed) return;
+      setJournal(loadJournal());
+      setGifts(load<GiftEntry[]>("gifts", []));
+      setAnimal(load<AnimalId>("animal", "polar"));
+    });
+  }, [account]);
   // two first-screen styles to compare (preview only): kraft desk, watercolour sketchbook
   const [helloStyle, setHelloStyle] = useState<"desk" | "nap" | "mine" | "sketch">(() => { const h = load<string>("helloStyle2", "mine"); return h === "desk" || h === "sketch" || h === "nap" ? h : "mine"; });
   useEffect(() => save("helloStyle2", helloStyle), [helloStyle]);
@@ -77,6 +94,8 @@ export default function App() {
   // Greeting: "I missed you" after 2+ days away, otherwise a line for the time of day.
   const [line, setLine] = useState(() => {
     const last = load<number>("lastVisit", 0);
+    if (welcome === "new") return "안녕! 만나서 반가워, 오늘부터 잘 부탁해";
+    if (welcome === "back") return "다시 왔구나! 보고 싶었어";
     return last && Date.now() - last > 2 * 86_400_000 ? MISSED_YOU : pick(LINES[phase]);
   });
   const firstPhase = useRef(true);
@@ -88,7 +107,13 @@ export default function App() {
     setLine(pick(LINES[phase]));
   }, [phase]);
   useEffect(() => save("lastVisit", Date.now()), []);
-  useEffect(() => save("animal", animal), [animal]);
+  // save the friend when it changes (not on start: that would look like a fresh edit to sync)
+  const savedAnimal = useRef(animal);
+  useEffect(() => {
+    if (savedAnimal.current === animal) return;
+    savedAnimal.current = animal;
+    save("animal", animal);
+  }, [animal]);
 
   const [pokeAt, setPokeAt] = useState(0);
   const onPoke = useCallback(() => {
@@ -197,19 +222,17 @@ export default function App() {
     setLine("안녕! 오늘부터 잘 부탁해");
   }, [visitor]);
 
-  const onSignedUp = useCallback((email: string, friend: AnimalId) => {
-    setAnimal(friend);
-    const acct = { email: email.trim(), since: Date.now() };
-    saveAccount(acct);
-    setAccount(acct);
-    setPokeAt(performance.now());
-    setLine("안녕! 만나서 반가워, 오늘부터 잘 부탁해");
-  }, []);
+  const onSignedUp = useCallback(async ({ email, isNew, animal: picked }: { email: string; isNew: boolean; animal?: AnimalId }) => {
+    // bring this account's journal, gifts and friend (from the server when there is one)
+    await pullFromServer(email);
+    if (isNew && picked) save("animal", picked);
+    onAccountChange?.(isNew ? "new" : "back");
+  }, [onAccountChange]);
   const onSignOut = useCallback(async () => {
     await signOut();
     setSettingsOpen(false);
-    setAccount(null);
-  }, []);
+    onAccountChange?.(null);
+  }, [onAccountChange]);
 
   const resetToday = useCallback(() => {
     setGifts((g) => {

@@ -13,14 +13,22 @@ npm run dev        # http://localhost:5173
 npm run build      # production build in dist/ (installable PWA)
 ```
 
-### Sign-up
+### Accounts (email + password)
 
-First launch asks for an email (no code, no password), then a friend to live with. The email only
-names the account on this device; everything is kept in the browser.
+First launch: 처음이에요 (sign up with an email and a password, then pick a friend) or 다시 왔어요
+(sign back in). The email is the ID. Each account's journal, gifts and friend are kept under that
+account, so signing in again brings them back.
 
-The 6-digit email code flow is still in `src/lib/auth.ts` (`sendCode` / `verifyCode`, Supabase email
-OTP) for later: to bring it back, set `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` in `.env.local`
-and put a code step back between the email and friend steps in `src/ui/Onboarding.tsx`.
+- **Without a server** (default): accounts live on this phone only (password kept as a salted hash),
+  so the same account works again on the same phone/browser.
+- **With Supabase** (free): the same email and password work on any phone and show the same records.
+  1. Create a project at supabase.com.
+  2. SQL Editor → run `supabase.sql` (one `soso_data` row per account, each person can only read their own).
+  3. Authentication → Sign In / Providers → Email: keep it on and turn **Confirm email** off
+     (otherwise people must click a mail before their first sign-in).
+  4. Put the project URL and anon key in `.env.local` (see `.env.example`), or for the GitHub Pages
+     build in the repository's Settings → Secrets and variables → Actions → **Variables** as
+     `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the anon key is meant to be public).
 
 ### Test switches (URL parameters)
 
