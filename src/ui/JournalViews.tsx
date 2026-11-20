@@ -220,7 +220,7 @@ function ExportCard({ journal, now }: { journal: Journal; now: Date }) {
       const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
       const a = document.createElement("a");
       a.href = url;
-      a.download = `소소-감사일기-${now.toISOString().slice(0, 10)}.txt`;
+      a.download = `SoSo-감사일기-${now.toISOString().slice(0, 10)}.txt`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       setNote("파일로 저장했어요. 메일에 첨부해서 보낼 수 있어요.");
@@ -230,7 +230,7 @@ function ExportCard({ journal, now }: { journal: Journal; now: Date }) {
   };
   const share = async () => {
     try {
-      await navigator.share({ title: "소소 감사일기", text });
+      await navigator.share({ title: "So So 감사일기", text });
     } catch {
       /* closed the share sheet */
     }

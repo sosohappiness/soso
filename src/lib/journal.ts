@@ -61,7 +61,7 @@ export function sampleJournal(today: Date): Journal {
 const WEEK_FULL = ["일", "월", "화", "수", "목", "금", "토"];
 
 /** Every entry, oldest first, as plain text for email, copying or a .txt file. */
-export function journalText(j: Journal, now: Date, name = "소소"): string {
+export function journalText(j: Journal, now: Date, name = "So So"): string {
   const days = Object.keys(j).filter((d) => linesOf(j, d).length > 0).sort();
   const total = days.reduce((n, d) => n + linesOf(j, d).length, 0);
   const head = [
@@ -80,7 +80,7 @@ export function journalText(j: Journal, now: Date, name = "소소"): string {
 /** Mail apps cut very long links; past this the body is shortened and points to the file option. */
 export const MAILTO_LIMIT = 1800;
 
-export function mailtoHref(text: string, subject = "소소 감사일기"): { href: string; trimmed: boolean } {
+export function mailtoHref(text: string, subject = "So So 감사일기"): { href: string; trimmed: boolean } {
   let body = text;
   let trimmed = false;
   if (encodeURIComponent(body).length > MAILTO_LIMIT * 3) {

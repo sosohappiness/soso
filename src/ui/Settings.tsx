@@ -10,7 +10,7 @@ export function FriendPortrait({ id, size = 64 }: { id: AnimalId; size?: number 
 
 /** The invite message friends receive, with the app's link. */
 function inviteText(link: string) {
-  return `소소에서 같이 감사일기 써요! 작은 친구에게 하루 하나 선물하고, 고마운 일을 적으면 구름에 꽃이 피어요.\n${link}`;
+  return `So So에서 같이 감사일기 써요! 작은 친구에게 하루 하나 선물하고, 고마운 일을 적으면 구름에 꽃이 피어요.\n${link}`;
 }
 
 /** 설정: change the friend (with a gentle check first), invite friends, and the account. */
@@ -24,7 +24,7 @@ export function Settings({ animal, email, onAnimal, onSignOut, onClose }: {
     const text = inviteText(link);
     if (typeof navigator.share === "function") {
       try {
-        await navigator.share({ title: "소소", text, url: link });
+        await navigator.share({ title: "So So", text, url: link });
         return;
       } catch {
         /* closed the share sheet, fall through to copy */
@@ -67,7 +67,7 @@ export function Settings({ animal, email, onAnimal, onSignOut, onClose }: {
 
       <h3 className="set-title">친구 초대</h3>
       <div className="set-box">
-        <p className="journal-hint">소소를 친구에게 소개해 보세요. 링크를 받은 친구도 자기만의 미니미와 구름을 키울 수 있어요.</p>
+        <p className="journal-hint">So So를 친구에게 소개해 보세요. 링크를 받은 친구도 자기만의 미니미와 구름을 키울 수 있어요.</p>
         <button className="export-action primary" onClick={invite}>친구 초대하기</button>
         {inviteNote && <p className="export-note" role="status">{inviteNote}</p>}
         {inviteNote && <p className="invite-link">{link}</p>}
