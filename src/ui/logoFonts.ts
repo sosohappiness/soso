@@ -1,7 +1,10 @@
 // Font options for the "So So" logo on the first screen (chosen in the preview's dev bar).
-export type LogoFontId = "poppins" | "fredoka" | "bagel" | "courier" | "caveat" | "shrikhand";
+export type LogoFontId = "nanumbrush" | "marker" | "rocksalt" | "caveat" | "poppins" | "fredoka" | "bagel" | "courier" | "shrikhand";
 
 export const LOGO_FONTS: Record<LogoFontId, { label: string; family: string; css: string; weight: number; spacing: string; scale: number }> = {
+  nanumbrush: { label: "Nanum Brush", family: "'Nanum Brush Script'", css: "Nanum+Brush+Script", weight: 400, spacing: "0", scale: 1.35 },
+  marker: { label: "Permanent Marker", family: "'Permanent Marker'", css: "Permanent+Marker", weight: 400, spacing: "0", scale: 0.92 },
+  rocksalt: { label: "Rock Salt", family: "'Rock Salt'", css: "Rock+Salt", weight: 400, spacing: "0", scale: 0.72 },
   poppins: { label: "Poppins", family: "'Poppins'", css: "Poppins:wght@800", weight: 800, spacing: "-0.045em", scale: 1 },
   fredoka: { label: "Fredoka", family: "'Fredoka'", css: "Fredoka:wght@700", weight: 700, spacing: "-0.02em", scale: 1.05 },
   bagel: { label: "Bagel Fat One", family: "'Bagel Fat One'", css: "Bagel+Fat+One", weight: 400, spacing: "-0.01em", scale: 1 },
@@ -10,7 +13,7 @@ export const LOGO_FONTS: Record<LogoFontId, { label: string; family: string; css
   shrikhand: { label: "Shrikhand", family: "'Shrikhand'", css: "Shrikhand", weight: 400, spacing: "0", scale: 0.95 },
 };
 
-export const LOGO_ORDER: LogoFontId[] = ["poppins", "fredoka", "bagel", "courier", "caveat", "shrikhand"];
+export const LOGO_ORDER: LogoFontId[] = ["marker", "nanumbrush", "rocksalt", "caveat", "poppins", "fredoka", "bagel", "courier", "shrikhand"];
 
 /** Load the font's stylesheet once and return the inline style for the logo. */
 export function logoStyle(id: LogoFontId): React.CSSProperties {

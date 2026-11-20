@@ -71,7 +71,7 @@ export function Hello({ onStart, logoFont = "poppins" }: { onStart: () => void; 
       <header className="hello-head">
         <h1 className="hello-logo2" aria-label="So So" style={logoStyle(logoFont)}>
           <span>So</span>
-          <span>So<i aria-hidden="true" /></span>
+          <span>So</span>
         </h1>
         <p className="hello-ko">지친 하루 끝, 작은 친구가 기다리고 있어요<br />오늘의 소소한 행복을 함께 모아요</p>
         <span className="hello-pill">하루 하나</span>
@@ -120,60 +120,40 @@ const CHALK = "#FFF8EC";
 const chalk = { stroke: CHALK, strokeWidth: 4.2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, fill: "none" };
 
 /**
- * A tired person, like the "Lay." sketch: a round head resting at the foot of a tall reclined
- * office chair, the body poured out long and flat down to the floor, one arm hugging the armrest.
- * Beside it, a small desk with books piled high, a monitor and a mug.
+ * A worn-out person on a stool, folded forward with the face down on the desk in front of the
+ * monitor, both arms hanging straight down. Pens lie on the desk and on the floor.
  */
 function DeskScene() {
   const fill = "#BB8D65";
-  const books: [number, number, number][] = [
-    [244, 50, 18], [248, 44, 16], [242, 52, 20], [250, 40, 14], [244, 48, 18], [252, 38, 16], [246, 46, 20],
-  ];
-  let y = 252;
   return (
     <g filter="url(#chalk-wobble)">
-      {/* small desk on the right with a tall book stack, monitor and mug */}
-      <path d="M234 252 L 362 252 L 362 264 L 234 264 Z" {...chalk} />
-      <path d="M244 264 L 244 368 M352 264 L 352 368" {...chalk} />
-      {books.map(([x, w, h], i) => {
-        y -= h;
-        const top = y;
-        return (
-          <g key={i}>
-            <rect x={x} y={top} width={w} height={h} rx={3} {...chalk} />
-            <path d={`M${x + 8} ${top + 4} L ${x + 8} ${top + h - 4}`} {...chalk} strokeWidth={2.2} />
-          </g>
-        );
-      })}
-      <rect x="298" y="178" width="60" height="46" rx="6" {...chalk} />
-      <path d="M306 192 L 340 192 M306 204 L 350 204" {...chalk} strokeWidth={2.4} />
-      <path d="M328 224 L 328 244 M314 250 C 316 242 340 242 342 250 Z" {...chalk} />
+      {/* desk running off to the right */}
+      <path d="M140 238 L 362 238 L 362 252 L 140 252 Z" {...chalk} />
+      <path d="M150 252 C 190 290 250 330 300 352" {...chalk} strokeWidth={2.6} />
+      {/* big monitor with a thick bezel */}
+      <path d="M244 96 L 352 92 L 356 184 L 248 190 Z" {...chalk} fill={CHALK} />
+      <path d="M256 106 L 342 103 L 345 174 L 259 178 Z" {...chalk} fill={fill} />
+      <path d="M300 190 L 304 222 M284 232 L 322 230" {...chalk} />
+      {/* pens: two on the desk, one on the floor */}
+      <path d="M204 246 L 232 250 M236 244 L 266 246" {...chalk} strokeWidth={5} />
+      <path d="M180 356 L 214 358" {...chalk} strokeWidth={5} />
 
-      {/* the chair: a tall backrest leaning back to the upper right, seat, post, star base */}
-      <path d="M148 262 L 196 162 C 200 150 236 150 240 160 L 178 262 Z" {...chalk} fill={fill} />
-      <path d="M200 166 L 234 168" {...chalk} strokeWidth={2.6} />
-      <path d="M160 272 L 160 316" {...chalk} />
-      <path d="M118 334 L 160 316 L 202 334 M136 340 L 160 316 L 184 340" {...chalk} />
-      <circle cx="116" cy="338" r="5" {...chalk} strokeWidth={3} />
-      <circle cx="204" cy="338" r="5" {...chalk} strokeWidth={3} />
-      <circle cx="134" cy="344" r="4.5" {...chalk} strokeWidth={3} />
-      <circle cx="186" cy="344" r="4.5" {...chalk} strokeWidth={3} />
-
-      {/* the body, poured out long and flat from the chair to the floor */}
-      <path
-        d="M186 226 C 160 222 120 232 90 250 C 60 270 30 300 4 322 L 4 346 C 40 344 80 322 116 300 C 140 286 160 278 176 274 C 196 270 204 248 186 226 Z"
-        {...chalk} fill={fill}
-      />
-      <path d="M150 248 C 116 260 76 286 40 316" {...chalk} strokeWidth={2.6} />
-      {/* armrest, with the arm wrapped over it */}
-      <path d="M168 250 L 222 244 M214 244 L 214 262" {...chalk} />
-      <path d="M140 244 C 156 256 190 256 214 248 C 220 246 222 238 214 236 C 196 240 170 242 150 236" {...chalk} fill={fill} />
-      {/* round head with a sleepy smile */}
-      <path d="M150 222 C 146 204 160 192 176 192 C 194 192 204 206 200 222 C 196 236 156 238 150 222 Z" {...chalk} fill={fill} />
-      <path d="M164 210 q 3 3 6 0 M180 210 q 3 3 6 0" {...chalk} strokeWidth={2.6} />
-      <path d="M170 220 q 5 4 10 0" {...chalk} strokeWidth={2.6} />
-      {/* z z */}
-      <path d="M128 186 l 10 0 l -10 10 l 10 0 M112 168 l 7 0 l -7 7 l 7 0" {...chalk} strokeWidth={2.6} />
+      {/* stool */}
+      <ellipse cx="74" cy="274" rx="38" ry="8" {...chalk} fill={fill} />
+      <path d="M74 282 L 74 350" {...chalk} />
+      <ellipse cx="74" cy="356" rx="28" ry="6" {...chalk} />
+      {/* legs: thighs forward, shins down, shoes on the floor */}
+      <path d="M70 266 L 124 266 L 128 346 M84 280 L 112 280 L 112 346" {...chalk} fill={fill} />
+      <path d="M110 346 C 108 356 136 358 146 354 C 146 348 136 344 128 344" {...chalk} />
+      {/* the jumper: torso folded forward from the hips to the desk */}
+      <path d="M46 268 C 42 246 64 226 96 216 C 120 208 140 206 156 212 L 160 232 C 140 236 118 246 104 262 C 96 270 74 274 46 268 Z" {...chalk} fill={CHALK} />
+      {/* an arm hanging straight down */}
+      <path d="M146 214 L 160 214 L 162 316 L 150 318 Z" {...chalk} fill={CHALK} />
+      <path d="M150 318 C 148 330 162 332 162 318" {...chalk} />
+      {/* head face-down on the desk, hair spilling forward, eyes closed */}
+      <path d="M156 226 C 156 214 172 208 190 210 C 206 212 212 222 208 232 C 198 238 166 238 156 226 Z" {...chalk} fill={fill} />
+      <path d="M172 222 q -3 4 0 8 M180 220 q -3 4 0 8" {...chalk} strokeWidth={2.4} />
+      <path d="M200 216 C 214 220 228 226 240 232 M204 224 C 216 228 228 234 236 238 M198 212 C 212 214 226 218 236 222" {...chalk} strokeWidth={2} />
     </g>
   );
 }
@@ -184,13 +164,13 @@ export function HelloDesk({ onStart, logoFont = "poppins" }: { onStart: () => vo
       <header className="hello-head">
         <h1 className="hello-logo2 chalk-logo" aria-label="So So" style={logoStyle(logoFont)}>
           <span>So</span>
-          <span>So<i aria-hidden="true" /></span>
+          <span>So</span>
         </h1>
         <p className="desk-ask">지치셨나요?</p>
         <p className="desk-ko">지친 하루 끝, 친구가 기다리고 있어요.<br />소소한 행복을 함께 모아요.</p>
       </header>
 
-      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="뒤로 젖힌 사무용 의자에 몸을 길게 늘어뜨리고 누운 지친 사람, 옆 책상에 높이 쌓인 책과 모니터">
+      <svg className="hello-art2" viewBox="0 70 364 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="의자에 앉아 모니터 앞 책상에 얼굴을 묻고 팔을 늘어뜨린 지친 사람">
         <defs>
           <filter id="chalk-wobble" x="-5%" y="-5%" width="110%" height="110%">
             <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="5" result="n" />

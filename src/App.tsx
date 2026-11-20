@@ -60,10 +60,10 @@ export default function App() {
   const [helloStyle, setHelloStyle] = useState<"desk" | "sketch">(() => load<"desk" | "sketch">("helloStyle", "desk"));
   useEffect(() => save("helloStyle", helloStyle), [helloStyle]);
   const [logoFont, setLogoFont] = useState<LogoFontId>(() => {
-    const f = load<LogoFontId>("logoFont", "poppins");
-    return f in LOGO_FONTS ? f : "poppins";
+    const f = load<LogoFontId>("logoFont2", "marker");
+    return f in LOGO_FONTS ? f : "marker";
   });
-  useEffect(() => save("logoFont", logoFont), [logoFont]);
+  useEffect(() => save("logoFont2", logoFont), [logoFont]);
   const [tab, setTab] = useState<Tab>("home");
   const [gifts, setGifts] = useState<GiftEntry[]>(() => load<GiftEntry[]>("gifts", []));
   const today = localDay(now);
