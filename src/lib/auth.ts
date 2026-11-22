@@ -55,16 +55,16 @@ export async function signUp(email: string, password: string): Promise<string | 
   if (supabase) {
     const { data, error } = await supabase.auth.signUp({ email: e, password });
     if (error) {
-      if (/registered|exists/i.test(error.message)) return "이미 가입한 이메일이에요. '다시 왔어요'에서 로그인해 주세요.";
+      if (/registered|exists/i.test(error.message)) return "이미 가입한 이메일이에요.";
       if (/password/i.test(error.message)) return `비밀번호는 ${MIN_PASSWORD}자 이상으로 해 주세요.`;
       return "가입하지 못했어요. 잠시 후 다시 해 주세요.";
     }
     // an existing email comes back as a user with no identities
-    if (data.user && data.user.identities?.length === 0) return "이미 가입한 이메일이에요. '다시 왔어요'에서 로그인해 주세요.";
-    if (!data.session) return "메일함에서 가입 확인 메일을 눌러 준 뒤, '다시 왔어요'에서 로그인해 주세요.";
+    if (data.user && data.user.identities?.length === 0) return "이미 가입한 이메일이에요.";
+    if (!data.session) return "메일함에서 가입 확인 메일을 눌러 준 뒤 다시 들어와 주세요.";
   } else {
     const accounts = load<Record<string, LocalAccount>>("accounts", {});
-    if (accounts[e]) return "이미 가입한 이메일이에요. '다시 왔어요'에서 로그인해 주세요.";
+    if (accounts[e]) return "이미 가입한 이메일이에요.";
     const salt = Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => b.toString(16).padStart(2, "0")).join("");
     accounts[e] = { salt, hash: await hashPassword(password, salt), since: Date.now() };
     save("accounts", accounts);
@@ -86,11 +86,35 @@ export async function signIn(email: string, password: string): Promise<string | 
     }
   } else {
     const acct = load<Record<string, LocalAccount>>("accounts", {})[e];
-    if (!acct) return "이 휴대폰에서 가입한 적 없는 이메일이에요. '처음이에요'에서 가입해 주세요.";
+    if (!acct) return "이 휴대폰에서 가입한 적 없는 이메일이에요.";
     if ((await hashPassword(password, acct.salt)) !== acct.hash) return "비밀번호가 맞지 않아요.";
   }
   saveAccount({ email: e, since: Date.now() });
   return null;
+}
+
+/**
+ * One step in: signs in when the email already has an account, otherwise makes one.
+ * Returns { error } or { isNew }.
+ */
+export async function enter(email: string, password: string): Promise<{ error: string } | { isNew: boolean }> {
+  const e = norm(email);
+  if (supabase) {
+    const { error } = await supabase.auth.signInWithPassword({ email: e, password });
+    if (!error) {
+      saveAccount({ email: e, since: Date.now() });
+      return { isNew: false };
+    }
+    if (/confirm/i.test(error.message)) return { error: "가입 확인 메일을 먼저 눌러 주세요." };
+    // not signed in: either a new email, or the wrong password for an existing one
+    const made = await signUp(e, password);
+    if (made === null) return { isNew: true };
+    if (/이미 가입한/.test(made)) return { error: "비밀번호가 맞지 않아요." };
+    return { error: made };
+  }
+  const known = load<Record<string, LocalAccount>>("accounts", {})[e];
+  const err = known ? await signIn(e, password) : await signUp(e, password);
+  return err ? { error: err } : { isNew: !known };
 }
 
 export async function signOut() {
