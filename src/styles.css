@@ -113,8 +113,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .gift-emo:active .ge-icon { transform: scale(.92); }
 .ge-label { font-size: 13px; color: #4a3b33; background: #fff9f0; border-radius: 10px; padding: 1px 8px; white-space: nowrap; }
 @keyframes emo-pop { from { opacity: 0; transform: translateY(30px) scale(.4); } }
-.gift-box { width: 22px; height: 18px; border-radius: 4px; background: var(--yellow); position: relative; flex: 0 0 auto; }
-.gift-box::before { content: ""; position: absolute; left: 9px; top: 0; bottom: 0; width: 4px; background: var(--terracotta); }
 
 .tabs { display: flex; justify-content: space-around; margin-top: 14px; }
 .tabs button { background: none; border: 0; font-size: 15px; font-weight: 400; padding: 6px 10px 10px; position: relative; color: var(--ink-ground); }
@@ -130,8 +128,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
   background: #fffbf4; color: var(--navy); border: 2.5px solid var(--navy); border-radius: 20px; padding: 14px 16px;
   box-shadow: 0 4px 0 rgba(30,36,86,.15); animation: card-in .5s cubic-bezier(.3,1.5,.6,1) both;
 }
-.gift-card .gift-box { width: 34px; height: 28px; }
-.gift-card .gift-box::before { left: 14px; width: 6px; }
 .gc-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .gc-small { font-size: 12px; opacity: .7; }
 .gc-title { font-size: 19px; overflow-wrap: anywhere; }
@@ -254,7 +250,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .bubble, .panel, .panel-wrap, .gift-emo, .cal-day.has svg { animation: none; }
 }
-.gift-btn .gift-box { background: #fff9f0; border: 1.5px solid var(--navy); }
 
 /* ---- settings button (top right) and the settings panel ---- */
 .hud .side { pointer-events: auto; }
@@ -417,3 +412,4 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .ob-modes button.on { background: #fff8ec; color: #6b4a2e; }
 .ob-note { margin: 2px 0 0; font-size: 13px; line-height: 1.5; color: rgba(255,248,236,.8); }
 .onboard .ob-form { gap: 8px; }
+.present-icon { flex: 0 0 auto; display: block; }

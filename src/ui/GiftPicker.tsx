@@ -53,6 +53,24 @@ export function GiftIcon({ id, size = 30 }: { id: GiftId; size?: number }) {
   }
 }
 
+/** A wrapped present with a ribbon and a bow, for the "선물 주기" button and the gift card. */
+export function PresentIcon({ size = 26 }: { size?: number }) {
+  const ink = "#1E2456";
+  return (
+    <svg className="present-icon" width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
+      {/* bow loops and tails */}
+      <path d="M16 10 C 12 3 5 4 7.5 8.5 C 9 11 13 10.6 16 10 Z" fill="#E8604F" stroke={ink} strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M16 10 C 20 3 27 4 24.5 8.5 C 23 11 19 10.6 16 10 Z" fill="#E8604F" stroke={ink} strokeWidth="1.5" strokeLinejoin="round" />
+      {/* box and lid */}
+      <rect x="6" y="15" width="20" height="13" rx="2" fill="#F6D46A" stroke={ink} strokeWidth="1.5" />
+      <rect x="4.5" y="10.5" width="23" height="5.5" rx="1.8" fill="#F9E39A" stroke={ink} strokeWidth="1.5" />
+      {/* ribbon */}
+      <rect x="14" y="10.5" width="4" height="17.5" fill="#E8604F" stroke={ink} strokeWidth="1.2" />
+      <circle cx="16" cy="10" r="2" fill="#E8604F" stroke={ink} strokeWidth="1.4" />
+    </svg>
+  );
+}
+
 /**
  * "선물 주기": tap it and the gift emoticons pop out; tap one and it's on its way.
  * One gift a day; once given the button says so until tomorrow.
@@ -85,7 +103,7 @@ export function GiftPicker({ given, onGive, busy }: { given: GiftEntry | null; o
         </>
       )}
       <button className={`gift-btn${done ? " done" : ""}${open ? " open" : ""}`} disabled={done} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        {done && given?.item ? <GiftIcon id={given.item} size={24} /> : <span className="gift-box" aria-hidden="true" />}
+        {done && given?.item ? <GiftIcon id={given.item} size={24} /> : <PresentIcon />}
         <span>{busy ? "선물을 전하는 중…" : done ? "오늘 선물 완료 · 내일 또 줄 수 있어" : open ? "무엇을 줄까?" : "선물 주기"}</span>
       </button>
     </div>

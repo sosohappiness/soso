@@ -6,7 +6,7 @@ import { LINES, MISSED_YOU, pick, pokeLine } from "./lib/lines";
 import { demoGrowth } from "./lib/demo";
 import { load, save } from "./lib/storage";
 import { Hud } from "./ui/Hud";
-import { GiftPicker, type GiftEntry } from "./ui/GiftPicker";
+import { GiftPicker, PresentIcon, type GiftEntry } from "./ui/GiftPicker";
 import { Tabs, type Tab } from "./ui/Tabs";
 import { JournalHistory, JournalWrite } from "./ui/JournalViews";
 import { growthFromJournal, loadJournal, sampleJournal, saveJournal, type Journal } from "./lib/journal";
@@ -268,7 +268,7 @@ export default function App({ welcome = null, onAccountChange }: { welcome?: Wel
       </div>
       {card && (
         <button className="gift-card" onClick={() => setCard(null)}>
-          <span className="gift-box" aria-hidden="true" />
+          <PresentIcon size={38} />
           <span className="gc-text">
             <span className="gc-small">오늘의 선물 · {card.day.slice(5).replace("-", "월 ")}일</span>
             <span className="gc-title">{card.caption}</span>
